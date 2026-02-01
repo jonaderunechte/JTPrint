@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JT Print - Professioneller 3D-Druck Service</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #0066cc 0%, #00cc99 100%);
+            --primary-blue: #0066cc;
+            --primary-green: #00cc99;
+            --dark-bg: #0a0f1a;
+            --darker-bg: #050810;
+            --card-bg: rgba(20, 30, 48, 0.8);
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+            --accent-glow: rgba(0, 204, 153, 0.3);
+            --border-color: rgba(0, 204, 153, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #0a0f1a 0%, #050810 100%);
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 50%, rgba(0, 102, 204, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(0, 204, 153, 0.1) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(10, 15, 26, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+        }
+
+        nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-placeholder {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-gradient);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.5rem;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-gradient);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 204, 153, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 204, 153, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-green);
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--primary-green);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-green);
+            color: var(--dark-bg);
+        }
+
+        /* Hero Section */
+        .hero {
+            max-width: 1400px;
+            margin: 4rem auto;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Section Styling */
+        section {
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-align: center;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Services Grid */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-green);
+            box-shadow: 0 10px 30px var(--accent-glow);
+        }
+
+        .service-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-green);
+        }
+
+        .service-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-green);
+            box-shadow: 0 10px 30px var(--accent-glow);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(0, 102, 204, 0.2), rgba(0, 204, 153, 0.2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-info h4 {
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 0.5rem;
+            color: var(--primary-green);
+        }
+
+        .product-price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin: 0.5rem 0;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .modal h2 {
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 1.5rem;
+            color: var(--primary-green);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary-green);
+            background: rgba(0, 204, 153, 0.05);
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        /* Price Calculator */
+        .price-calculator {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 1rem;
+        }
+
+        .price-result {
+            background: var(--primary-gradient);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .price-result .amount {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        /* Cart */
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--primary-green);
+            color: var(--dark-bg);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .error-message {
+            color: #ff4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .success-message {
+            color: var(--primary-green);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab.active {
+            color: var(--primary-green);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary-gradient);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-green);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .services-grid,
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .tab {
+                padding: 0.75rem;
+                text-align: left;
+                border-bottom: 1px solid var(--border-color);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo-container">
+                <div class="logo-placeholder">JT</div>
+                <span class="logo-text">JT Print</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#gallery">Galerie</a></li>
+                <li><a href="#products">Produkte</a></li>
+                <li id="nav-auth">
+                    <button class="btn-secondary" onclick="showLoginModal()">Anmelden</button>
+                </li>
+                <li class="hidden" id="nav-cart">
+                    <div class="cart-icon" onclick="showCart()">
+                        🛒 <span class="cart-count">0</span>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <h1>Professioneller 3D-Druck für Ihre Ideen</h1>
+        <p>Laden Sie Ihr Design hoch oder lassen Sie uns Ihr individuelles 3D-Modell erstellen. Präzise Fertigung mit modernster Technologie.</p>
+        <div class="hero-buttons">
+            <button class="btn-primary" onclick="showUploadModal()">Design hochladen</button>
+            <button class="btn-secondary" onclick="showCustomDesignModal()">Custom Design anfragen</button>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <div class="container">
+        <section id="services">
+            <h2 class="section-title">Unsere Services</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <h3>🖨️ 3D-Druck Service</h3>
+                    <p>Laden Sie Ihre STL-Datei hoch oder beschreiben Sie Ihr Wunschmodell. Wir drucken es für Sie mit hochwertigen Materialien.</p>
+                    <ul style="color: var(--text-secondary); margin-left: 1.5rem;">
+                        <li>Bambu Lab P1S Drucker</li>
+                        <li>Druckgröße bis 25x25cm</li>
+                        <li>Alle gängigen Materialien</li>
+                        <li>Hardened Steel Nozzle</li>
+                    </ul>
+                </div>
+                <div class="service-card">
+                    <h3>✏️ Custom Design Service</h3>
+                    <p>Benötigen Sie ein individuelles 3D-Modell? Beschreiben Sie Ihre Idee und wir erstellen das perfekte Design für Sie.</p>
+                    <ul style="color: var(--text-secondary); margin-left: 1.5rem;">
+                        <li>Professionelle CAD-Modellierung</li>
+                        <li>OnShape-Software</li>
+                        <li>Unbegrenzte Komplexität</li>
+                        <li>Design + Fertigung</li>
+                    </ul>
+                </div>
+                <div class="service-card">
+                    <h3>⚡ Express-Service</h3>
+                    <p>Brauchen Sie Ihr Modell schnell? Mit unserem Express-Service erhalten Sie Ihren Druck priorisiert.</p>
+                    <ul style="color: var(--text-secondary); margin-left: 1.5rem;">
+                        <li>Bevorzugte Bearbeitung</li>
+                        <li>Schnellere Lieferung</li>
+                        <li>Status-Updates</li>
+                        <li>+30% Aufpreis</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery Section -->
+        <section id="gallery">
+            <h2 class="section-title">Portfolio & Beispiele</h2>
+            <div class="product-grid" id="gallery-grid">
+                <div class="product-card">
+                    <div class="product-image">🎨</div>
+                    <div class="product-info">
+                        <h4>Beispielprojekt 1</h4>
+                        <p style="color: var(--text-secondary);">Hier können Sie Ihre bisherigen Arbeiten präsentieren</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products">
+            <h2 class="section-title">Produktkatalog</h2>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('internet')">Internet-Modelle</button>
+                <button class="tab" onclick="switchTab('custom')">Eigene Designs</button>
+            </div>
+
+            <div id="internet-tab" class="tab-content active">
+                <div class="product-grid" id="internet-products">
+                    <!-- Products will be loaded here -->
+                </div>
+            </div>
+
+            <div id="custom-tab" class="tab-content">
+                <div class="product-grid" id="custom-products">
+                    <!-- Products will be loaded here -->
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+            <h2>Anmelden</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>E-Mail</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Passwort</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <div id="loginError" class="error-message hidden"></div>
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem;">Anmelden</button>
+            </form>
+            <p style="text-align: center; margin-top: 1rem; color: var(--text-secondary);">
+                Noch kein Konto? <a href="#" onclick="showRegisterModal()" style="color: var(--primary-green);">Registrieren</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('registerModal')">&times;</button>
+            <h2>Registrieren</h2>
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label>Geburtsdatum</label>
+                    <input type="date" id="registerBirthdate" required>
+                </div>
+                <div class="form-group">
+                    <label>E-Mail</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Passwort</label>
+                    <input type="password" id="registerPassword" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label>Passwort wiederholen</label>
+                    <input type="password" id="registerPasswordConfirm" required>
+                </div>
+                <div id="registerError" class="error-message hidden"></div>
+                <div id="registerSuccess" class="success-message hidden"></div>
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem;">Registrieren</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('uploadModal')">&times;</button>
+            <h2>3D-Modell hochladen</h2>
+            <form id="uploadForm" onsubmit="handleUpload(event)">
+                <div class="form-group">
+                    <label>STL-Datei hochladen</label>
+                    <div class="file-upload" onclick="document.getElementById('stlFile').click()">
+                        <input type="file" id="stlFile" accept=".stl" required>
+                        <p>📁 Klicken Sie hier oder ziehen Sie Ihre STL-Datei hierher</p>
+                        <p id="fileName" style="color: var(--primary-green); margin-top: 0.5rem;"></p>
+                    </div>
+                </div>
+                
+                <div class="price-calculator">
+                    <h3 style="color: var(--primary-green); margin-bottom: 1rem;">Preiskalkulator</h3>
+                    <div class="form-group">
+                        <label>Geschätztes Gewicht (Gramm)</label>
+                        <input type="number" id="weight" min="1" step="0.1" required oninput="calculatePrice()">
+                    </div>
+                    <div class="form-group">
+                        <label>Material</label>
+                        <select id="material" onchange="calculatePrice()">
+                            <option value="standard">Bambu Lab PLA (Standard)</option>
+                            <option value="other">Anderes Material (+10€)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Express-Service</label>
+                        <select id="express" onchange="calculatePrice()">
+                            <option value="no">Nein</option>
+                            <option value="yes">Ja (+30%)</option>
+                        </select>
+                    </div>
+                    <div class="price-result hidden" id="priceResult">
+                        <p>Geschätzter Preis:</p>
+                        <p class="amount" id="priceAmount">0.00€</p>
+                        <p style="font-size: 0.875rem; opacity: 0.8;">inkl. Grundpreis von 8€</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Anmerkungen (optional)</label>
+                    <textarea id="uploadNotes" placeholder="Besondere Wünsche, Farben, etc."></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem;">In den Warenkorb</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom Design Modal -->
+    <div id="customDesignModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('customDesignModal')">&times;</button>
+            <h2>Custom Design anfragen</h2>
+            <form id="customDesignForm" onsubmit="handleCustomDesign(event)">
+                <div class="form-group">
+                    <label>Projektbeschreibung</label>
+                    <textarea id="designDescription" required placeholder="Beschreiben Sie Ihr Wunschmodell so detailliert wie möglich..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Maße (falls bekannt)</label>
+                    <input type="text" id="designDimensions" placeholder="z.B. 10cm x 5cm x 3cm">
+                </div>
+                <div class="form-group">
+                    <label>Referenzbilder hochladen (optional)</label>
+                    <div class="file-upload" onclick="document.getElementById('referenceImages').click()">
+                        <input type="file" id="referenceImages" accept="image/*" multiple>
+                        <p>🖼️ Klicken Sie hier um Referenzbilder hochzuladen</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Geschätzte Komplexität</label>
+                    <select id="complexity">
+                        <option value="simple">Einfach (1-2 Stunden) - 30-50€</option>
+                        <option value="medium">Mittel (3-5 Stunden) - 90-150€</option>
+                        <option value="complex">Komplex (6+ Stunden) - 180€+</option>
+                    </select>
+                </div>
+                <div style="background: var(--card-bg); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                        ℹ️ Nach Ihrer Anfrage erhalten Sie ein individuelles Angebot mit genauem Preis und Zeitrahmen.
+                    </p>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem;">Anfrage senden</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <button class="modal-close" onclick="closeModal('cartModal')">&times;</button>
+            <h2>Warenkorb</h2>
+            <div id="cartItems"></div>
+            <div id="cartTotal" style="margin-top: 2rem; padding-top: 1rem; border-top: 2px solid var(--border-color);">
+                <h3 style="text-align: right; color: var(--primary-green);">Gesamt: <span id="totalAmount">0.00€</span></h3>
+            </div>
+            <button class="btn-primary" style="width: 100%; margin-top: 1rem;" onclick="proceedToCheckout()">Zur Kasse</button>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <button class="modal-close" onclick="closeModal('checkoutModal')">&times;</button>
+            <h2>Bestellung abschließen</h2>
+            <form id="checkoutForm" onsubmit="handleCheckout(event)">
+                <h3 style="color: var(--primary-green); margin-bottom: 1rem;">Lieferadresse</h3>
+                <div class="form-group">
+                    <label>Straße und Hausnummer</label>
+                    <input type="text" id="street" required>
+                </div>
+                <div class="form-group">
+                    <label>Postleitzahl</label>
+                    <input type="text" id="zipCode" required>
+                </div>
+                <div class="form-group">
+                    <label>Stadt</label>
+                    <input type="text" id="city" required>
+                </div>
+                <div class="form-group">
+                    <label>Land</label>
+                    <input type="text" id="country" value="Deutschland" required>
+                </div>
+
+                <h3 style="color: var(--primary-green); margin: 2rem 0 1rem;">Gutscheincode</h3>
+                <div class="form-group">
+                    <input type="text" id="couponCode" placeholder="Gutscheincode eingeben">
+                    <button type="button" class="btn-secondary" style="margin-top: 0.5rem;" onclick="applyCoupon()">Einlösen</button>
+                </div>
+
+                <h3 style="color: var(--primary-green); margin: 2rem 0 1rem;">Zahlungsmethode</h3>
+                <div class="form-group">
+                    <select id="paymentMethod" required>
+                        <option value="">Bitte wählen...</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="transfer">Überweisung</option>
+                        <option value="card">Kreditkarte</option>
+                    </select>
+                </div>
+
+                <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 8px; margin: 2rem 0;">
+                    <h4 style="color: var(--primary-green);">Bestellübersicht</h4>
+                    <div style="margin-top: 1rem; color: var(--text-secondary);">
+                        <div style="display: flex; justify-content: space-between; margin: 0.5rem 0;">
+                            <span>Zwischensumme:</span>
+                            <span id="checkoutSubtotal">0.00€</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin: 0.5rem 0;">
+                            <span>Versandkosten:</span>
+                            <span id="shippingCost">5.99€</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin: 0.5rem 0;">
+                            <span>Rabatt:</span>
+                            <span id="discount">0.00€</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); font-size: 1.25rem; color: var(--primary-green); font-weight: 700;">
+                            <span>Gesamt:</span>
+                            <span id="checkoutTotal">0.00€</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%;">Zahlungspflichtig bestellen</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase Integration -->
+    <script type="module">
+        // WICHTIG: Firebase Konfiguration muss hier eingefügt werden
+        // Diese Zeilen sind Platzhalter - Sie müssen Ihre echten Firebase-Credentials einsetzen
+        
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+
+        // TODO: Ersetzen Sie dies mit Ihrer Firebase-Konfiguration
+        const firebaseConfig = {
+          apiKey: "AIzaSyDazql6oJx5_z3hASwmo4200-OpQhodZVc",
+          authDomain: "d-druckservice-jtprint.firebaseapp.com",
+          projectId: "d-druckservice-jtprint",
+          storageBucket: "d-druckservice-jtprint.firebasestorage.app",
+          messagingSenderId: "247787543764",
+          appId: "1:247787543764:web:b3cc1e7d05eb8aa2abef41"
+       };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        // Global verfügbar machen
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+        window.firebaseStorage = storage;
+        window.firebaseAuthFunctions = { 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            sendEmailVerification, 
+            onAuthStateChanged,
+            signOut
+        };
+        window.firebaseDbFunctions = { collection, addDoc, getDocs, query, where, doc, setDoc };
+        window.firebaseStorageFunctions = { ref, uploadBytes, getDownloadURL };
+
+        // Auth State Observer
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('nav-auth').innerHTML = `
+                    <span style="color: var(--text-secondary);">${user.email}</span>
+                    <button class="btn-secondary" onclick="handleLogout()">Abmelden</button>
+                `;
+                document.getElementById('nav-cart').classList.remove('hidden');
+                loadUserData(user);
+            } else {
+                document.getElementById('nav-auth').innerHTML = `
+                    <button class="btn-secondary" onclick="showLoginModal()">Anmelden</button>
+                `;
+                document.getElementById('nav-cart').classList.add('hidden');
+            }
+        });
+
+        async function loadUserData(user) {
+            // Lade Benutzerdaten und Warenkorb
+            console.log('User logged in:', user.email);
+        }
+    </script>
+
+    <script>
+        // Global State
+        let cart = [];
+        let currentUser = null;
+
+        // Modal Functions
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.add('active');
+        }
+
+        function showRegisterModal() {
+            closeModal('loginModal');
+            document.getElementById('registerModal').classList.add('active');
+        }
+
+        function showUploadModal() {
+            if (!window.firebaseAuth.currentUser) {
+                alert('Bitte melden Sie sich zuerst an!');
+                showLoginModal();
+                return;
+            }
+            document.getElementById('uploadModal').classList.add('active');
+        }
+
+        function showCustomDesignModal() {
+            if (!window.firebaseAuth.currentUser) {
+                alert('Bitte melden Sie sich zuerst an!');
+                showLoginModal();
+                return;
+            }
+            document.getElementById('customDesignModal').classList.add('active');
+        }
+
+        function showCart() {
+            updateCartDisplay();
+            document.getElementById('cartModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Tab Switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+
+        // Price Calculator
+        function calculatePrice() {
+            const weight = parseFloat(document.getElementById('weight').value) || 0;
+            const material = document.getElementById('material').value;
+            const express = document.getElementById('express').value;
+
+            if (weight === 0) {
+                document.getElementById('priceResult').classList.add('hidden');
+                return;
+            }
+
+            const basePrice = 8; // Grundpreis
+            const pricePerGram = 0.20; // 0.20€ pro Gramm
+            let total = basePrice + (weight * pricePerGram);
+
+            if (material === 'other') {
+                total += 10;
+            }
+
+            if (express === 'yes') {
+                total *= 1.30;
+            }
+
+            document.getElementById('priceAmount').textContent = total.toFixed(2) + '€';
+            document.getElementById('priceResult').classList.remove('hidden');
+
+            return total;
+        }
+
+        // File Upload Handler
+        document.getElementById('stlFile')?.addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name;
+            if (fileName) {
+                document.getElementById('fileName').textContent = '✓ ' + fileName;
+            }
+        });
+
+        // Authentication Handlers
+        async function handleRegister(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('registerName').value;
+            const birthdate = document.getElementById('registerBirthdate').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+
+            const errorDiv = document.getElementById('registerError');
+            const successDiv = document.getElementById('registerSuccess');
+            errorDiv.classList.add('hidden');
+            successDiv.classList.add('hidden');
+
+            if (password !== passwordConfirm) {
+                errorDiv.textContent = 'Passwörter stimmen nicht überein!';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const userCredential = await window.firebaseAuthFunctions.createUserWithEmailAndPassword(
+                    window.firebaseAuth, email, password
+                );
+
+                // Send verification email
+                await window.firebaseAuthFunctions.sendEmailVerification(userCredential.user);
+
+                // Save user data to Firestore
+                await window.firebaseDbFunctions.setDoc(
+                    window.firebaseDbFunctions.doc(window.firebaseDb, 'users', userCredential.user.uid),
+                    {
+                        name: name,
+                        birthdate: birthdate,
+                        email: email,
+                        createdAt: new Date().toISOString()
+                    }
+                );
+
+                successDiv.textContent = 'Registrierung erfolgreich! Bitte bestätigen Sie Ihre E-Mail-Adresse.';
+                successDiv.classList.remove('hidden');
+
+                setTimeout(() => {
+                    closeModal('registerModal');
+                }, 2000);
+            } catch (error) {
+                errorDiv.textContent = 'Fehler: ' + error.message;
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.classList.add('hidden');
+
+            try {
+                await window.firebaseAuthFunctions.signInWithEmailAndPassword(
+                    window.firebaseAuth, email, password
+                );
+                closeModal('loginModal');
+            } catch (error) {
+                errorDiv.textContent = 'Fehler: ' + error.message;
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        async function handleLogout() {
+            try {
+                await window.firebaseAuthFunctions.signOut(window.firebaseAuth);
+                cart = [];
+                updateCartCount();
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+
+        // Upload Handler
+        async function handleUpload(event) {
+            event.preventDefault();
+
+            const file = document.getElementById('stlFile').files[0];
+            const weight = document.getElementById('weight').value;
+            const material = document.getElementById('material').value;
+            const express = document.getElementById('express').value;
+            const notes = document.getElementById('uploadNotes').value;
+            const price = calculatePrice();
+
+            if (!file) {
+                alert('Bitte wählen Sie eine Datei aus!');
+                return;
+            }
+
+            // Add to cart
+            cart.push({
+                type: 'upload',
+                fileName: file.name,
+                weight: weight,
+                material: material,
+                express: express,
+                notes: notes,
+                price: price
+            });
+
+            updateCartCount();
+            closeModal('uploadModal');
+            alert('Produkt wurde zum Warenkorb hinzugefügt!');
+            
+            // Reset form
+            document.getElementById('uploadForm').reset();
+            document.getElementById('fileName').textContent = '';
+            document.getElementById('priceResult').classList.add('hidden');
+        }
+
+        // Custom Design Handler
+        async function handleCustomDesign(event) {
+            event.preventDefault();
+
+            const description = document.getElementById('designDescription').value;
+            const dimensions = document.getElementById('designDimensions').value;
+            const complexity = document.getElementById('complexity').value;
+
+            // In real implementation, this would be saved to Firebase
+            alert('Ihre Custom Design Anfrage wurde gesendet! Sie erhalten in Kürze ein individuelles Angebot per E-Mail.');
+            
+            closeModal('customDesignModal');
+            document.getElementById('customDesignForm').reset();
+        }
+
+        // Cart Functions
+        function updateCartCount() {
+            const count = cart.length;
+            document.querySelector('.cart-count').textContent = count;
+        }
+
+        function updateCartDisplay() {
+            const cartItemsDiv = document.getElementById('cartItems');
+            let total = 0;
+
+            if (cart.length === 0) {
+                cartItemsDiv.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Ihr Warenkorb ist leer</p>';
+                document.getElementById('totalAmount').textContent = '0.00€';
+                return;
+            }
+
+            cartItemsDiv.innerHTML = cart.map((item, index) => {
+                total += item.price;
+                return `
+                    <div style="background: var(--card-bg); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4 style="color: var(--primary-green);">${item.type === 'upload' ? 'Upload: ' + item.fileName : 'Custom Design'}</h4>
+                                <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                                    ${item.weight ? item.weight + 'g | ' : ''}
+                                    ${item.material === 'other' ? 'Spezialmaterial | ' : 'Standard PLA | '}
+                                    ${item.express === 'yes' ? 'Express' : 'Normal'}
+                                </p>
+                            </div>
+                            <div style="text-align: right;">
+                                <p style="font-size: 1.25rem; font-weight: 700; color: var(--primary-blue);">${item.price.toFixed(2)}€</p>
+                                <button onclick="removeFromCart(${index})" style="background: none; border: none; color: #ff4444; cursor: pointer;">Entfernen</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('totalAmount').textContent = total.toFixed(2) + '€';
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartCount();
+            updateCartDisplay();
+        }
+
+        function proceedToCheckout() {
+            if (cart.length === 0) {
+                alert('Ihr Warenkorb ist leer!');
+                return;
+            }
+
+            const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+            document.getElementById('checkoutSubtotal').textContent = subtotal.toFixed(2) + '€';
+            
+            const shipping = 5.99;
+            const total = subtotal + shipping;
+            document.getElementById('checkoutTotal').textContent = total.toFixed(2) + '€';
+
+            closeModal('cartModal');
+            document.getElementById('checkoutModal').classList.add('active');
+        }
+
+        function applyCoupon() {
+            const code = document.getElementById('couponCode').value;
+            // Implement coupon logic here
+            alert('Gutschein-Funktion wird in der finalen Version implementiert');
+        }
+
+        async function handleCheckout(event) {
+            event.preventDefault();
+
+            const orderData = {
+                userId: window.firebaseAuth.currentUser.uid,
+                items: cart,
+                address: {
+                    street: document.getElementById('street').value,
+                    zipCode: document.getElementById('zipCode').value,
+                    city: document.getElementById('city').value,
+                    country: document.getElementById('country').value
+                },
+                paymentMethod: document.getElementById('paymentMethod').value,
+                total: parseFloat(document.getElementById('checkoutTotal').textContent),
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                await window.firebaseDbFunctions.addDoc(
+                    window.firebaseDbFunctions.collection(window.firebaseDb, 'orders'),
+                    orderData
+                );
+
+                alert('Bestellung erfolgreich aufgegeben! Sie erhalten eine Bestätigung per E-Mail.');
+                cart = [];
+                updateCartCount();
+                closeModal('checkoutModal');
+                document.getElementById('checkoutForm').reset();
+            } catch (error) {
+                alert('Fehler beim Aufgeben der Bestellung: ' + error.message);
+            }
+        }
+
+        // Close modal when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
