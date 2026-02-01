@@ -5,749 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JT Print - Professioneller 3D-Druck Service</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-gradient: linear-gradient(135deg, #0066cc 0%, #00cc99 100%);
-            --primary-blue: #0066cc;
-            --primary-green: #00cc99;
-            --dark-bg: #0a0f1a;
-            --darker-bg: #050810;
-            --card-bg: rgba(20, 30, 48, 0.8);
-            --text-primary: #ffffff;
-            --text-secondary: #a0aec0;
-            --accent-glow: rgba(0, 204, 153, 0.3);
-            --border-color: rgba(0, 204, 153, 0.2);
-            --red-accent: #ff4444;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--dark-bg);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        .bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: linear-gradient(135deg, #0a0f1a 0%, #050810 100%);
-            overflow: hidden;
-        }
-
-        .bg-animation::before {
-            content: '';
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 20% 50%, rgba(0, 102, 204, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 80%, rgba(0, 204, 153, 0.1) 0%, transparent 50%);
-            animation: float 20s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            33% { transform: translate(30px, -30px) rotate(120deg); }
-            66% { transform: translate(-20px, 20px) rotate(240deg); }
-        }
-
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: rgba(10, 15, 26, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem 0;
-        }
-
-        nav {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .logo-placeholder {
-            width: 50px;
-            height: 50px;
-            background: var(--primary-gradient);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: 1.5rem;
-            box-shadow: 0 0 20px var(--accent-glow);
-        }
-
-        .logo-text {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: var(--text-primary);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary-gradient);
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        .btn-primary {
-            background: var(--primary-gradient);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 204, 153, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 204, 153, 0.4);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--primary-green);
-            padding: 0.75rem 1.5rem;
-            border: 2px solid var(--primary-green);
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-secondary:hover {
-            background: var(--primary-green);
-            color: var(--dark-bg);
-        }
-
-        .hero {
-            max-width: 1400px;
-            margin: 4rem auto;
-            padding: 4rem 2rem;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3.5rem;
-            font-weight: 900;
-            margin-bottom: 1.5rem;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: fadeInUp 1s ease;
-        }
-
-        .hero p {
-            font-size: 1.25rem;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto 2rem;
-            animation: fadeInUp 1s ease 0.2s both;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            animation: fadeInUp 1s ease 0.4s both;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        section {
-            margin-bottom: 4rem;
-        }
-
-        .section-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            text-align: center;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
-        }
-
-        .service-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 2rem;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .service-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary-green);
-            box-shadow: 0 10px 30px var(--accent-glow);
-        }
-
-        .service-card h3 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: var(--primary-green);
-        }
-
-        .service-card p {
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-        }
-
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .product-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary-green);
-            box-shadow: 0 10px 30px var(--accent-glow);
-        }
-
-        .product-image {
-            width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, rgba(0, 102, 204, 0.2), rgba(0, 204, 153, 0.2));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .product-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .product-info {
-            padding: 1.5rem;
-        }
-
-        .product-info h4 {
-            font-family: 'Orbitron', sans-serif;
-            margin-bottom: 0.5rem;
-            color: var(--primary-green);
-        }
-
-        .product-price {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--primary-blue);
-            margin: 0.5rem 0;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--darker-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .modal-content-large {
-            max-width: 800px;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            font-size: 2rem;
-            cursor: pointer;
-            line-height: 1;
-        }
-
-        .modal h2 {
-            font-family: 'Orbitron', sans-serif;
-            margin-bottom: 1.5rem;
-            color: var(--primary-green);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 0.75rem;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--primary-green);
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-
-        .form-group textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .price-calculator {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-top: 1rem;
-        }
-
-        .price-result {
-            background: var(--primary-gradient);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-            text-align: center;
-        }
-
-        .price-result .amount {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2rem;
-            font-weight: 700;
-        }
-
-        .discount-badge {
-            display: inline-block;
-            background: var(--red-accent);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 4px;
-            font-size: 0.875rem;
-            font-weight: 700;
-            margin-left: 0.5rem;
-        }
-
-        .original-price {
-            text-decoration: line-through;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-left: 0.5rem;
-        }
-
-        .cart-icon {
-            position: relative;
-            cursor: pointer;
-        }
-
-        .cart-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: var(--primary-green);
-            color: var(--dark-bg);
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .error-message {
-            color: #ff4444;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-
-        .success-message {
-            color: var(--primary-green);
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .tab {
-            padding: 1rem 2rem;
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .tab.active {
-            color: var(--primary-green);
-        }
-
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: var(--primary-gradient);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Chat Widget */
-        .chat-widget {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            z-index: 1500;
-        }
-
-        .chat-button {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--primary-gradient);
-            border: none;
-            box-shadow: 0 4px 20px var(--accent-glow);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            transition: all 0.3s ease;
-        }
-
-        .chat-button:hover {
-            transform: scale(1.1);
-        }
-
-        .chat-window {
-            position: absolute;
-            bottom: 80px;
-            right: 0;
-            width: 350px;
-            height: 500px;
-            background: var(--darker-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            display: none;
-            flex-direction: column;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        }
-
-        .chat-window.active {
-            display: flex;
-        }
-
-        .chat-header {
-            background: var(--primary-gradient);
-            padding: 1rem;
-            border-radius: 16px 16px 0 0;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 1rem;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .chat-message {
-            padding: 0.75rem;
-            border-radius: 8px;
-            max-width: 80%;
-        }
-
-        .chat-message.user {
-            background: var(--primary-gradient);
-            align-self: flex-end;
-            margin-left: auto;
-        }
-
-        .chat-message.admin {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-        }
-
-        .chat-input-container {
-            padding: 1rem;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 0.75rem;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-primary);
-        }
-
-        /* Product Detail Modal */
-        .product-detail-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-        }
-
-        .color-selector {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            margin-top: 0.5rem;
-        }
-
-        .color-option {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 2px solid var(--border-color);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .color-option.selected {
-            border-color: var(--primary-green);
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-
-        .quantity-selector {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-top: 0.5rem;
-        }
-
-        .quantity-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            font-size: 1.25rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .quantity-btn:hover {
-            border-color: var(--primary-green);
-        }
-
-        .quantity-display {
-            font-size: 1.25rem;
-            font-weight: 700;
-            min-width: 40px;
-            text-align: center;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-
-            .nav-links {
-                gap: 1rem;
-                font-size: 0.9rem;
-            }
-
-            .services-grid,
-            .product-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .tabs {
-                flex-direction: column;
-                gap: 0;
-            }
-
-            .tab {
-                padding: 0.75rem;
-                text-align: left;
-                border-bottom: 1px solid var(--border-color);
-            }
-
-            .product-detail-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .chat-window {
-                width: 90vw;
-                right: 5vw;
-            }
-
-            .chat-widget {
-                right: 1rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="bg-animation"></div>
 
+    <!-- Header -->
     <header>
         <nav>
             <div class="logo-container">
-                <div class="https://i.postimg.cc/433yTPrC/296ae7d7-58c3-4968-b8a8-e6b6add85135-removebg-preview.png"></div>
+                <img src="https://i.postimg.cc/433yTPrC/296ae7d7-58c3-4968-b8a8-e6b6add85135-removebg-preview.png" alt="JT Print Logo" class="logo-image">
                 <span class="logo-text">JT Print</span>
             </div>
             <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#gallery">Galerie</a></li>
-                <li><a href="#products">Produkte</a></li>
+                <li><a href="#home" onclick="showPublicSite()">Home</a></li>
+                <li><a href="#services" onclick="showPublicSite()">Services</a></li>
+                <li><a href="#gallery" onclick="showPublicSite()">Galerie</a></li>
+                <li><a href="#products" onclick="showPublicSite()">Produkte</a></li>
+                
+                <!-- Admin Tabs (nur sichtbar wenn Admin eingeloggt) -->
+                <li class="hidden admin-only">
+                    <a href="#" onclick="showAdminPanel('orders')">📦 Bestellungen</a>
+                </li>
+                <li class="hidden admin-only">
+                    <a href="#" onclick="showAdminPanel('products')">🛍️ Produkte</a>
+                </li>
+                <li class="hidden admin-only">
+                    <a href="#" onclick="showAdminPanel('chat')">💬 Chats</a>
+                </li>
+                
                 <li id="nav-auth">
                     <button class="btn-secondary" onclick="showLoginModal()">Anmelden</button>
+                </li>
+                <li class="hidden" id="nav-settings">
+                    <button class="btn-secondary" onclick="showSettingsModal()">⚙️</button>
                 </li>
                 <li class="hidden" id="nav-cart">
                     <div class="cart-icon" onclick="showCart()">
@@ -758,75 +49,105 @@
         </nav>
     </header>
 
-    <section class="hero" id="home">
-        <h1>Professioneller 3D-Druck für Ihre Ideen</h1>
-        <p>Laden Sie Ihr Design hoch oder lassen Sie uns Ihr individuelles 3D-Modell erstellen. Präzise Fertigung mit modernster Technologie.</p>
-        <div class="hero-buttons">
-            <button class="btn-primary" onclick="showUploadModal()">Design hochladen</button>
-            <button class="btn-secondary" onclick="showCustomDesignModal()">Custom Design anfragen</button>
+    <!-- Public Site -->
+    <div id="publicSite">
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <h1>Professioneller 3D-Druck für Ihre Ideen</h1>
+            <p>Laden Sie Ihr Design hoch oder lassen Sie uns Ihr individuelles 3D-Modell erstellen. Präzise Fertigung mit modernster Technologie.</p>
+            <div class="hero-buttons">
+                <button class="btn-primary" onclick="showUploadModal()">Design hochladen</button>
+                <button class="btn-secondary" onclick="showCustomDesignModal()">Custom Design anfragen</button>
+            </div>
+        </section>
+
+        <!-- Main Container -->
+        <div class="container">
+            <!-- Services Section -->
+            <section id="services">
+                <h2 class="section-title">Unsere Services</h2>
+                <div class="services-grid">
+                    <div class="service-card">
+                        <h3>🖨️ 3D-Druck Service</h3>
+                        <p>Laden Sie Ihre STL-Datei hoch oder beschreiben Sie Ihr Wunschmodell. Wir drucken es für Sie mit hochwertigen Materialien.</p>
+                        <ul style="color: var(--text-secondary); margin-left: 1.5rem;">
+                            <li>Bambu Lab P1S Drucker</li>
+                            <li>Druckgröße bis 25x25cm</li>
+                            <li>Zwei Nozzle-Optionen</li>
+                            <li>50% Rabatt auf PLA-Grundpreis!</li>
+                        </ul>
+                    </div>
+                    <div class="service-card">
+                        <h3>✏️ Custom Design Service</h3>
+                        <p>Benötigen Sie ein individuelles 3D-Modell? Beschreiben Sie Ihre Idee und wir erstellen das perfekte Design für Sie.</p>
+                        <ul style="color: var(--text-secondary); margin-left: 1.5rem;">
+                            <li>Professionelle CAD-Modellierung</li>
+                            <li>OnShape-Software</li>
+                            <li>20€/Stunde oder VB</li>
+                            <li>Design + Fertigung</li>
+                        </ul>
+                    </div>
+                    <div class="service-card">
+                        <h3>⚡ Express-Service</h3>
+                        <p>Brauchen Sie Ihr Modell schnell? Mit unserem Express-Service erhalten Sie Ihren Druck priorisiert.</p>
+                        <ul style="color: var(--text-secondary); margin-left: 1.5rem;">
+                            <li>Bevorzugte Bearbeitung</li>
+                            <li>Schnellere Lieferung</li>
+                            <li>Status-Updates</li>
+                            <li>+30% Aufpreis</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gallery Section -->
+            <section id="gallery">
+                <h2 class="section-title">Portfolio & Beispiele</h2>
+                <div class="product-grid" id="gallery-grid"></div>
+            </section>
+
+            <!-- Products Section -->
+            <section id="products">
+                <h2 class="section-title">Produktkatalog</h2>
+                
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('internet')">Internet-Modelle</button>
+                    <button class="tab" onclick="switchTab('custom')">Eigene Designs</button>
+                </div>
+
+                <div id="internet-tab" class="tab-content active">
+                    <div class="product-grid" id="internet-products"></div>
+                </div>
+
+                <div id="custom-tab" class="tab-content">
+                    <div class="product-grid" id="custom-products"></div>
+                </div>
+            </section>
         </div>
-    </section>
+    </div>
 
-    <div class="container">
-        <section id="services">
-            <h2 class="section-title">Unsere Services</h2>
-            <div class="services-grid">
-                <div class="service-card">
-                    <h3>🖨️ 3D-Druck Service</h3>
-                    <p>Laden Sie Ihre STL-Datei hoch oder beschreiben Sie Ihr Wunschmodell. Wir drucken es für Sie mit hochwertigen Materialien.</p>
-                    <ul style="color: var(--text-secondary); margin-left: 1.5rem;">
-                        <li>Bambu Lab P1S Drucker</li>
-                        <li>Druckgröße bis 25x25cm</li>
-                        <li>Alle gängigen Materialien</li>
-                        <li>50% Rabatt auf PLA-Grundpreis!</li>
-                    </ul>
-                </div>
-                <div class="service-card">
-                    <h3>✏️ Custom Design Service</h3>
-                    <p>Benötigen Sie ein individuelles 3D-Modell? Beschreiben Sie Ihre Idee und wir erstellen das perfekte Design für Sie.</p>
-                    <ul style="color: var(--text-secondary); margin-left: 1.5rem;">
-                        <li>Professionelle CAD-Modellierung</li>
-                        <li>OnShape-Software</li>
-                        <li>20€/Stunde oder VB</li>
-                        <li>Design + Fertigung</li>
-                    </ul>
-                </div>
-                <div class="service-card">
-                    <h3>⚡ Express-Service</h3>
-                    <p>Brauchen Sie Ihr Modell schnell? Mit unserem Express-Service erhalten Sie Ihren Druck priorisiert.</p>
-                    <ul style="color: var(--text-secondary); margin-left: 1.5rem;">
-                        <li>Bevorzugte Bearbeitung</li>
-                        <li>Schnellere Lieferung</li>
-                        <li>Status-Updates</li>
-                        <li>+30% Aufpreis</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <section id="gallery">
-            <h2 class="section-title">Portfolio & Beispiele</h2>
-            <div class="product-grid" id="gallery-grid">
-                <!-- Galerie-Einträge werden hier eingefügt -->
-            </div>
-        </section>
-
-        <section id="products">
-            <h2 class="section-title">Produktkatalog</h2>
-            
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('internet')">Internet-Modelle</button>
-                <button class="tab" onclick="switchTab('custom')">Eigene Designs</button>
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="hidden">
+        <div class="container">
+            <!-- Order Management -->
+            <div id="adminOrders" class="admin-section">
+                <h2 class="section-title">📦 Bestellverwaltung</h2>
+                <div id="ordersList"></div>
             </div>
 
-            <div id="internet-tab" class="tab-content active">
-                <div class="product-grid" id="internet-products"></div>
+            <!-- Product Management -->
+            <div id="adminProducts" class="admin-section hidden">
+                <h2 class="section-title">🛍️ Produktverwaltung</h2>
+                <button class="btn-primary" onclick="showAddProductModal()" style="margin-bottom: 2rem;">➕ Neues Produkt hinzufügen</button>
+                <div id="adminProductsList"></div>
             </div>
 
-            <div id="custom-tab" class="tab-content">
-                <div class="product-grid" id="custom-products"></div>
+            <!-- Chat Management -->
+            <div id="adminChat" class="admin-section hidden">
+                <h2 class="section-title">💬 Chat-Verwaltung</h2>
+                <div id="chatsList"></div>
             </div>
-        </section>
+        </div>
     </div>
 
     <!-- Chat Widget -->
@@ -851,6 +172,7 @@
     </div>
 
     <!-- Modals -->
+    <!-- Login Modal -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
@@ -873,6 +195,7 @@
         </div>
     </div>
 
+    <!-- Register Modal -->
     <div id="registerModal" class="modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('registerModal')">&times;</button>
@@ -905,6 +228,30 @@
         </div>
     </div>
 
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('settingsModal')">&times;</button>
+            <h2>Kontoeinstellungen</h2>
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="settingsName" readonly>
+            </div>
+            <div class="form-group">
+                <label>E-Mail</label>
+                <input type="email" id="settingsEmail" readonly>
+            </div>
+            <div class="form-group">
+                <label>Mitglied seit</label>
+                <input type="text" id="settingsMemberSince" readonly>
+            </div>
+            <h3 style="color: var(--primary-green); margin: 2rem 0 1rem;">Benachrichtigungen</h3>
+            <div id="notificationsList"></div>
+            <button class="btn-secondary" onclick="handleLogout()" style="width: 100%; margin-top: 2rem;">Abmelden</button>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
     <div id="uploadModal" class="modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('uploadModal')">&times;</button>
@@ -926,6 +273,13 @@
                         <select id="material" onchange="calculatePrice()">
                             <option value="pla">Bambu Lab PLA (50% Rabatt!)</option>
                             <option value="other">Anderes Material (+10€)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nozzle-Größe</label>
+                        <select id="nozzle" onchange="calculatePrice()">
+                            <option value="0.4">0.4mm Hardened Steel (Standard)</option>
+                            <option value="0.2">0.2mm Stainless Steel (+4€, nur PLA)</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -952,12 +306,13 @@
         </div>
     </div>
 
+    <!-- Product Detail Modal -->
     <div id="productDetailModal" class="modal">
         <div class="modal-content modal-content-large">
             <button class="modal-close" onclick="closeModal('productDetailModal')">&times;</button>
             <div class="product-detail-grid">
                 <div>
-                    <div id="detailImage" style="width: 100%; height: 300px; background: var(--card-bg); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 4rem;"></div>
+                    <div id="detailImage" style="width: 100%; height: 300px; background: var(--card-bg); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 4rem; overflow: hidden;"></div>
                 </div>
                 <div>
                     <h2 id="detailName"></h2>
@@ -986,6 +341,7 @@
         </div>
     </div>
 
+    <!-- Cart Modal -->
     <div id="cartModal" class="modal">
         <div class="modal-content" style="max-width: 700px;">
             <button class="modal-close" onclick="closeModal('cartModal')">&times;</button>
@@ -998,6 +354,7 @@
         </div>
     </div>
 
+    <!-- Checkout Modal -->
     <div id="checkoutModal" class="modal">
         <div class="modal-content" style="max-width: 600px;">
             <button class="modal-close" onclick="closeModal('checkoutModal')">&times;</button>
@@ -1041,12 +398,17 @@
 
                 <h3 style="color: var(--primary-green); margin: 2rem 0 1rem;">Zahlungsmethode</h3>
                 <div class="form-group">
-                    <select id="paymentMethod" required>
+                    <select id="paymentMethod" onchange="checkPrivatePayment()" required>
                         <option value="">Bitte wählen...</option>
                         <option value="paypal">PayPal</option>
                         <option value="stripe">Kreditkarte (Stripe)</option>
                         <option value="transfer">Überweisung</option>
+                        <option value="private">Privat (nur für Bekannte)</option>
                     </select>
+                </div>
+                <div id="privatePaymentWarning" class="hidden" style="background: rgba(255, 68, 68, 0.1); border: 1px solid var(--red-accent); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                    <p style="color: var(--red-accent); font-weight: 600;">⚠️ Achtung:</p>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Die Option "Privat" ist aktuell nur für bekannte Nutzer verfügbar. Wenn Sie diese Zahlungsoption trotzdem auswählen, wird Ihre Bestellung möglicherweise ignoriert.</p>
                 </div>
 
                 <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 8px; margin: 2rem 0;">
@@ -1076,13 +438,84 @@
         </div>
     </div>
 
-    <!-- Firebase & Scripts -->
+    <!-- Add/Edit Product Modal (Admin) -->
+    <div id="addProductModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('addProductModal')">&times;</button>
+            <h2 id="productModalTitle">Neues Produkt hinzufügen</h2>
+            <form id="productForm" onsubmit="handleAddProduct(event)">
+                <div class="form-group">
+                    <label>Produktname</label>
+                    <input type="text" id="productName" required>
+                </div>
+                <div class="form-group">
+                    <label>Beschreibung</label>
+                    <textarea id="productDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Preis (€)</label>
+                    <input type="number" id="productPrice" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Kategorie</label>
+                    <select id="productCategory" required>
+                        <option value="internet">Internet-Modelle</option>
+                        <option value="custom">Eigene Designs</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Gewicht (Gramm)</label>
+                    <input type="number" id="productWeight" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label>Bild (Emoji oder URL)</label>
+                    <input type="text" id="productImage" placeholder="z.B. 📱 oder https://..." required>
+                </div>
+                <div class="form-group">
+                    <label>Verfügbare Farben (Hex-Codes, kommagetrennt)</label>
+                    <input type="text" id="productColors" placeholder="z.B. #000000,#FFFFFF,#0066cc" required>
+                </div>
+                <div class="form-group">
+                    <label>Auf Lager</label>
+                    <select id="productInStock">
+                        <option value="true">Ja</option>
+                        <option value="false">Nein</option>
+                    </select>
+                </div>
+                <input type="hidden" id="editProductId">
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem;">Speichern</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Message Customer Modal (Admin) -->
+    <div id="messageCustomerModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('messageCustomerModal')">&times;</button>
+            <h2>Kunde benachrichtigen</h2>
+            <form id="messageForm" onsubmit="handleSendMessage(event)">
+                <div class="form-group">
+                    <label>Empfänger</label>
+                    <input type="text" id="messageRecipient" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Nachricht</label>
+                    <textarea id="messageText" required placeholder="Ihre Nachricht an den Kunden..."></textarea>
+                </div>
+                <input type="hidden" id="messageUserId">
+                <button type="submit" class="btn-primary" style="width: 100%;">Nachricht senden</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-       const firebaseConfig = {
+        // TODO: Replace with your Firebase config
+      const firebaseConfig = {
           apiKey: "AIzaSyDazql6oJx5_z3hASwmo4200-OpQhodZVc",
           authDomain: "d-druckservice-jtprint.firebaseapp.com",
           projectId: "d-druckservice-jtprint",
@@ -1090,6 +523,7 @@
           messagingSenderId: "247787543764",
           appId: "1:247787543764:web:b3cc1e7d05eb8aa2abef41"
      };
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -1103,700 +537,65 @@
             onAuthStateChanged,
             signOut
         };
-        window.firebaseDbFunctions = { collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc };
+        window.firebaseDbFunctions = { collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc, orderBy, onSnapshot };
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
+                const isAdmin = user.email === 'jona.thielgen@gmail.com';
+                
                 document.getElementById('nav-auth').innerHTML = `
                     <span style="color: var(--text-secondary);">${user.email}</span>
                     <button class="btn-secondary" onclick="handleLogout()">Abmelden</button>
                 `;
+                document.getElementById('nav-settings').classList.remove('hidden');
                 document.getElementById('nav-cart').classList.remove('hidden');
+                
+                if (isAdmin) {
+                    document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+                    window.isAdmin = true;
+                } else {
+                    window.isAdmin = false;
+                }
+                
+                await loadUserData(user);
                 loadProducts();
+                
+                if (isAdmin) {
+                    loadOrders();
+                    loadChats();
+                }
             } else {
                 document.getElementById('nav-auth').innerHTML = `
                     <button class="btn-secondary" onclick="showLoginModal()">Anmelden</button>
                 `;
+                document.getElementById('nav-settings').classList.add('hidden');
                 document.getElementById('nav-cart').classList.add('hidden');
+                document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
+                window.isAdmin = false;
+                showPublicSite();
                 loadProducts();
             }
         });
 
-        async function loadProducts() {
+        async function loadUserData(user) {
             try {
-                const productsQuery = await window.firebaseDbFunctions.getDocs(
-                    window.firebaseDbFunctions.collection(window.firebaseDb, 'products')
+                const userDoc = await window.firebaseDbFunctions.getDocs(
+                    window.firebaseDbFunctions.query(
+                        window.firebaseDbFunctions.collection(window.firebaseDb, 'users'),
+                        window.firebaseDbFunctions.where('email', '==', user.email)
+                    )
                 );
                 
-                window.allProducts = [];
-                productsQuery.forEach((doc) => {
-                    window.allProducts.push({ id: doc.id, ...doc.data() });
-                });
-                
-                displayProducts();
-                displayGallery();
+                if (!userDoc.empty) {
+                    window.currentUserData = userDoc.docs[0].data();
+                    window.currentUserData.uid = user.uid;
+                }
             } catch (error) {
-                console.log('Produkte werden aus Beispieldaten geladen');
-                loadSampleProducts();
+                console.log('Error loading user data:', error);
             }
         }
-
-        window.loadProducts = loadProducts;
     </script>
 
-    <script>
-        let cart = [];
-        let currentProduct = null;
-        let selectedQuantity = 1;
-        let selectedColor = '';
-        let allProducts = [];
-        let chatMessages = [];
-
-        // Sample Products
-        const sampleProducts = [
-            {
-                id: '1',
-                name: 'Smartphone Halterung',
-                description: 'Verstellbare Smartphone-Halterung für den Schreibtisch. Kompatibel mit allen gängigen Smartphones.',
-                price: 12.99,
-                category: 'internet',
-                weight: 45,
-                colors: ['#000000', '#FFFFFF', '#0066cc', '#ff4444', '#00cc99'],
-                image: '📱',
-                inStock: true
-            },
-            {
-                id: '2',
-                name: 'Kabelhalter Set',
-                description: 'Praktisches 5er-Set Kabelhalter für einen aufgeräumten Schreibtisch. Selbstklebend.',
-                price: 8.99,
-                category: 'internet',
-                weight: 20,
-                colors: ['#000000', '#FFFFFF', '#808080'],
-                image: '🔌',
-                inStock: true
-            },
-            {
-                id: '3',
-                name: 'Würfel Organizer',
-                description: 'Modularer Würfel-Organizer für Stifte, Büroklammern und Kleinteile. Stapelbar.',
-                price: 15.99,
-                category: 'custom',
-                weight: 80,
-                colors: ['#0066cc', '#00cc99', '#ff4444', '#ffaa00', '#9933cc'],
-                image: '📦',
-                inStock: true
-            },
-            {
-                id: '4',
-                name: 'Kopfhörer Ständer',
-                description: 'Eleganter Kopfhörer-Ständer mit rutschfester Basis. Für alle Kopfhörer-Größen geeignet.',
-                price: 18.99,
-                category: 'custom',
-                weight: 120,
-                colors: ['#000000', '#FFFFFF', '#808080', '#0066cc'],
-                image: '🎧',
-                inStock: true
-            },
-            {
-                id: '5',
-                name: 'Pflanztopf Mini',
-                description: 'Dekorativer Mini-Pflanztopf mit geometrischem Design. Perfekt für Sukkulenten.',
-                price: 9.99,
-                category: 'internet',
-                weight: 35,
-                colors: ['#FFFFFF', '#00cc99', '#ffaa00', '#ff69b4'],
-                image: '🌱',
-                inStock: true
-            },
-            {
-                id: '6',
-                name: 'Schlüsselanhänger Custom',
-                description: 'Personalisierter Schlüsselanhänger mit Ihrem Namen oder Logo. Robust und langlebig.',
-                price: 6.99,
-                category: 'custom',
-                weight: 15,
-                colors: ['#000000', '#0066cc', '#ff4444', '#00cc99', '#ffaa00'],
-                image: '🔑',
-                inStock: true
-            }
-        ];
-
-        function loadSampleProducts() {
-            allProducts = sampleProducts;
-            displayProducts();
-            displayGallery();
-        }
-
-        function displayProducts() {
-            const internetGrid = document.getElementById('internet-products');
-            const customGrid = document.getElementById('custom-products');
-            
-            internetGrid.innerHTML = '';
-            customGrid.innerHTML = '';
-
-            allProducts.forEach(product => {
-                const card = createProductCard(product);
-                if (product.category === 'internet') {
-                    internetGrid.appendChild(card);
-                } else {
-                    customGrid.appendChild(card);
-                }
-            });
-        }
-
-        function createProductCard(product) {
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            card.onclick = () => showProductDetail(product);
-            
-            card.innerHTML = `
-                <div class="product-image">${product.image || '📦'}</div>
-                <div class="product-info">
-                    <h4>${product.name}</h4>
-                    <p style="color: var(--text-secondary); font-size: 0.9rem;">${product.description.substring(0, 60)}...</p>
-                    <p class="product-price">${product.price.toFixed(2)}€</p>
-                    ${product.inStock ? '<span style="color: var(--primary-green); font-size: 0.875rem;">✓ Auf Lager</span>' : '<span style="color: var(--red-accent); font-size: 0.875rem;">Nicht verfügbar</span>'}
-                </div>
-            `;
-            
-            return card;
-        }
-
-        function displayGallery() {
-            const galleryGrid = document.getElementById('gallery-grid');
-            galleryGrid.innerHTML = '';
-            
-            const galleryItems = allProducts.slice(0, 6);
-            
-            galleryItems.forEach(product => {
-                const card = createProductCard(product);
-                galleryGrid.appendChild(card);
-            });
-        }
-
-        function showProductDetail(product) {
-            currentProduct = product;
-            selectedQuantity = 1;
-            
-            document.getElementById('detailImage').innerHTML = product.image || '📦';
-            document.getElementById('detailName').textContent = product.name;
-            document.getElementById('detailDescription').textContent = product.description;
-            document.getElementById('detailPrice').textContent = product.price.toFixed(2) + '€';
-            document.getElementById('quantityDisplay').textContent = '1';
-            
-            const colorSelector = document.getElementById('colorSelector');
-            colorSelector.innerHTML = '';
-            
-            product.colors.forEach((color, index) => {
-                const colorDiv = document.createElement('div');
-                colorDiv.className = 'color-option' + (index === 0 ? ' selected' : '');
-                colorDiv.style.background = color;
-                colorDiv.onclick = () => selectColor(colorDiv, color);
-                colorSelector.appendChild(colorDiv);
-            });
-            
-            selectedColor = product.colors[0];
-            
-            document.getElementById('productDetailModal').classList.add('active');
-        }
-
-        function selectColor(element, color) {
-            document.querySelectorAll('.color-option').forEach(el => el.classList.remove('selected'));
-            element.classList.add('selected');
-            selectedColor = color;
-        }
-
-        function changeQuantity(delta) {
-            selectedQuantity = Math.max(1, selectedQuantity + delta);
-            document.getElementById('quantityDisplay').textContent = selectedQuantity;
-        }
-
-        function addDetailProductToCart() {
-            if (!currentProduct) return;
-            
-            cart.push({
-                type: 'product',
-                product: currentProduct,
-                quantity: selectedQuantity,
-                color: selectedColor,
-                price: currentProduct.price * selectedQuantity
-            });
-            
-            updateCartCount();
-            closeModal('productDetailModal');
-            alert('Produkt wurde zum Warenkorb hinzugefügt!');
-        }
-
-        // Modal Functions
-        function showLoginModal() {
-            document.getElementById('loginModal').classList.add('active');
-        }
-
-        function showRegisterModal() {
-            closeModal('loginModal');
-            document.getElementById('registerModal').classList.add('active');
-        }
-
-        function showUploadModal() {
-            if (!window.firebaseAuth.currentUser) {
-                alert('Bitte melden Sie sich zuerst an!');
-                showLoginModal();
-                return;
-            }
-            document.getElementById('uploadModal').classList.add('active');
-        }
-
-        function showCustomDesignModal() {
-            if (!window.firebaseAuth.currentUser) {
-                alert('Bitte melden Sie sich zuerst an!');
-                showLoginModal();
-                return;
-            }
-            toggleChat();
-        }
-
-        function showCart() {
-            updateCartDisplay();
-            document.getElementById('cartModal').classList.add('active');
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
-
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            event.target.classList.add('active');
-            document.getElementById(tabName + '-tab').classList.add('active');
-        }
-
-        // Chat Functions
-        function toggleChat() {
-            const chatWindow = document.getElementById('chatWindow');
-            chatWindow.classList.toggle('active');
-        }
-
-        function handleChatKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendChatMessage();
-            }
-        }
-
-        function sendChatMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            
-            if (!message) return;
-            
-            const messagesDiv = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'chat-message user';
-            messageDiv.textContent = message;
-            messagesDiv.appendChild(messageDiv);
-            
-            input.value = '';
-            
-            chatMessages.push({ sender: 'user', text: message, timestamp: new Date() });
-            
-            setTimeout(() => {
-                const responseDiv = document.createElement('div');
-                responseDiv.className = 'chat-message admin';
-                responseDiv.innerHTML = `Vielen Dank für Ihre Anfrage! Ich werde Ihr Projekt analysieren und Ihnen innerhalb von 24 Stunden ein detailliertes Angebot unterbreiten.<br><br>Basis-Stundensatz: <strong>20€/h</strong><br>Gerne können wir auch über den Preis verhandeln!`;
-                messagesDiv.appendChild(responseDiv);
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            }, 1000);
-            
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-
-        // Price Calculator
-        function calculatePrice() {
-            const weight = parseFloat(document.getElementById('weight').value) || 0;
-            const material = document.getElementById('material').value;
-            const express = document.getElementById('express').value;
-
-            if (weight === 0) {
-                document.getElementById('priceResult').classList.add('hidden');
-                return;
-            }
-
-            const isPLA = material === 'pla';
-            const basePrice = isPLA ? 4 : 8;
-            const pricePerGram = 0.20;
-            let total = basePrice + (weight * pricePerGram);
-
-            if (material === 'other') {
-                total += 10;
-            }
-
-            if (express === 'yes') {
-                total *= 1.30;
-            }
-
-            let breakdown = `Grundpreis: ${basePrice}€`;
-            if (isPLA) {
-                breakdown += ' <span class="discount-badge">-50%</span> <span class="original-price">8€</span>';
-            }
-            breakdown += `<br>Material: ${(weight * pricePerGram).toFixed(2)}€`;
-            if (material === 'other') breakdown += `<br>Spezialmaterial: +10€`;
-            if (express === 'yes') breakdown += `<br>Express: +30%`;
-
-            document.getElementById('priceAmount').textContent = total.toFixed(2) + '€';
-            document.getElementById('priceBreakdown').innerHTML = breakdown;
-            document.getElementById('priceResult').classList.remove('hidden');
-
-            return total;
-        }
-
-        // Authentication
-        async function handleRegister(event) {
-            event.preventDefault();
-            
-            const name = document.getElementById('registerName').value;
-            const birthdate = document.getElementById('registerBirthdate').value;
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
-
-            const errorDiv = document.getElementById('registerError');
-            const successDiv = document.getElementById('registerSuccess');
-            errorDiv.classList.add('hidden');
-            successDiv.classList.add('hidden');
-
-            if (password !== passwordConfirm) {
-                errorDiv.textContent = 'Passwörter stimmen nicht überein!';
-                errorDiv.classList.remove('hidden');
-                return;
-            }
-
-            try {
-                const userCredential = await window.firebaseAuthFunctions.createUserWithEmailAndPassword(
-                    window.firebaseAuth, email, password
-                );
-
-                await window.firebaseAuthFunctions.sendEmailVerification(userCredential.user);
-
-                await window.firebaseDbFunctions.setDoc(
-                    window.firebaseDbFunctions.doc(window.firebaseDb, 'users', userCredential.user.uid),
-                    {
-                        name: name,
-                        birthdate: birthdate,
-                        email: email,
-                        createdAt: new Date().toISOString()
-                    }
-                );
-
-                successDiv.textContent = 'Registrierung erfolgreich! Bitte bestätigen Sie Ihre E-Mail-Adresse.';
-                successDiv.classList.remove('hidden');
-
-                setTimeout(() => {
-                    closeModal('registerModal');
-                }, 2000);
-            } catch (error) {
-                errorDiv.textContent = 'Fehler: ' + error.message;
-                errorDiv.classList.remove('hidden');
-            }
-        }
-
-        async function handleLogin(event) {
-            event.preventDefault();
-            
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const errorDiv = document.getElementById('loginError');
-            errorDiv.classList.add('hidden');
-
-            try {
-                await window.firebaseAuthFunctions.signInWithEmailAndPassword(
-                    window.firebaseAuth, email, password
-                );
-                closeModal('loginModal');
-            } catch (error) {
-                errorDiv.textContent = 'Fehler: ' + error.message;
-                errorDiv.classList.remove('hidden');
-            }
-        }
-
-        async function handleLogout() {
-            try {
-                await window.firebaseAuthFunctions.signOut(window.firebaseAuth);
-                cart = [];
-                updateCartCount();
-            } catch (error) {
-                console.error('Logout error:', error);
-            }
-        }
-
-        // Upload Handler
-        async function handleUpload(event) {
-            event.preventDefault();
-
-            const description = document.getElementById('uploadDescription').value;
-            const weight = document.getElementById('weight').value;
-            const material = document.getElementById('material').value;
-            const express = document.getElementById('express').value;
-            const notes = document.getElementById('uploadNotes').value;
-            const price = calculatePrice();
-
-            cart.push({
-                type: 'upload',
-                description: description,
-                weight: weight,
-                material: material,
-                express: express,
-                notes: notes,
-                price: price
-            });
-
-            updateCartCount();
-            closeModal('uploadModal');
-            alert('Auftrag wurde zum Warenkorb hinzugefügt!');
-            
-            document.getElementById('uploadForm').reset();
-            document.getElementById('priceResult').classList.add('hidden');
-        }
-
-        // Cart Functions
-        function updateCartCount() {
-            const count = cart.length;
-            document.querySelector('.cart-count').textContent = count;
-        }
-
-        function updateCartDisplay() {
-            const cartItemsDiv = document.getElementById('cartItems');
-            let total = 0;
-
-            if (cart.length === 0) {
-                cartItemsDiv.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Ihr Warenkorb ist leer</p>';
-                document.getElementById('totalAmount').textContent = '0.00€';
-                return;
-            }
-
-            cartItemsDiv.innerHTML = cart.map((item, index) => {
-                total += item.price;
-                
-                if (item.type === 'product') {
-                    return `
-                        <div style="background: var(--card-bg); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <h4 style="color: var(--primary-green);">${item.product.name}</h4>
-                                    <p style="color: var(--text-secondary); font-size: 0.9rem;">
-                                        Menge: ${item.quantity} | Farbe: <span style="display: inline-block; width: 15px; height: 15px; background: ${item.color}; border-radius: 50%; vertical-align: middle;"></span>
-                                    </p>
-                                </div>
-                                <div style="text-align: right;">
-                                    <p style="font-size: 1.25rem; font-weight: 700; color: var(--primary-blue);">${item.price.toFixed(2)}€</p>
-                                    <button onclick="removeFromCart(${index})" style="background: none; border: none; color: #ff4444; cursor: pointer;">Entfernen</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    return `
-                        <div style="background: var(--card-bg); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <h4 style="color: var(--primary-green);">Custom Upload</h4>
-                                    <p style="color: var(--text-secondary); font-size: 0.9rem;">
-                                        ${item.weight}g | ${item.material === 'pla' ? 'PLA' : 'Spezialmaterial'} | ${item.express === 'yes' ? 'Express' : 'Normal'}
-                                    </p>
-                                </div>
-                                <div style="text-align: right;">
-                                    <p style="font-size: 1.25rem; font-weight: 700; color: var(--primary-blue);">${item.price.toFixed(2)}€</p>
-                                    <button onclick="removeFromCart(${index})" style="background: none; border: none; color: #ff4444; cursor: pointer;">Entfernen</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-            }).join('');
-
-            document.getElementById('totalAmount').textContent = total.toFixed(2) + '€';
-        }
-
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCartCount();
-            updateCartDisplay();
-        }
-
-        function updateShipping() {
-            const method = document.getElementById('shippingMethod').value;
-            const addressFields = document.getElementById('addressFields');
-            const shippingCostEl = document.getElementById('shippingCost');
-            
-            let shipping = 0;
-            
-            if (method === 'pickup') {
-                addressFields.classList.add('hidden');
-                shipping = 0;
-            } else if (method === 'standard') {
-                addressFields.classList.remove('hidden');
-                shipping = 4.99;
-            } else if (method === 'express') {
-                addressFields.classList.remove('hidden');
-                shipping = 9.99;
-            }
-            
-            shippingCostEl.textContent = shipping.toFixed(2) + '€';
-            updateCheckoutTotal();
-        }
-
-        function updateCheckoutTotal() {
-            const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-            const shippingText = document.getElementById('shippingCost').textContent;
-            const shipping = parseFloat(shippingText.replace('€', '')) || 0;
-            const discountText = document.getElementById('discount').textContent;
-            const discount = parseFloat(discountText.replace('€', '').replace('-', '')) || 0;
-            
-            const total = subtotal + shipping - discount;
-            
-            document.getElementById('checkoutSubtotal').textContent = subtotal.toFixed(2) + '€';
-            document.getElementById('checkoutTotal').textContent = total.toFixed(2) + '€';
-        }
-
-        function proceedToCheckout() {
-            if (cart.length === 0) {
-                alert('Ihr Warenkorb ist leer!');
-                return;
-            }
-
-            const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-            document.getElementById('checkoutSubtotal').textContent = subtotal.toFixed(2) + '€';
-            document.getElementById('shippingCost').textContent = '0.00€';
-            document.getElementById('discount').textContent = '0.00€';
-            document.getElementById('checkoutTotal').textContent = subtotal.toFixed(2) + '€';
-
-            closeModal('cartModal');
-            document.getElementById('checkoutModal').classList.add('active');
-        }
-
-        function applyCoupon() {
-            const code = document.getElementById('couponCode').value.toUpperCase();
-            const discountEl = document.getElementById('discount');
-            
-            const coupons = {
-                'WELCOME10': 0.10,
-                'SAVE20': 0.20,
-                'FIRST50': 0.50
-            };
-            
-            if (coupons[code]) {
-                const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-                const discount = subtotal * coupons[code];
-                discountEl.textContent = '-' + discount.toFixed(2) + '€';
-                updateCheckoutTotal();
-                alert('Gutschein erfolgreich eingelöst!');
-            } else {
-                alert('Ungültiger Gutscheincode');
-            }
-        }
-
-        async function handleCheckout(event) {
-            event.preventDefault();
-
-            const shippingMethod = document.getElementById('shippingMethod').value;
-            const paymentMethod = document.getElementById('paymentMethod').value;
-            
-            let address = null;
-            if (shippingMethod !== 'pickup') {
-                address = {
-                    street: document.getElementById('street').value,
-                    zipCode: document.getElementById('zipCode').value,
-                    city: document.getElementById('city').value,
-                    country: document.getElementById('country').value
-                };
-            }
-
-            const orderData = {
-                userId: window.firebaseAuth.currentUser.uid,
-                userEmail: window.firebaseAuth.currentUser.email,
-                items: cart,
-                shippingMethod: shippingMethod,
-                address: address,
-                paymentMethod: paymentMethod,
-                total: parseFloat(document.getElementById('checkoutTotal').textContent),
-                status: 'pending',
-                createdAt: new Date().toISOString()
-            };
-
-            try {
-                // Save order to Firestore
-                const orderRef = await window.firebaseDbFunctions.addDoc(
-                    window.firebaseDbFunctions.collection(window.firebaseDb, 'orders'),
-                    orderData
-                );
-
-                // Process payment based on method
-                if (paymentMethod === 'paypal') {
-                    // PayPal integration would go here
-                    alert('PayPal-Zahlung wird geöffnet... (Demo-Modus)');
-                    completeOrder(orderRef.id);
-                } else if (paymentMethod === 'stripe') {
-                    // Stripe integration would go here
-                    alert('Stripe-Zahlung wird geöffnet... (Demo-Modus)');
-                    completeOrder(orderRef.id);
-                } else if (paymentMethod === 'transfer') {
-                    alert(`Bestellung erfolgreich!\n\nBitte überweisen Sie ${orderData.total.toFixed(2)}€ an:\n\nIBAN: DE89 3704 0044 0532 0130 00\nBetreff: Bestellung ${orderRef.id}\n\nSie erhalten eine Bestätigung per E-Mail.`);
-                    completeOrder(orderRef.id);
-                }
-            } catch (error) {
-                alert('Fehler beim Aufgeben der Bestellung: ' + error.message);
-            }
-        }
-
-        function completeOrder(orderId) {
-            cart = [];
-            updateCartCount();
-            closeModal('checkoutModal');
-            document.getElementById('checkoutForm').reset();
-            
-            alert(`Bestellung erfolgreich aufgegeben!\n\nBestellnummer: ${orderId}\n\nSie erhalten eine Bestätigungs-E-Mail.`);
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            loadSampleProducts();
-        });
-
-        // Close modal on outside click
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    this.classList.remove('active');
-                }
-            });
-        });
-
-        // Make functions globally available
-        window.showLoginModal = showLoginModal;
-        window.showRegisterModal = showRegisterModal;
-        window.showUploadModal = showUploadModal;
-        window.showCustomDesignModal = showCustomDesignModal;
-        window.showCart = showCart;
-        window.closeModal = closeModal;
-        window.switchTab = switchTab;
-        window.handleRegister = handleRegister;
-        window.handleLogin = handleLogin;
-        window.handleLogout = handleLogout;
-        window.handleUpload = handleUpload;
-        window.calculatePrice = calculatePrice;
-        window.removeFromCart = removeFromCart;
-        window.proceedToCheckout = proceedToCheckout;
-        window.applyCoupon = applyCoupon;
-        window.handleCheckout = handleCheckout;
-        window.updateShipping = updateShipping;
-        window.toggleChat = toggleChat;
-        window.sendChatMessage = sendChatMessage;
-        window.handleChatKeyPress = handleChatKeyPress;
-        window.showProductDetail = showProductDetail;
-        window.selectColor = selectColor;
-        window.changeQuantity = changeQuantity;
-        window.addDetailProductToCart = addDetailProductToCart;
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
