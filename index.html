@@ -627,20 +627,4 @@
 
     <script src="script.js"></script>
 </body>
-    <script>
-        function showSettingsModal() {
-    if (!window.firebaseAuth.currentUser || !currentUserData) return;
-    
-    document.getElementById('settingsName').value = currentUserData.name || '';
-    document.getElementById('settingsEmail').value = currentUserData.email || '';
-    document.getElementById('settingsMemberSince').value = currentUserData.createdAt ? new Date(currentUserData.createdAt).toLocaleDateString('de-DE') : '';
-    
-    loadNotifications();
-    document.getElementById('settingsModal').classList.add('active');
-}
-
-function closeModal(modalId) {
-    document.getElementById(modalId).classList.remove('active');
-}
- </script>
 </html>
