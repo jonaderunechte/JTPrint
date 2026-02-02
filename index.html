@@ -18,20 +18,20 @@
                 <span class="logo-text">JT Print</span>
             </div>
             <ul class="nav-links">
-                <li><a href="#home" onclick="showPublicSite(); return false;">Home</a></li>
-                <li><a href="#services" onclick="showPublicSite(); return false;">Services</a></li>
-                <li><a href="#gallery" onclick="showPublicSite(); return false;">Galerie</a></li>
-                <li><a href="#products" onclick="showPublicSite(); return false;">Produkte</a></li>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#gallery">Galerie</a></li>
+                <li><a href="#products">Produkte</a></li>
                 
                 <!-- Admin Tabs (nur sichtbar wenn Admin eingeloggt) -->
                 <li class="hidden admin-only">
-                    <a href="#" onclick="showAdminPanel('orders'); return false;">📦 Bestellungen</a>
+                    <a href="javascript:void(0);" onclick="event.preventDefault(); showAdminPanel('orders');">📦 Bestellungen</a>
                 </li>
                 <li class="hidden admin-only">
-                    <a href="#" onclick="showAdminPanel('products'); return false;">🛍️ Produkte</a>
+                    <a href="javascript:void(0);" onclick="event.preventDefault(); showAdminPanel('products');">🛍️ Produkte</a>
                 </li>
                 <li class="hidden admin-only">
-                    <a href="#" onclick="showAdminPanel('chat'); return false;">💬 Chats</a>
+                    <a href="javascript:void(0);" onclick="event.preventDefault(); showAdminPanel('chat');">💬 Chats</a>
                 </li>
                 
                 <li id="nav-auth">
@@ -543,14 +543,14 @@
         import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         // TODO: Replace with your Firebase config
-     const firebaseConfig = {
-          apiKey: "AIzaSyDazql6oJx5_z3hASwmo4200-OpQhodZVc",
-          authDomain: "d-druckservice-jtprint.firebaseapp.com",
-          projectId: "d-druckservice-jtprint",
-          storageBucket: "d-druckservice-jtprint.firebasestorage.app",
-          messagingSenderId: "247787543764",
-          appId: "1:247787543764:web:b3cc1e7d05eb8aa2abef41"
-     };
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
