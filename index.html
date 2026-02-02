@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JT Print - Professioneller 3D-Druck Service</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="bg-animation"></div>
@@ -13,7 +13,7 @@
     <!-- Header -->
     <header>
         <nav>
-            <div class="logo-container" onclick="goToHome()" style="cursor: pointer;">
+            <div class="logo-container">
                 <img src="https://i.postimg.cc/433yTPrC/296ae7d7-58c3-4968-b8a8-e6b6add85135-removebg-preview.png" alt="JT Print Logo" class="logo-image">
                 <span class="logo-text">JT Print</span>
             </div>
@@ -22,133 +22,141 @@
                 <li><a href="#services">Services</a></li>
                 <li><a href="#gallery">Galerie</a></li>
                 <li><a href="#products">Produkte</a></li>
-                
-                <!-- Admin Tabs (nur sichtbar wenn Admin eingeloggt) -->
-                <li class="hidden admin-only">
-                    <a href="javascript:void(0);" onclick="event.preventDefault(); showAdminPanel('orders');">📦 Bestellungen</a>
-                </li>
-                <li class="hidden admin-only">
-                    <a href="javascript:void(0);" onclick="event.preventDefault(); showAdminPanel('products');">🛍️ Produkte</a>
-                </li>
-                <li class="hidden admin-only">
-                    <a href="javascript:void(0);" onclick="event.preventDefault(); showAdminPanel('chat');">💬 Chats</a>
-                </li>
-                
                 <li id="nav-auth">
                     <button class="btn-secondary" onclick="showLoginModal()">Anmelden</button>
-                </li>
-                <li class="hidden" id="nav-settings">
-                    <button class="btn-secondary" onclick="showSettingsModal()">⚙️</button>
                 </li>
                 <li class="hidden" id="nav-cart">
                     <div class="cart-icon" onclick="showCart()">
                         🛒 <span class="cart-count">0</span>
                     </div>
                 </li>
+                <li class="hidden" id="nav-settings">
+                    <button class="btn-secondary" onclick="showSettingsModal()">⚙️</button>
+                </li>
             </ul>
         </nav>
+
+        <!-- Admin Tabs -->
+        <div id="adminTabs" class="admin-tabs hidden">
+            <button class="admin-tab active" onclick="switchAdminTab('orders')">📦 Bestellungen</button>
+            <button class="admin-tab" onclick="switchAdminTab('products')">🛍️ Produkte</button>
+            <button class="admin-tab" onclick="switchAdminTab('gallery')">🎨 Galerie</button>
+            <button class="admin-tab" onclick="switchAdminTab('chat')">💬 Chat-Anfragen</button>
+        </div>
     </header>
 
-    <!-- Public Site -->
-    <div id="publicSite">
-        <!-- Hero Section -->
-        <section class="hero" id="home">
-            <h1>Professioneller 3D-Druck für Ihre Ideen</h1>
-            <p>Laden Sie Ihr Design hoch oder lassen Sie uns Ihr individuelles 3D-Modell erstellen. Präzise Fertigung mit modernster Technologie.</p>
-            <div class="hero-buttons">
-                <button class="btn-primary" onclick="showUploadModal()">Design hochladen</button>
-                <button class="btn-secondary" onclick="showCustomDesignModal()">Custom Design anfragen</button>
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="admin-panel hidden">
+        <!-- Order Management -->
+        <div id="admin-orders" class="admin-content active">
+            <div class="admin-header">
+                <h2>Bestellverwaltung</h2>
+                <div class="filter-buttons">
+                    <button class="btn-secondary" onclick="filterOrders('all')">Alle</button>
+                    <button class="btn-secondary" onclick="filterOrders('pending')">Ausstehend</button>
+                    <button class="btn-secondary" onclick="filterOrders('processing')">In Bearbeitung</button>
+                    <button class="btn-secondary" onclick="filterOrders('completed')">Abgeschlossen</button>
+                </div>
             </div>
-        </section>
+            <div id="ordersList" class="orders-list"></div>
+        </div>
 
-        <!-- Main Container -->
-        <div class="container">
-            <!-- Services Section -->
-            <section id="services">
-                <h2 class="section-title">Unsere Services</h2>
-                <div class="services-grid">
-                    <div class="service-card">
-                        <h3>🖨️ 3D-Druck Service</h3>
-                        <p>Laden Sie Ihre STL-Datei hoch oder beschreiben Sie Ihr Wunschmodell. Wir drucken es für Sie mit hochwertigen Materialien.</p>
-                        <ul style="color: var(--text-secondary); margin-left: 1.5rem;">
-                            <li>Bambu Lab P1S Drucker</li>
-                            <li>Druckgröße bis 25x25cm</li>
-                            <li>Zwei Nozzle-Optionen</li>
-                            <li>50% Rabatt auf PLA-Grundpreis!</li>
-                        </ul>
-                    </div>
-                    <div class="service-card">
-                        <h3>✏️ Custom Design Service</h3>
-                        <p>Benötigen Sie ein individuelles 3D-Modell? Beschreiben Sie Ihre Idee und wir erstellen das perfekte Design für Sie.</p>
-                        <ul style="color: var(--text-secondary); margin-left: 1.5rem;">
-                            <li>Professionelle CAD-Modellierung</li>
-                            <li>OnShape-Software</li>
-                            <li>20€/Stunde oder VB</li>
-                            <li>Design + Fertigung</li>
-                        </ul>
-                    </div>
-                    <div class="service-card">
-                        <h3>⚡ Express-Service</h3>
-                        <p>Brauchen Sie Ihr Modell schnell? Mit unserem Express-Service erhalten Sie Ihren Druck priorisiert.</p>
-                        <ul style="color: var(--text-secondary); margin-left: 1.5rem;">
-                            <li>Bevorzugte Bearbeitung</li>
-                            <li>Schnellere Lieferung</li>
-                            <li>Status-Updates</li>
-                            <li>+30% Aufpreis</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
+        <!-- Product Management -->
+        <div id="admin-products" class="admin-content">
+            <div class="admin-header">
+                <h2>Produktverwaltung</h2>
+                <button class="btn-primary" onclick="showAddProductModal()">+ Neues Produkt</button>
+            </div>
+            <div id="productsList" class="products-list"></div>
+        </div>
 
-            <!-- Gallery Section -->
-            <section id="gallery">
-                <h2 class="section-title">Portfolio & Beispiele</h2>
-                <div class="product-grid" id="gallery-grid"></div>
-            </section>
+        <!-- Gallery Management -->
+        <div id="admin-gallery" class="admin-content">
+            <div class="admin-header">
+                <h2>Galerie-Verwaltung</h2>
+                <button class="btn-primary" onclick="showAddGalleryModal()">+ Neues Galerie-Bild</button>
+            </div>
+            <div id="galleryList" class="gallery-admin-list"></div>
+        </div>
 
-            <!-- Products Section -->
-            <section id="products">
-                <h2 class="section-title">Produktkatalog</h2>
-                
-                <div class="tabs">
-                    <!-- NUR DIESE STELLEN SIND GEÄNDERT -->
-                    <button class="tab active" onclick="switchTab('internet', event)">Internet-Modelle</button>
-                    <button class="tab" onclick="switchTab('custom', event)">Eigene Designs</button>
-                </div>
-
-                <div id="internet-tab" class="tab-content active">
-                    <div class="product-grid" id="internet-products"></div>
-                </div>
-
-                <div id="custom-tab" class="tab-content">
-                    <div class="product-grid" id="custom-products"></div>
-                </div>
-            </section>
+        <!-- Chat Management -->
+        <div id="admin-chat" class="admin-content">
+            <div class="admin-header">
+                <h2>Chat-Anfragen</h2>
+            </div>
+            <div id="chatRequestsList" class="chat-requests-list"></div>
         </div>
     </div>
 
-    <!-- Admin Panel -->
-    <div id="adminPanel" class="hidden">
-        <div class="container">
-            <!-- Order Management -->
-            <div id="adminOrders" class="admin-section">
-                <h2 class="section-title">📦 Bestellverwaltung</h2>
-                <div id="ordersList"></div>
-            </div>
-
-            <!-- Product Management -->
-            <div id="adminProducts" class="admin-section hidden">
-                <h2 class="section-title">🛍️ Produktverwaltung</h2>
-                <button class="btn-primary" onclick="showAddProductModal()" style="margin-bottom: 2rem;">➕ Neues Produkt hinzufügen</button>
-                <div id="adminProductsList"></div>
-            </div>
-
-            <!-- Chat Management -->
-            <div id="adminChat" class="admin-section hidden">
-                <h2 class="section-title">💬 Chat-Verwaltung</h2>
-                <div id="chatsList"></div>
-            </div>
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <h1>Professioneller 3D-Druck für Ihre Ideen</h1>
+        <p>Laden Sie Ihr Design hoch oder lassen Sie uns Ihr individuelles 3D-Modell erstellen. Präzise Fertigung mit modernster Technologie.</p>
+        <div class="hero-buttons">
+            <button class="btn-primary" onclick="showUploadModal()">Design hochladen</button>
+            <button class="btn-secondary" onclick="showCustomDesignModal()">Custom Design anfragen</button>
         </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <section id="services">
+            <h2 class="section-title">Unsere Services</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <h3>🖨️ 3D-Druck Service</h3>
+                    <p>Laden Sie Ihre STL-Datei hoch oder beschreiben Sie Ihr Wunschmodell. Wir drucken es für Sie mit hochwertigen Materialien.</p>
+                    <ul style="color: var(--text-secondary); margin-left: 1.5rem;">
+                        <li>Bambu Lab P1S Drucker</li>
+                        <li>Druckgröße bis 25x25cm</li>
+                        <li>Alle gängigen Materialien</li>
+                        <li>50% Rabatt auf PLA-Grundpreis!</li>
+                    </ul>
+                </div>
+                <div class="service-card">
+                    <h3>✏️ Custom Design Service</h3>
+                    <p>Benötigen Sie ein individuelles 3D-Modell? Beschreiben Sie Ihre Idee und wir erstellen das perfekte Design für Sie.</p>
+                    <ul style="color: var(--text-secondary); margin-left: 1.5rem;">
+                        <li>Professionelle CAD-Modellierung</li>
+                        <li>OnShape-Software</li>
+                        <li>20€/Stunde oder VB</li>
+                        <li>Design + Fertigung</li>
+                    </ul>
+                </div>
+                <div class="service-card">
+                    <h3>⚡ Express-Service</h3>
+                    <p>Brauchen Sie Ihr Modell schnell? Mit unserem Express-Service erhalten Sie Ihren Druck priorisiert.</p>
+                    <ul style="color: var(--text-secondary); margin-left: 1.5rem;">
+                        <li>Bevorzugte Bearbeitung</li>
+                        <li>Schnellere Lieferung</li>
+                        <li>Status-Updates</li>
+                        <li>+30% Aufpreis</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="gallery">
+            <h2 class="section-title">Portfolio & Beispiele</h2>
+            <div class="product-grid" id="gallery-grid"></div>
+        </section>
+
+        <section id="products">
+            <h2 class="section-title">Produktkatalog</h2>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('internet')">Internet-Modelle</button>
+                <button class="tab" onclick="switchTab('custom')">Eigene Designs</button>
+            </div>
+
+            <div id="internet-tab" class="tab-content active">
+                <div class="product-grid" id="internet-products"></div>
+            </div>
+
+            <div id="custom-tab" class="tab-content">
+                <div class="product-grid" id="custom-products"></div>
+            </div>
+        </section>
     </div>
 
     <!-- Chat Widget -->
@@ -163,9 +171,7 @@
                 <div class="chat-message admin">
                     Hallo! Ich bin hier um Ihnen bei Ihrem Custom Design zu helfen. Beschreiben Sie mir einfach Ihre Idee und ich erstelle Ihnen ein Angebot.<br><br>
                     <strong>Mein Stundensatz: 20€/h oder Preisvorschlag</strong><br><br>
-                    <em style="font-size: 0.9rem; color: var(--text-secondary);">
-                        Hinweis: Ich werde Sie möglicherweise nach weiteren Informationen über das Design fragen (Maße, Funktionen, Präferenzen etc.), um das beste Ergebnis zu erzielen.
-                    </em>
+                    <em>Hinweis: Möglicherweise werden Sie nach weiteren Informationen über das Design gefragt (z.B. genaue Maße, Verwendungszweck, Materialwünsche).</em>
                 </div>
             </div>
             <div class="chat-input-container">
@@ -176,7 +182,6 @@
     </div>
 
     <!-- Modals -->
-    <!-- Login Modal -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
@@ -199,7 +204,6 @@
         </div>
     </div>
 
-    <!-- Register Modal -->
     <div id="registerModal" class="modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('registerModal')">&times;</button>
@@ -227,41 +231,41 @@
                 </div>
                 <div id="registerError" class="error-message hidden"></div>
                 <div id="registerSuccess" class="success-message hidden"></div>
-                <div id="registerEmailInfo" class="hidden" style="background: rgba(0, 204, 153, 0.1); border: 1px solid var(--primary-green); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
-                    <p style="color: var(--primary-green); font-weight: 600;">📧 E-Mail-Bestätigung erforderlich</p>
-                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
-                        Wir haben Ihnen eine Bestätigungs-E-Mail gesendet. Bitte überprüfen Sie auch Ihren <strong>Spam-Ordner</strong>, falls Sie die E-Mail nicht finden!
-                    </p>
-                </div>
                 <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem;">Registrieren</button>
             </form>
+            <p style="text-align: center; margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                <strong>Wichtig:</strong> Bitte überprüfen Sie auch Ihren Spam-Ordner für die Bestätigungs-E-Mail!
+            </p>
         </div>
     </div>
 
-    <!-- Settings Modal -->
     <div id="settingsModal" class="modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('settingsModal')">&times;</button>
             <h2>Kontoeinstellungen</h2>
-            <div class="form-group">
-                <label>Name</label>
-                <input type="text" id="settingsName" readonly>
+            <div class="settings-section">
+                <h3>Persönliche Informationen</h3>
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="settingsName" readonly>
+                </div>
+                <div class="form-group">
+                    <label>E-Mail</label>
+                    <input type="email" id="settingsEmail" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Geburtsdatum</label>
+                    <input type="date" id="settingsBirthdate" readonly>
+                </div>
             </div>
-            <div class="form-group">
-                <label>E-Mail</label>
-                <input type="email" id="settingsEmail" readonly>
+            <div class="settings-section">
+                <h3>Benachrichtigungen</h3>
+                <div id="userNotifications" style="max-height: 300px; overflow-y: auto;"></div>
             </div>
-            <div class="form-group">
-                <label>Mitglied seit</label>
-                <input type="text" id="settingsMemberSince" readonly>
-            </div>
-            <h3 style="color: var(--primary-green); margin: 2rem 0 1rem;">Benachrichtigungen</h3>
-            <div id="notificationsList"></div>
-            <button class="btn-secondary" onclick="handleLogout()" style="width: 100%; margin-top: 2rem;">Abmelden</button>
+            <button class="btn-secondary" onclick="closeModal('settingsModal')" style="width: 100%; margin-top: 1rem;">Schließen</button>
         </div>
     </div>
 
-    <!-- Upload Modal -->
     <div id="uploadModal" class="modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('uploadModal')">&times;</button>
@@ -279,26 +283,25 @@
                         <input type="number" id="weight" min="1" step="0.1" required oninput="calculatePrice()">
                     </div>
                     <div class="form-group">
-                        <label>Material</label>
-                        <select id="material" onchange="calculatePrice()">
-                            <option value="pla">PLA (50% Rabatt!)</option>
-                            <option value="tpu">TPU (+10€)</option>
-                            <option value="asa">ASA (+10€)</option>
-                            <option value="abs">ABS (+10€)</option>
-                            <option value="petg">PETG (+10€)</option>
-                            <option value="pla-cf">PLA Carbon Fiber (+10€)</option>
-                            <option value="petg-cf">PETG Carbon Fiber (+10€)</option>
-                            <option value="pla-wood">PLA Wood (+10€)</option>
-                            <option value="pla-glow">PLA Glow in the Dark (+10€)</option>
-                            <option value="pla-marble">PLA Marble (+10€)</option>
-                            <option value="pla-silk">PLA Silk (+10€)</option>
+                        <label>Nozzle-Größe</label>
+                        <select id="nozzleSize" onchange="calculatePrice()">
+                            <option value="0.4">0,4mm Hardened Steel (Standard)</option>
+                            <option value="0.2">0,2mm Stainless Steel (+4€, nur PLA)</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Nozzle-Größe</label>
-                        <select id="nozzle" onchange="calculatePrice()">
-                            <option value="0.4">0.4mm Hardened Steel (Standard)</option>
-                            <option value="0.2">0.2mm Stainless Steel (+4€, nur PLA)</option>
+                        <label>Material</label>
+                        <select id="material" onchange="calculatePrice()">
+                            <option value="pla">PLA (Standard - 50% Rabatt!)</option>
+                            <option value="tpu">TPU (Flexibel)</option>
+                            <option value="asa">ASA (UV-beständig)</option>
+                            <option value="abs">ABS (Hitzebeständig)</option>
+                            <option value="petg">PETG (Robust)</option>
+                            <option value="pla-cf">PLA Carbon Fiber</option>
+                            <option value="petg-cf">PETG Carbon Fiber</option>
+                            <option value="pla-wood">PLA Wood (Holzoptik)</option>
+                            <option value="pla-glow">PLA Glow (Leuchtend)</option>
+                            <option value="pla-marble">PLA Marble (Marmor)</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -325,13 +328,13 @@
         </div>
     </div>
 
-    <!-- Product Detail Modal -->
     <div id="productDetailModal" class="modal">
         <div class="modal-content modal-content-large">
             <button class="modal-close" onclick="closeModal('productDetailModal')">&times;</button>
             <div class="product-detail-grid">
                 <div>
-                    <div id="detailImage" style="width: 100%; height: 300px; background: var(--card-bg); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 4rem; overflow: hidden;"></div>
+                    <div id="detailImage" class="detail-image-container"></div>
+                    <div id="detailThumbnails" class="detail-thumbnails"></div>
                 </div>
                 <div>
                     <h2 id="detailName"></h2>
@@ -360,7 +363,6 @@
         </div>
     </div>
 
-    <!-- Cart Modal -->
     <div id="cartModal" class="modal">
         <div class="modal-content" style="max-width: 700px;">
             <button class="modal-close" onclick="closeModal('cartModal')">&times;</button>
@@ -373,7 +375,6 @@
         </div>
     </div>
 
-    <!-- Checkout Modal -->
     <div id="checkoutModal" class="modal">
         <div class="modal-content" style="max-width: 600px;">
             <button class="modal-close" onclick="closeModal('checkoutModal')">&times;</button>
@@ -417,17 +418,17 @@
 
                 <h3 style="color: var(--primary-green); margin: 2rem 0 1rem;">Zahlungsmethode</h3>
                 <div class="form-group">
-                    <select id="paymentMethod" onchange="checkPrivatePayment()" required>
+                    <select id="paymentMethod" onchange="handlePaymentMethodChange()" required>
                         <option value="">Bitte wählen...</option>
                         <option value="paypal">PayPal</option>
                         <option value="stripe">Kreditkarte (Stripe)</option>
                         <option value="transfer">Überweisung</option>
                         <option value="private">Privat (nur für Bekannte)</option>
                     </select>
-                </div>
-                <div id="privatePaymentWarning" class="hidden" style="background: rgba(255, 68, 68, 0.1); border: 1px solid var(--red-accent); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
-                    <p style="color: var(--red-accent); font-weight: 600;">⚠️ Achtung:</p>
-                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Die Option "Privat" ist aktuell nur für bekannte Nutzer verfügbar. Wenn Sie diese Zahlungsoption trotzdem auswählen, wird Ihre Bestellung möglicherweise ignoriert.</p>
+                    <div id="privatePaymentWarning" class="hidden" style="background: var(--card-bg); padding: 1rem; border-radius: 8px; margin-top: 1rem; border: 2px solid #ff4444;">
+                        <p style="color: #ff4444; font-weight: 600;">⚠️ Warnung</p>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Diese Zahlungsoption ist aktuell nur für bekannte Nutzer verfügbar. Wenn Sie diese Option trotzdem auswählen, wird Ihre Bestellung möglicherweise ignoriert.</p>
+                    </div>
                 </div>
 
                 <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 8px; margin: 2rem 0;">
@@ -457,12 +458,13 @@
         </div>
     </div>
 
-    <!-- Add/Edit Product Modal (Admin) -->
+    <!-- Admin Modals -->
     <div id="addProductModal" class="modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('addProductModal')">&times;</button>
             <h2 id="productModalTitle">Neues Produkt hinzufügen</h2>
-            <form id="productForm" onsubmit="handleAddProduct(event)">
+            <form id="addProductForm" onsubmit="handleAddProduct(event)">
+                <input type="hidden" id="editProductId">
                 <div class="form-group">
                     <label>Produktname</label>
                     <input type="text" id="productName" required>
@@ -476,6 +478,10 @@
                     <input type="number" id="productPrice" step="0.01" min="0" required>
                 </div>
                 <div class="form-group">
+                    <label>Gewicht (g)</label>
+                    <input type="number" id="productWeight" min="1" required>
+                </div>
+                <div class="form-group">
                     <label>Kategorie</label>
                     <select id="productCategory" required>
                         <option value="internet">Internet-Modelle</option>
@@ -483,26 +489,13 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Gewicht (Gramm)</label>
-                    <input type="number" id="productWeight" min="1" required>
+                    <label>Bild-URLs (eine pro Zeile für verschiedene Farben)</label>
+                    <textarea id="productImages" placeholder="https://example.com/bild1.jpg&#10;https://example.com/bild2.jpg" rows="4"></textarea>
+                    <small style="color: var(--text-secondary);">Tipp: Verwenden Sie Imgur.com oder ImgBB.com zum Hochladen</small>
                 </div>
                 <div class="form-group">
-                    <label>Bild (Emoji oder URL)</label>
-                    <input type="text" id="productImage" placeholder="z.B. 📱 oder https://..." required>
-                    <small style="color: var(--text-secondary); display: block; margin-top: 0.25rem;">
-                        Für einzelnes Bild
-                    </small>
-                </div>
-                <div class="form-group">
-                    <label>Mehrere Bilder für verschiedene Farben (optional)</label>
-                    <textarea id="productImages" placeholder="Ein Bild pro Zeile (in der gleichen Reihenfolge wie die Farben)&#10;z.B.:&#10;https://bild-schwarz.jpg&#10;https://bild-weiss.jpg&#10;https://bild-blau.jpg"></textarea>
-                    <small style="color: var(--text-secondary); display: block; margin-top: 0.25rem;">
-                        Falls leer, wird das einzelne Bild oben für alle Farben verwendet
-                    </small>
-                </div>
-                <div class="form-group">
-                    <label>Verfügbare Farben (Hex-Codes, kommagetrennt)</label>
-                    <input type="text" id="productColors" placeholder="z.B. #000000,#FFFFFF,#0066cc" required>
+                    <label>Verfügbare Farben (Hex-Codes, eine pro Zeile)</label>
+                    <textarea id="productColors" placeholder="#000000&#10;#FFFFFF&#10;#0066cc" rows="4" required></textarea>
                 </div>
                 <div class="form-group">
                     <label>Auf Lager</label>
@@ -511,39 +504,49 @@
                         <option value="false">Nein</option>
                     </select>
                 </div>
-                <input type="hidden" id="editProductId">
                 <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem;">Speichern</button>
             </form>
         </div>
     </div>
 
-    <!-- Message Customer Modal (Admin) -->
-    <div id="messageCustomerModal" class="modal">
+    <div id="orderDetailModal" class="modal">
+        <div class="modal-content modal-content-large">
+            <button class="modal-close" onclick="closeModal('orderDetailModal')">&times;</button>
+            <h2>Bestelldetails</h2>
+            <div id="orderDetailContent"></div>
+        </div>
+    </div>
+
+    <div id="notifyCustomerModal" class="modal">
         <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('messageCustomerModal')">&times;</button>
+            <button class="modal-close" onclick="closeModal('notifyCustomerModal')">&times;</button>
             <h2>Kunde benachrichtigen</h2>
-            <form id="messageForm" onsubmit="handleSendMessage(event)">
+            <form id="notifyForm" onsubmit="handleNotifyCustomer(event)">
+                <input type="hidden" id="notifyOrderId">
                 <div class="form-group">
-                    <label>Empfänger</label>
-                    <input type="text" id="messageRecipient" readonly>
+                    <label>Nachrichtentyp</label>
+                    <select id="notifyType" required>
+                        <option value="price">Preisänderung</option>
+                        <option value="time">Zeitänderung</option>
+                        <option value="question">Rückfrage</option>
+                        <option value="custom">Benutzerdefiniert</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Nachricht</label>
-                    <textarea id="messageText" required placeholder="Ihre Nachricht an den Kunden..."></textarea>
+                    <textarea id="notifyMessage" required placeholder="Ihre Nachricht an den Kunden..."></textarea>
                 </div>
-                <input type="hidden" id="messageUserId">
-                <button type="submit" class="btn-primary" style="width: 100%;">Nachricht senden</button>
+                <button type="submit" class="btn-primary" style="width: 100%;">Benachrichtigung senden</button>
             </form>
         </div>
     </div>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase Integration -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        // TODO: Replace with your Firebase config
         const firebaseConfig = {
           apiKey: "AIzaSyDazql6oJx5_z3hASwmo4200-OpQhodZVc",
           authDomain: "d-druckservice-jtprint.firebaseapp.com",
@@ -571,58 +574,64 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const isAdmin = user.email === 'jona.thielgen@gmail.com';
+                window.isAdmin = isAdmin;
                 
                 document.getElementById('nav-auth').innerHTML = `
                     <span style="color: var(--text-secondary);">${user.email}</span>
                     <button class="btn-secondary" onclick="handleLogout()">Abmelden</button>
                 `;
-                document.getElementById('nav-settings').classList.remove('hidden');
                 document.getElementById('nav-cart').classList.remove('hidden');
+                document.getElementById('nav-settings').classList.remove('hidden');
                 
                 if (isAdmin) {
-                    document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
-                    window.isAdmin = true;
+                    document.getElementById('adminTabs').classList.remove('hidden');
+                    document.getElementById('adminPanel').classList.remove('hidden');
+                    document.querySelector('.hero').style.display = 'none';
+                    document.querySelector('.container').style.display = 'none';
+                    loadAdminData();
                 } else {
-                    window.isAdmin = false;
+                    document.getElementById('adminTabs').classList.add('hidden');
+                    document.getElementById('adminPanel').classList.add('hidden');
+                    document.querySelector('.hero').style.display = 'block';
+                    document.querySelector('.container').style.display = 'block';
                 }
                 
-                await loadUserData(user);
                 loadProducts();
-                
-                if (isAdmin) {
-                    loadOrders();
-                    loadChats();
-                }
+                loadUserSettings(user);
             } else {
                 document.getElementById('nav-auth').innerHTML = `
                     <button class="btn-secondary" onclick="showLoginModal()">Anmelden</button>
                 `;
-                document.getElementById('nav-settings').classList.add('hidden');
                 document.getElementById('nav-cart').classList.add('hidden');
-                document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
-                window.isAdmin = false;
-                showPublicSite();
+                document.getElementById('nav-settings').classList.add('hidden');
+                document.getElementById('adminTabs').classList.add('hidden');
+                document.getElementById('adminPanel').classList.add('hidden');
+                document.querySelector('.hero').style.display = 'block';
+                document.querySelector('.container').style.display = 'block';
                 loadProducts();
             }
         });
 
-        async function loadUserData(user) {
+        async function loadProducts() {
             try {
-                const userDoc = await window.firebaseDbFunctions.getDocs(
-                    window.firebaseDbFunctions.query(
-                        window.firebaseDbFunctions.collection(window.firebaseDb, 'users'),
-                        window.firebaseDbFunctions.where('email', '==', user.email)
-                    )
+                const productsQuery = await window.firebaseDbFunctions.getDocs(
+                    window.firebaseDbFunctions.collection(window.firebaseDb, 'products')
                 );
                 
-                if (!userDoc.empty) {
-                    window.currentUserData = userDoc.docs[0].data();
-                    window.currentUserData.uid = user.uid;
-                }
+                window.allProducts = [];
+                productsQuery.forEach((doc) => {
+                    window.allProducts.push({ id: doc.id, ...doc.data() });
+                });
+                
+                displayProducts();
+                displayGallery();
             } catch (error) {
-                console.log('Error loading user data:', error);
+                console.log('Laden von Beispieldaten...');
+                loadSampleProducts();
             }
         }
+
+        window.loadProducts = loadProducts;
     </script>
 
     <script src="script.js"></script>
