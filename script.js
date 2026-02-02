@@ -1360,3 +1360,22 @@ document.querySelectorAll('.modal').forEach(modal => {
         }
     });
 });
+
+// Navigation event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Ensure public site is shown when clicking normal nav links
+    const publicNavLinks = document.querySelectorAll('.nav-links a[href^="#"]:not(.admin-only a)');
+    publicNavLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            showPublicSite();
+        });
+    });
+});
+
+// Handle hash changes to show public site
+window.addEventListener('hashchange', function() {
+    const hash = window.location.hash;
+    if (hash && (hash === '#home' || hash === '#services' || hash === '#gallery' || hash === '#products')) {
+        showPublicSite();
+    }
+});
