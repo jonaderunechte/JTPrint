@@ -13,25 +13,25 @@
     <!-- Header -->
     <header>
         <nav>
-            <div class="logo-container">
+            <div class="logo-container" onclick="goToHome()" style="cursor: pointer;">
                 <img src="https://i.postimg.cc/433yTPrC/296ae7d7-58c3-4968-b8a8-e6b6add85135-removebg-preview.png" alt="JT Print Logo" class="logo-image">
                 <span class="logo-text">JT Print</span>
             </div>
             <ul class="nav-links">
-                <li><a href="#home" onclick="showPublicSite()">Home</a></li>
-                <li><a href="#services" onclick="showPublicSite()">Services</a></li>
-                <li><a href="#gallery" onclick="showPublicSite()">Galerie</a></li>
-                <li><a href="#products" onclick="showPublicSite()">Produkte</a></li>
+                <li><a href="#home" onclick="showPublicSite(); return false;">Home</a></li>
+                <li><a href="#services" onclick="showPublicSite(); return false;">Services</a></li>
+                <li><a href="#gallery" onclick="showPublicSite(); return false;">Galerie</a></li>
+                <li><a href="#products" onclick="showPublicSite(); return false;">Produkte</a></li>
                 
                 <!-- Admin Tabs (nur sichtbar wenn Admin eingeloggt) -->
                 <li class="hidden admin-only">
-                    <a href="#" onclick="showAdminPanel('orders')">📦 Bestellungen</a>
+                    <a href="#" onclick="showAdminPanel('orders'); return false;">📦 Bestellungen</a>
                 </li>
                 <li class="hidden admin-only">
-                    <a href="#" onclick="showAdminPanel('products')">🛍️ Produkte</a>
+                    <a href="#" onclick="showAdminPanel('products'); return false;">🛍️ Produkte</a>
                 </li>
                 <li class="hidden admin-only">
-                    <a href="#" onclick="showAdminPanel('chat')">💬 Chats</a>
+                    <a href="#" onclick="showAdminPanel('chat'); return false;">💬 Chats</a>
                 </li>
                 
                 <li id="nav-auth">
@@ -161,7 +161,10 @@
             <div class="chat-messages" id="chatMessages">
                 <div class="chat-message admin">
                     Hallo! Ich bin hier um Ihnen bei Ihrem Custom Design zu helfen. Beschreiben Sie mir einfach Ihre Idee und ich erstelle Ihnen ein Angebot.<br><br>
-                    <strong>Mein Stundensatz: 20€/h oder Preisvorschlag</strong>
+                    <strong>Mein Stundensatz: 20€/h oder Preisvorschlag</strong><br><br>
+                    <em style="font-size: 0.9rem; color: var(--text-secondary);">
+                        Hinweis: Ich werde Sie möglicherweise nach weiteren Informationen über das Design fragen (Maße, Funktionen, Präferenzen etc.), um das beste Ergebnis zu erzielen.
+                    </em>
                 </div>
             </div>
             <div class="chat-input-container">
@@ -223,6 +226,12 @@
                 </div>
                 <div id="registerError" class="error-message hidden"></div>
                 <div id="registerSuccess" class="success-message hidden"></div>
+                <div id="registerEmailInfo" class="hidden" style="background: rgba(0, 204, 153, 0.1); border: 1px solid var(--primary-green); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                    <p style="color: var(--primary-green); font-weight: 600;">📧 E-Mail-Bestätigung erforderlich</p>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+                        Wir haben Ihnen eine Bestätigungs-E-Mail gesendet. Bitte überprüfen Sie auch Ihren <strong>Spam-Ordner</strong>, falls Sie die E-Mail nicht finden!
+                    </p>
+                </div>
                 <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem;">Registrieren</button>
             </form>
         </div>
@@ -271,8 +280,17 @@
                     <div class="form-group">
                         <label>Material</label>
                         <select id="material" onchange="calculatePrice()">
-                            <option value="pla">Bambu Lab PLA (50% Rabatt!)</option>
-                            <option value="other">Anderes Material (+10€)</option>
+                            <option value="pla">PLA (50% Rabatt!)</option>
+                            <option value="tpu">TPU (+10€)</option>
+                            <option value="asa">ASA (+10€)</option>
+                            <option value="abs">ABS (+10€)</option>
+                            <option value="petg">PETG (+10€)</option>
+                            <option value="pla-cf">PLA Carbon Fiber (+10€)</option>
+                            <option value="petg-cf">PETG Carbon Fiber (+10€)</option>
+                            <option value="pla-wood">PLA Wood (+10€)</option>
+                            <option value="pla-glow">PLA Glow in the Dark (+10€)</option>
+                            <option value="pla-marble">PLA Marble (+10€)</option>
+                            <option value="pla-silk">PLA Silk (+10€)</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -470,6 +488,16 @@
                 <div class="form-group">
                     <label>Bild (Emoji oder URL)</label>
                     <input type="text" id="productImage" placeholder="z.B. 📱 oder https://..." required>
+                    <small style="color: var(--text-secondary); display: block; margin-top: 0.25rem;">
+                        Für einzelnes Bild
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label>Mehrere Bilder für verschiedene Farben (optional)</label>
+                    <textarea id="productImages" placeholder="Ein Bild pro Zeile (in der gleichen Reihenfolge wie die Farben)&#10;z.B.:&#10;https://bild-schwarz.jpg&#10;https://bild-weiss.jpg&#10;https://bild-blau.jpg"></textarea>
+                    <small style="color: var(--text-secondary); display: block; margin-top: 0.25rem;">
+                        Falls leer, wird das einzelne Bild oben für alle Farben verwendet
+                    </small>
                 </div>
                 <div class="form-group">
                     <label>Verfügbare Farben (Hex-Codes, kommagetrennt)</label>
@@ -515,7 +543,7 @@
         import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         // TODO: Replace with your Firebase config
-      const firebaseConfig = {
+     const firebaseConfig = {
           apiKey: "AIzaSyDazql6oJx5_z3hASwmo4200-OpQhodZVc",
           authDomain: "d-druckservice-jtprint.firebaseapp.com",
           projectId: "d-druckservice-jtprint",
