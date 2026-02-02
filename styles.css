@@ -82,13 +82,18 @@ nav {
 }
 
 .logo-image {
-    height: 50px;
+    height: 70px;
     width: auto;
+    transition: transform 0.3s ease;
+}
+
+.logo-image:hover {
+    transform: scale(1.05);
 }
 
 .logo-text {
     font-family: 'Orbitron', sans-serif;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 700;
     background: var(--primary-gradient);
     -webkit-background-clip: text;
