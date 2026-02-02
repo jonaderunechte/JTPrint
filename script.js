@@ -9,13 +9,6 @@ let isAdmin = false;
 let currentUserData = null;
 let currentEditProductId = null;
 
-// Navigate to home
-function goToHome() {
-    showPublicSite();
-    window.location.hash = 'home';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
 // Sample Products
 const sampleProducts = [
     {
@@ -299,22 +292,6 @@ function createOrderCard(order) {
                 💬 Kunde benachrichtigen
             </button>
             
-            <button class="btn-secondary" onclick="notifyPriceChange('${order.userId}', '${order.userEmail}', '${order.id}', 'higher')">
-                💰 Preis höher
-            </button>
-            
-            <button class="btn-secondary" onclick="notifyPriceChange('${order.userId}', '${order.userEmail}', '${order.id}', 'lower')">
-                💰 Preis niedriger
-            </button>
-            
-            <button class="btn-secondary" onclick="notifyTimeChange('${order.userId}', '${order.userEmail}', '${order.id}', 'longer')">
-                ⏰ Dauert länger
-            </button>
-            
-            <button class="btn-secondary" onclick="notifyTimeChange('${order.userId}', '${order.userEmail}', '${order.id}', 'shorter')">
-                ⏰ Dauert kürzer
-            </button>
-            
             ${order.status === 'completed' || order.status === 'rejected' ? `
                 <button class="btn-danger" onclick="deleteOrder('${order.id}')">
                     🗑️ Bestellung entfernen
@@ -415,40 +392,6 @@ async function handleSendMessage(event) {
     } catch (error) {
         console.error('Error sending message:', error);
         alert('Fehler beim Senden der Nachricht');
-    }
-}
-
-async function notifyPriceChange(userId, userEmail, orderId, direction) {
-    const priceText = direction === 'higher' ? 'höher ausfallen' : 'niedriger ausfallen';
-    const reason = prompt(`Warum wird der Preis ${priceText}?\n\nz.B. "Falsches Gewicht angegeben", "Material aktuell nicht verfügbar", etc.`);
-    
-    if (!reason) return;
-    
-    const message = `⚠️ Preisänderung für Bestellung #${orderId.substring(0, 8)}\n\nIhr Auftrag wird voraussichtlich ${priceText} als ursprünglich kalkuliert.\n\nGrund: ${reason}\n\nWir werden Sie mit dem genauen Preis kontaktieren, bevor wir fortfahren.`;
-    
-    try {
-        await sendNotification(userId, message);
-        alert('Kunde wurde über die Preisänderung informiert!');
-    } catch (error) {
-        console.error('Error sending notification:', error);
-        alert('Fehler beim Senden der Benachrichtigung');
-    }
-}
-
-async function notifyTimeChange(userId, userEmail, orderId, direction) {
-    const timeText = direction === 'longer' ? 'länger dauern' : 'schneller fertig sein';
-    const reason = prompt(`Warum wird es ${timeText}?\n\nz.B. "Komplexeres Design als erwartet", "Drucker schneller verfügbar", etc.`);
-    
-    if (!reason) return;
-    
-    const message = `⏰ Zeitänderung für Bestellung #${orderId.substring(0, 8)}\n\nIhr Auftrag wird voraussichtlich ${timeText} als ursprünglich geschätzt.\n\nGrund: ${reason}\n\nWir halten Sie auf dem Laufenden!`;
-    
-    try {
-        await sendNotification(userId, message);
-        alert('Kunde wurde über die Zeitänderung informiert!');
-    } catch (error) {
-        console.error('Error sending notification:', error);
-        alert('Fehler beim Senden der Benachrichtigung');
     }
 }
 
@@ -562,7 +505,6 @@ function editProduct(productId) {
     document.getElementById('productCategory').value = product.category;
     document.getElementById('productWeight').value = product.weight;
     document.getElementById('productImage').value = product.image;
-    document.getElementById('productImages').value = product.images && Array.isArray(product.images) ? product.images.join('\n') : '';
     document.getElementById('productColors').value = product.colors.join(',');
     document.getElementById('productInStock').value = product.inStock.toString();
     document.getElementById('editProductId').value = productId;
@@ -574,9 +516,6 @@ function editProduct(productId) {
 async function handleAddProduct(event) {
     event.preventDefault();
     
-    const imagesText = document.getElementById('productImages').value.trim();
-    const imagesArray = imagesText ? imagesText.split('\n').map(img => img.trim()).filter(img => img) : null;
-    
     const productData = {
         name: document.getElementById('productName').value,
         description: document.getElementById('productDescription').value,
@@ -584,7 +523,6 @@ async function handleAddProduct(event) {
         category: document.getElementById('productCategory').value,
         weight: parseInt(document.getElementById('productWeight').value),
         image: document.getElementById('productImage').value,
-        images: imagesArray, // Multiple images for color variations
         colors: document.getElementById('productColors').value.split(',').map(c => c.trim()),
         inStock: document.getElementById('productInStock').value === 'true'
     };
@@ -776,19 +714,9 @@ function showProductDetail(product) {
     currentProduct = product;
     selectedQuantity = 1;
     
-    // Handle multiple images or single image
-    let imageContent;
-    if (product.images && Array.isArray(product.images) && product.images.length > 0) {
-        // Multiple images for different colors
-        imageContent = product.images[0].startsWith('http') 
-            ? `<img src="${product.images[0]}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;" id="productDetailImageElement">` 
-            : `<span id="productDetailImageElement" style="font-size: 4rem;">${product.images[0]}</span>`;
-    } else {
-        // Single image fallback
-        imageContent = product.image.startsWith('http') 
-            ? `<img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;" id="productDetailImageElement">` 
-            : `<span id="productDetailImageElement" style="font-size: 4rem;">${product.image}</span>`;
-    }
+    const imageContent = product.image.startsWith('http') 
+        ? `<img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">` 
+        : product.image;
     
     document.getElementById('detailImage').innerHTML = imageContent;
     document.getElementById('detailName').textContent = product.name;
@@ -803,7 +731,7 @@ function showProductDetail(product) {
         const colorDiv = document.createElement('div');
         colorDiv.className = 'color-option' + (index === 0 ? ' selected' : '');
         colorDiv.style.background = color;
-        colorDiv.onclick = () => selectColor(colorDiv, color, index);
+        colorDiv.onclick = () => selectColor(colorDiv, color);
         colorSelector.appendChild(colorDiv);
     });
     
@@ -812,36 +740,10 @@ function showProductDetail(product) {
     document.getElementById('productDetailModal').classList.add('active');
 }
 
-function selectColor(element, color, colorIndex) {
+function selectColor(element, color) {
     document.querySelectorAll('.color-option').forEach(el => el.classList.remove('selected'));
     element.classList.add('selected');
     selectedColor = color;
-    
-    // Change product image if multiple images available
-    if (currentProduct.images && Array.isArray(currentProduct.images) && currentProduct.images[colorIndex]) {
-        const imageElement = document.getElementById('productDetailImageElement');
-        if (imageElement) {
-            if (currentProduct.images[colorIndex].startsWith('http')) {
-                // Update img src
-                if (imageElement.tagName === 'IMG') {
-                    imageElement.src = currentProduct.images[colorIndex];
-                } else {
-                    // Replace span with img
-                    document.getElementById('detailImage').innerHTML = 
-                        `<img src="${currentProduct.images[colorIndex]}" alt="${currentProduct.name}" style="width: 100%; height: 100%; object-fit: cover;" id="productDetailImageElement">`;
-                }
-            } else {
-                // Update emoji/text
-                if (imageElement.tagName === 'SPAN') {
-                    imageElement.textContent = currentProduct.images[colorIndex];
-                } else {
-                    // Replace img with span
-                    document.getElementById('detailImage').innerHTML = 
-                        `<span id="productDetailImageElement" style="font-size: 4rem;">${currentProduct.images[colorIndex]}</span>`;
-                }
-            }
-        }
-    }
 }
 
 function changeQuantity(delta) {
@@ -889,8 +791,7 @@ function calculatePrice() {
     const pricePerGram = 0.20;
     let total = basePrice + (weight * pricePerGram);
 
-    // Add special material cost (all except standard PLA)
-    if (material !== 'pla') {
+    if (material === 'other') {
         total += 10;
     }
 
@@ -902,27 +803,12 @@ function calculatePrice() {
         total *= 1.30;
     }
 
-    // Get material display name
-    const materialNames = {
-        'pla': 'PLA',
-        'tpu': 'TPU',
-        'asa': 'ASA',
-        'abs': 'ABS',
-        'petg': 'PETG',
-        'pla-cf': 'PLA Carbon Fiber',
-        'petg-cf': 'PETG Carbon Fiber',
-        'pla-wood': 'PLA Wood',
-        'pla-glow': 'PLA Glow in the Dark',
-        'pla-marble': 'PLA Marble',
-        'pla-silk': 'PLA Silk'
-    };
-
     let breakdown = `Grundpreis: ${basePrice}€`;
     if (isPLA) {
         breakdown += ' <span class="discount-badge">-50%</span> <span class="original-price">8€</span>';
     }
-    breakdown += `<br>Material (${materialNames[material]}): ${(weight * pricePerGram).toFixed(2)}€`;
-    if (material !== 'pla') breakdown += `<br>Spezialmaterial: +10€`;
+    breakdown += `<br>Material: ${(weight * pricePerGram).toFixed(2)}€`;
+    if (material === 'other') breakdown += `<br>Spezialmaterial: +10€`;
     if (nozzle === '0.2') breakdown += `<br>0.2mm Nozzle: +4€`;
     if (express === 'yes') breakdown += `<br>Express: +30%`;
 
@@ -1052,13 +938,12 @@ async function handleRegister(event) {
             }
         );
 
-        successDiv.textContent = 'Registrierung erfolgreich!';
+        successDiv.textContent = 'Registrierung erfolgreich! Bitte bestätigen Sie Ihre E-Mail-Adresse.';
         successDiv.classList.remove('hidden');
-        document.getElementById('registerEmailInfo').classList.remove('hidden');
 
         setTimeout(() => {
             closeModal('registerModal');
-        }, 5000);
+        }, 2000);
     } catch (error) {
         errorDiv.textContent = 'Fehler: ' + error.message;
         errorDiv.classList.remove('hidden');
@@ -1079,22 +964,7 @@ async function handleLogin(event) {
         );
         closeModal('loginModal');
     } catch (error) {
-        let errorMessage = 'Fehler beim Anmelden';
-        
-        // User-friendly error messages
-        if (error.code === 'auth/invalid-credential' || 
-            error.code === 'auth/wrong-password' || 
-            error.code === 'auth/user-not-found') {
-            errorMessage = 'Falsches Passwort oder E-Mail-Adresse';
-        } else if (error.code === 'auth/invalid-email') {
-            errorMessage = 'Ungültige E-Mail-Adresse';
-        } else if (error.code === 'auth/user-disabled') {
-            errorMessage = 'Dieser Account wurde deaktiviert';
-        } else if (error.code === 'auth/too-many-requests') {
-            errorMessage = 'Zu viele fehlgeschlagene Versuche. Bitte versuchen Sie es später erneut';
-        }
-        
-        errorDiv.textContent = errorMessage;
+        errorDiv.textContent = 'Fehler: ' + error.message;
         errorDiv.classList.remove('hidden');
     }
 }
