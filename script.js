@@ -125,7 +125,7 @@ function showCart() {
 }
 
 function showSettingsModal() {
-    if (!window.firebaseAuth.currentUser || !currentUserData) return;
+    if (!window.firebaseAuth.currentUser) return;
     
     document.getElementById('settingsName').value = currentUserData.name || '';
     document.getElementById('settingsEmail').value = currentUserData.email || '';
