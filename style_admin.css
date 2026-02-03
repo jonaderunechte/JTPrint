@@ -7,7 +7,7 @@
 .admin-section { display:none; }
 .admin-section.active { display:block; }
 
-/* ===== ORDER CARDS ===== */
+/* ===== ORDER CARDS===== */
 .order-card {
     background:var(--card); border:1px solid var(--border);
     border-radius:14px; padding:1.3rem; margin-bottom:1rem;
