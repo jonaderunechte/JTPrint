@@ -104,15 +104,38 @@ const SAMPLE_ORDERS = [
 ];
 
 // ─── NOTIFICATION HELPERS ────────────────────────────────────
+// Funktion zum Aktualisieren des roten Punktes am User-Icon
+function updateNotificationBadge() {
+  const badge = document.getElementById('notif-badge'); // Stelle sicher, dass dieses Element im HTML existiert
+  const unreadCount = notifications.filter(n => !n.read).length;
+  if (badge) {
+    badge.textContent = unreadCount;
+    badge.classList.toggle('hidden', unreadCount === 0);
+  }
+}
+
+// Benachrichtigung hinzufügen und in Firebase speichern
 async function addNotification(title, text, targetUserId = null) {
   const notification = {
     title,
     text,
-    time: 'Gerade eben',
-    timestamp: new Date().toISOString(),
+    time: new Date().toISOString(),
     read: false,
     userId: targetUserId || (window.currentUser ? window.currentUser.uid : 'system')
   };
+
+  notifications.unshift(notification);
+  updateNotificationBadge();
+
+  // Persistenz: In Firestore speichern
+  if (window.fbDb && window.fbFuncs) {
+    try {
+      await window.fbFuncs.addDoc(window.fbFuncs.collection(window.fbDb, 'notifications'), notification);
+    } catch (err) {
+      console.error("Fehler beim Speichern der Benachrichtigung:", err);
+    }
+  }
+}
 
   // 1. Lokal hinzufügen (für sofortige Anzeige)
   notifications.unshift(notification);
