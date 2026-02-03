@@ -130,12 +130,24 @@ function updateOrderStatus(orderId, newStatus) {
   addNotification('Status geändert', `${orderId} → ${(STATUS_OPTIONS.find(s=>s.val===newStatus)||{}).label}`);
 }
 
-// ─── COMPLETE & REMOVE ORDER ──────────────────────────────────
-function completeOrder(orderId) {
-  if (!confirm('Bestellung ' + orderId + ' als fertig markieren und entfernen?')) return;
+// In script_admin.js
+async function completeOrder(orderId) {
+  if (!confirm('Bestellung wirklich als erledigt markieren und löschen?')) return;
+
+  // 1. Aus lokalem Array löschen
   orders = orders.filter(o => o.id !== orderId);
   renderOrders();
-  addNotification('Bestellung fertig', orderId + ' wurde als abgeschlossen markiert.');
+
+  // 2. In Firestore löschen (Das fehlt wahrscheinlich!)
+  if (window.fbDb) {
+    try {
+      const { deleteDoc, doc } = window.fbFuncs;
+      await deleteDoc(doc(window.fbDb, 'orders', orderId));
+      addNotification('System', 'Bestellung wurde dauerhaft gelöscht.');
+    } catch (e) {
+      console.error("Löschen fehlgeschlagen:", e);
+    }
+  }
 }
 
 // ─── ADMIN REPLY IN CHAT ──────────────────────────────────────
