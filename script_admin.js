@@ -1,4 +1,4 @@
-/* ===== script_admin.js — Admin Panel: Orders, Products, Gallery, Chat Mgmt ===== */
+/* ===== script_admin.js — Admin Panel: Orders, Products, Gallery, Chat Mgment ===== */
 
 // ─── LOAD ORDERS ──────────────────────────────────────────────
 function loadOrders() {
