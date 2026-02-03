@@ -103,16 +103,48 @@ const SAMPLE_ORDERS = [
   }
 ];
 
-// ─── NOTIFICATION HELPERS ────────────────────────────────────
+// Hilfsfunktion für den roten Punkt am Icon
+function updateNotificationBadge() {
+  const badge = document.getElementById('notif-badge'); // Sicherstellen, dass die ID im HTML existiert
+  const unreadCount = notifications.filter(n => !n.read).length;
+  if (badge) {
+    badge.textContent = unreadCount;
+    badge.classList.toggle('hidden', unreadCount === 0);
+  }
+}
+
 async function addNotification(title, text, targetUserId = null) {
   const notification = {
     title,
     text,
-    time: 'Gerade eben',
-    timestamp: new Date().toISOString(),
+    time: new Date().toISOString(),
     read: false,
     userId: targetUserId || (window.currentUser ? window.currentUser.uid : 'system')
   };
+
+  notifications.unshift(notification);
+  updateNotificationBadge();
+
+  // Firebase Speicherung
+  if (window.fbDb && window.fbFuncs && window.currentUser) {
+    try {
+      await window.fbFuncs.addDoc(window.fbFuncs.collection(window.fbDb, 'notifications'), notification);
+    } catch (err) { console.error("Firebase Notif Error:", err); }
+  }
+}
+
+// Neue Funktion zum Laden beim Start
+async function loadProducts() {
+  if (window.fbDb) {
+    try {
+      const docs = await window.fbFuncs.getCollectionDocs(window.fbDb, 'products');
+      allProducts = docs.length > 0 ? docs : [...SAMPLE_PRODUCTS];
+      renderShop(); // Shop aktualisieren
+    } catch (e) { allProducts = [...SAMPLE_PRODUCTS]; }
+  } else {
+    allProducts = [...SAMPLE_PRODUCTS];
+  }
+}
 
   // 1. Lokal hinzufügen (für sofortige Anzeige)
   notifications.unshift(notification);
