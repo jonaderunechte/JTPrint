@@ -106,11 +106,17 @@ const SAMPLE_ORDERS = [
 // ─── NOTIFICATION HELPERS ────────────────────────────────────
 // Funktion zum Aktualisieren des roten Punktes am User-Icon
 function updateNotificationBadge() {
-  const badge = document.getElementById('notif-badge'); // Stelle sicher, dass dieses Element im HTML existiert
+  const badge = document.getElementById('notif-badge');
+  // Zähle alle Benachrichtigungen, die noch nicht "read" sind
   const unreadCount = notifications.filter(n => !n.read).length;
+  
   if (badge) {
     badge.textContent = unreadCount;
-    badge.classList.toggle('hidden', unreadCount === 0);
+    if (unreadCount > 0) {
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
   }
 }
 
