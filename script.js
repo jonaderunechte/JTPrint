@@ -4,8 +4,9 @@
 const ADMIN_EMAIL = 'jona.thielgen@gmail.com';
 
 let cart = [];
-let currentUser = null;
-let isAdmin = false;
+// In script.js ganz oben
+window.currentUser = null;
+window.isAdmin = false;
 let allProducts = [];
 let notifications = [];
 let chatMessages = [];   // per-order chat map: { orderId: [...msgs] }
