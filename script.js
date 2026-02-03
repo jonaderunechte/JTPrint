@@ -302,15 +302,7 @@ function renderNav() {
 }
 
 // ─── PRODUCT LOADING ──────────────────────────────────────────
-function loadProducts() {
-  // Try Firestore first; fallback to samples
-  if (window.fbDb) {
-    window.fbFuncs.getCollectionDocs(window.fbDb, 'products').then(docs => {
-      if (docs.length > 0) { allProducts = docs; } else { allProducts = [...SAMPLE_PRODUCTS]; }
-      renderShop(); renderGallery();
-    }).catch(() => { allProducts = [...SAMPLE_PRODUCTS]; renderShop(); renderGallery(); });
-  } else { allProducts = [...SAMPLE_PRODUCTS]; renderShop(); renderGallery(); }
-}
+
 
 function renderShop() {
   const internet = document.getElementById('internet-products');
