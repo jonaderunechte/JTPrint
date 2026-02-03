@@ -453,7 +453,7 @@
           appId: "1:247787543764:web:b3cc1e7d05eb8aa2abef41"
      };
 
-  const app  = initializeApp(cfg);
+  const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db   = getFirestore(app);
 
@@ -478,17 +478,17 @@
 
   // Auth state listener
   onAuthStateChanged(auth, (user) => {
-    currentUser = user;
+    window.currentUser = user; // Explizit auf das globale Objekt zugreifen
     if (user) {
-      isAdmin = (user.email === ADMIN_EMAIL);
-      renderNav();
-      if (isAdmin) addNotification('Admin-Modus aktiv', 'Sie sind als Administrator angemeldet.');
+        window.isAdmin = (user.email === ADMIN_EMAIL);
+        renderNav();
+        if (window.isAdmin) addNotification('Admin-Modus aktiv', 'Sie sind als Administrator angemeldet.');
     } else {
-      isAdmin = false;
-      renderNav();
-      showShop();
+        window.isAdmin = false;
+        renderNav();
+        showShop();
     }
-  });
+});
 </script>
 
 <!-- ═══════════ SCRIPTS ═══════════ -->
