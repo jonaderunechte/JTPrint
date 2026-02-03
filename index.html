@@ -1,403 +1,450 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JT Print - Professioneller 3D-Druck Service</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JT Print – 3D-Druck Service</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style_admin.css">
 </head>
 <body>
-<div class="bg-animation"></div>
+<div class="bg-anim"></div>
 
-<!-- ===================== HEADER ===================== -->
+<!-- ═══════════ HEADER ═══════════ -->
 <header>
-    <nav>
-        <div class="logo-container">
-            <img src="https://i.postimg.cc/433yTPrC/296ae7d7-58c3-4968-b8a8-e6b6add85135-removebg-preview.png" alt="JT Print Logo" class="logo-img">
-            <span class="logo-text">JT Print</span>
-        </div>
-        <ul class="nav-links" id="navLinks">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#gallery">Galerie</a></li>
-            <li><a href="#products">Produkte</a></li>
-        </ul>
-        <!-- Admin Tabs -->
-        <ul class="admin-tabs hidden" id="adminTabs">
-            <li><button class="admin-tab active" data-tab="orders" onclick="switchAdminTab('orders')">📦 Bestellungen</button></li>
-            <li><button class="admin-tab" data-tab="products" onclick="switchAdminTab('products')">🏷️ Produkte</button></li>
-            <li><button class="admin-tab" data-tab="gallery" onclick="switchAdminTab('gallery')">🖼️ Galerie</button></li>
-            <li><button class="admin-tab" data-tab="chat" onclick="switchAdminTab('chat')">💬 Chat</button></li>
-        </ul>
-        <ul class="nav-right">
-            <li id="navAuth"><button class="btn-secondary" onclick="showModal('loginModal')">Anmelden</button></li>
-            <li class="hidden" id="navCart"><div class="cart-icon" onclick="showCart()">🛒 <span class="cart-count" id="cartCount">0</span></div></li>
-            <li class="hidden" id="navSettings"><button class="btn-icon" onclick="showModal('settingsModal')">⚙️</button></li>
-        </ul>
-    </nav>
+  <nav>
+    <a href="#" class="logo" onclick="showShop()">
+      <img src="https://i.postimg.cc/433yTPrC/296ae7d7-58c3-4968-b8a8-e6b6add85135-removebg-preview.png" alt="JT Print Logo">
+      <span class="logo-txt">JT Print</span>
+    </a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#" onclick="showShop();scrollTo('home')">Home</a></li>
+      <li><a href="#" onclick="showShop();scrollTo('services')">Services</a></li>
+      <li><a href="#" onclick="showShop();scrollTo('gallery')">Galerie</a></li>
+      <li><a href="#" onclick="showShop();scrollTo('products')">Produkte</a></li>
+    </ul>
+    <div class="nav-right" id="nav-auth">
+      <button class="btn btn-sec" onclick="openModal('loginModal')">Anmelden</button>
+    </div>
+  </nav>
 </header>
 
-<!-- ===================== ADMIN PANEL ===================== -->
-<div class="admin-panel hidden" id="adminPanel">
-    <div class="admin-section active" id="adminOrders">
-        <h2 class="section-title">📦 Bestellungsverwaltung</h2>
-        <div class="admin-orders-grid" id="adminOrdersList"><p class="empty-state">Keine Bestellungen.</p></div>
+<!-- ═══════════ SHOP SECTION ═══════════ -->
+<div id="shop-section">
+  <!-- Hero -->
+  <div class="hero" id="home">
+    <h1>Professioneller 3D-Druck<br>für Ihre Ideen</h1>
+    <p>Laden Sie Ihr Design hoch oder lassen Sie uns Ihr individuelles 3D-Modell erstellen. Präzision mit der Bambu Lab P1S.</p>
+    <div class="hero-btns">
+      <button class="btn btn-pri" onclick="openUploadModal()">📁 Design hochladen</button>
+      <button class="btn btn-sec" onclick="openCustomDesign()">✏️ Custom Design</button>
     </div>
-    <div class="admin-section hidden" id="adminProducts">
-        <h2 class="section-title">🏷️ Produktverwaltung</h2>
-        <button class="btn-primary" onclick="showModal('addProductModal')">+ Neues Produkt</button>
-        <div class="admin-product-grid" id="adminProductList"></div>
-    </div>
-    <div class="admin-section hidden" id="adminGallery">
-        <h2 class="section-title">🖼️ Galerie-Verwaltung</h2>
-        <button class="btn-primary" onclick="showModal('addGalleryModal')">+ Neues Galerie-Bild</button>
-        <div class="admin-product-grid" id="adminGalleryList"></div>
-    </div>
-    <div class="admin-section hidden" id="adminChat">
-        <h2 class="section-title">💬 Chat-Verwaltung</h2>
-        <div class="admin-chat-layout">
-            <div class="admin-chat-list" id="adminChatList"><p class="empty-state">Keine Chats.</p></div>
-            <div class="admin-chat-view" id="adminChatView">
-                <div class="admin-chat-messages" id="adminChatMessages"><p class="empty-state">Wählen Sie einen Chat aus.</p></div>
-                <div class="admin-chat-input-area hidden" id="adminChatInputArea">
-                    <input type="text" class="chat-input" id="adminChatInput" placeholder="Nachricht an Kunde…" onkeypress="adminSendMsg(event)">
-                    <button class="btn-primary small" onclick="adminSendMsg()">→</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+  </div>
 
-<!-- ===================== CUSTOMER FRONTEND ===================== -->
-<div id="customerFrontend">
-    <section class="hero" id="home">
-        <h1>Professioneller 3D-Druck<br>für Ihre Ideen</h1>
-        <p>Laden Sie Ihr Design hoch oder lassen Sie uns Ihr individuelles 3D-Modell erstellen.</p>
-        <div class="hero-buttons">
-            <button class="btn-primary" onclick="showUploadModal()">Design hochladen</button>
-            <button class="btn-secondary" onclick="toggleChatWindow()">Custom Design anfragen</button>
+  <div class="container">
+    <!-- Services -->
+    <section id="services">
+      <h2 class="sec-title">Unsere Services</h2>
+      <div class="svc-grid">
+        <div class="svc-card">
+          <h3>🖨️ 3D-Druck Service</h3>
+          <p>Laden Sie Ihre STL-Datei hoch oder beschreiben Sie Ihr Modell.</p>
+          <ul><li>Bambu Lab P1S Drucker</li><li>Druckgröße bis 25×25 cm</li><li>Hardened Steel & Stainless Steel Düsen</li><li>50 % Rabatt auf PLA-Grundpreis!</li></ul>
         </div>
+        <div class="svc-card">
+          <h3>✏️ Custom Design</h3>
+          <p>Wir modellieren Ihr individuelles 3D-Modell in OnShape.</p>
+          <ul><li>Professionelle CAD-Modellierung</li><li>20 €/h oder Preisvorschlag</li><li>Ggf. werden weitere Infos zum Design abgefragt</li><li>Design + Fertigung</li></ul>
+        </div>
+        <div class="svc-card">
+          <h3>⚡ Express-Service</h3>
+          <p>Priorisierter Druck für dringende Aufträge.</p>
+          <ul><li>Bevorzugte Bearbeitung</li><li>3–5 Werktage</li><li>Status-Updates</li><li>+30 % Aufpreis</li></ul>
+        </div>
+      </div>
     </section>
-    <div class="container">
-        <section id="services">
-            <h2 class="section-title">Unsere Services</h2>
-            <div class="services-grid">
-                <div class="service-card">
-                    <h3>🖨️ 3D-Druck</h3>
-                    <p>Laden Sie Ihre STL-Datei hoch oder beschreiben Sie Ihr Modell.</p>
-                    <ul><li>Bambu Lab P1S</li><li>Druckgröße bis 25×25 cm</li><li>Hardened Steel & Stainless Steel Nozzle</li><li>50% Rabatt auf PLA-Grundpreis!</li></ul>
-                </div>
-                <div class="service-card">
-                    <h3>✏️ Custom Design</h3>
-                    <p>Individuelles 3D-Modell erstellen lassen.</p>
-                    <ul><li>CAD-Modellierung mit OnShape</li><li>20€/Stunde oder VB</li><li>Design + Fertigung</li></ul>
-                </div>
-                <div class="service-card">
-                    <h3>⚡ Express</h3>
-                    <p>Bevorzugte Bearbeitung für eilbedürftige Aufträge.</p>
-                    <ul><li>Priorisiert</li><li>Schnellere Lieferung</li><li>+30% Aufpreis</li></ul>
-                </div>
-            </div>
-        </section>
-        <section id="gallery">
-            <h2 class="section-title">Portfolio & Beispiele</h2>
-            <div class="product-grid" id="galleryGrid"></div>
-        </section>
-        <section id="products">
-            <h2 class="section-title">Produktkatalog</h2>
-            <div class="tabs">
-                <button class="tab active" onclick="switchProductTab('internet',this)">Internet-Modelle</button>
-                <button class="tab" onclick="switchProductTab('custom',this)">Eigene Designs</button>
-            </div>
-            <div id="internetTab" class="tab-content active"><div class="product-grid" id="internetProducts"></div></div>
-            <div id="customTab" class="tab-content"><div class="product-grid" id="customProducts"></div></div>
-        </section>
-    </div>
+
+    <!-- Gallery -->
+    <section id="gallery">
+      <h2 class="sec-title">Portfolio & Galerie</h2>
+      <div class="prod-grid" id="gallery-grid"></div>
+    </section>
+
+    <!-- Products -->
+    <section id="products">
+      <h2 class="sec-title">Produktkatalog</h2>
+      <div class="tabs">
+        <button class="tab active" onclick="switchProdTab('internet',this)">🌐 Internet-Modelle</button>
+        <button class="tab"        onclick="switchProdTab('custom',this)">✏️ Eigene Designs</button>
+      </div>
+      <div id="internet-tab" class="tab-content active"><div class="prod-grid" id="internet-products"></div></div>
+      <div id="custom-tab"   class="tab-content">       <div class="prod-grid" id="custom-products"></div></div>
+    </section>
+  </div>
 </div>
 
-<!-- ===================== CHAT WIDGET ===================== -->
+<!-- ═══════════ ADMIN PANEL ═══════════ -->
+<div id="admin-panel" class="hidden">
+  <div class="container">
+    <h2 class="sec-title" style="margin-top:1rem">🛡️ Admin Panel</h2>
+    <!-- Admin tab bar -->
+    <div class="admin-tabs">
+      <button class="admin-tab active" data-tab="orders"   onclick="switchAdminTab('orders')">📦 Bestellungen</button>
+      <button class="admin-tab"        data-tab="products" onclick="switchAdminTab('products')">🏷️ Produkte</button>
+      <button class="admin-tab"        data-tab="gallery"  onclick="switchAdminTab('gallery')">🖼️ Galerie</button>
+      <button class="btn btn-sec btn-sm" onclick="showShop()" style="margin-left:auto">← Shop</button>
+    </div>
+
+    <!-- Orders -->
+    <div class="admin-section active" id="admin-orders">
+      <div id="orders-list"></div>
+    </div>
+
+    <!-- Products -->
+    <div class="admin-section" id="admin-products">
+      <div class="editor-grid">
+        <!-- Left: existing products list -->
+        <div class="editor-left">
+          <h3 style="color:var(--green);font-size:.95rem;font-family:'Orbitron',sans-serif">Bestehende Produkte</h3>
+          <div class="prod-list" id="prod-editor-list"></div>
+        </div>
+        <!-- Right: add / edit form -->
+        <div class="editor-right">
+          <h4 id="pe-form-title">Neues Produkt hinzufügen</h4>
+          <div class="fg"><label>Name</label><input type="text" id="pe-name"></div>
+          <div class="fg"><label>Beschreibung</label><textarea id="pe-desc" style="min-height:60px"></textarea></div>
+          <div style="display:flex;gap:.7rem;flex-wrap:wrap">
+            <div class="fg" style="flex:1"><label>Preis (€)</label><input type="number" id="pe-price" step="0.01" min="0"></div>
+            <div class="fg" style="flex:1"><label>Gewicht (g)</label><input type="number" id="pe-weight" min="0"></div>
+          </div>
+          <div style="display:flex;gap:.7rem;flex-wrap:wrap">
+            <div class="fg" style="flex:1"><label>Emoji</label><input type="text" id="pe-emoji" value="📦" style="width:60px"></div>
+            <div class="fg" style="flex:1"><label>Kategorie</label>
+              <select id="pe-category"><option value="internet">Internet-Modelle</option><option value="custom">Eigene Designs</option></select>
+            </div>
+            <div class="fg" style="flex:0;align-self:flex-end;padding-bottom:.2rem">
+              <label><input type="checkbox" id="pe-instock" checked> Auf Lager</label>
+            </div>
+          </div>
+          <!-- Colors -->
+          <label style="color:var(--txt2);font-size:.85rem;font-weight:500">Farben</label>
+          <div class="color-input-row mt1" id="pe-colors"></div>
+          <div style="display:flex;gap:.4rem;align-items:center;margin-top:.5rem">
+            <input type="color" id="pe-new-color" style="width:36px;height:28px;border:none;background:none;cursor:pointer">
+            <button class="btn btn-sec btn-sm" onclick="addColorChip()">+ Farbe</button>
+          </div>
+          <!-- Images -->
+          <label style="color:var(--txt2);font-size:.85rem;font-weight:500;margin-top:.7rem;display:block">Bilder (URLs)</label>
+          <div class="img-url-list mt1" id="pe-images">
+            <div class="img-url-item"><input type="text" placeholder="Bild-URL (optional)"><button onclick="removeImgUrl(this)">✕</button></div>
+          </div>
+          <button class="btn btn-sec btn-sm mt1" onclick="addImgUrl()">+ Bild-URL</button>
+          <!-- Save -->
+          <div style="display:flex;gap:.5rem;margin-top:1rem">
+            <button class="btn btn-pri w-full" id="pe-submit-btn" onclick="saveProduct()">+ Produkt hinzufügen</button>
+            <button class="btn btn-sec btn-sm" onclick="resetProductForm()">↺</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gallery Editor -->
+    <div class="admin-section" id="admin-gallery">
+      <h3 style="color:var(--green);font-size:.95rem;font-family:'Orbitron',sans-serif;margin-bottom:.8rem">Galerie verwalten</h3>
+      <div class="gallery-grid" id="gallery-editor-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ CHAT WIDGET ═══════════ -->
 <div class="chat-widget">
-    <button class="chat-button" onclick="toggleChatWindow()">💬</button>
-    <div class="chat-window" id="chatWindow">
-        <div class="chat-header"><span>Custom Design Anfrage</span><button class="chat-close-btn" onclick="toggleChatWindow()">×</button></div>
-        <div class="chat-messages" id="chatMessages">
-            <div class="chat-msg admin">
-                Hallo! Willkommen bei <strong>JT Print</strong>.<br><br>
-                Beschreiben Sie bitte Ihr Wunschprojekt so detailliert wie möglich (Maße, Funktion, Referenzen).<br><br>
-                <strong>Stundensatz: 20€/h | Preisvorschlag möglich</strong><br><br>
-                ⚠️ Es kann sein, dass Sie nach weiteren Informationen zum Design gefragt werden – bitte bleiben Sie auf dem Laufenden.<br><br>
-                📧 <em>Falls Sie keine Antwort bekommen: Bitte überprüfen Sie auch Ihren <strong>Spam-Ordner</strong>!</em>
-            </div>
-        </div>
-        <div class="chat-input-container">
-            <input type="text" class="chat-input" id="chatInput" placeholder="Ihre Nachricht…" onkeypress="sendChat(event)">
-            <button class="btn-primary small" onclick="sendChat()">→</button>
-        </div>
+  <button class="chat-fab" onclick="toggleChat()">💬</button>
+  <div class="chat-win" id="chatWin">
+    <div class="chat-hd">Custom Design Anfrage <button onclick="toggleChat()">✕</button></div>
+    <div class="chat-msgs" id="chat-msgs">
+      <div class="chat-m b">
+        Hallo! 👋 Ich helfe Ihnen bei Ihrem Custom-Design-Auftrag.<br><br>
+        <strong>Stundensatz:</strong> 20 €/h oder Preisvorschlag – wir können verhandeln!<br><br>
+        Bitte beschreiben Sie Ihre Idee. Es ist möglich, dass ich nach <em>weiteren Informationen zum Design</em> nachfrage.
+        <div class="t">gerade eben</div>
+      </div>
     </div>
+    <div class="chat-inp">
+      <input type="text" id="chat-input" placeholder="Ihre Nachricht…" onkeydown="chatKeydown(event)">
+      <button class="btn btn-pri btn-sm" onclick="sendChat()">Send</button>
+    </div>
+  </div>
 </div>
 
-<!-- ===================== MODALS ===================== -->
-<!-- LOGIN -->
+<!-- ═══════════ MODALS ═══════════ -->
+
+<!-- Login -->
 <div class="modal" id="loginModal">
-    <div class="modal-content">
-        <button class="modal-close" onclick="closeModal('loginModal')">×</button>
-        <h2>Anmelden</h2>
-        <div class="form-group"><label>E-Mail</label><input type="email" id="loginEmail"></div>
-        <div class="form-group"><label>Passwort</label><input type="password" id="loginPassword"></div>
-        <div class="msg error hidden" id="loginError"></div>
-        <button class="btn-primary full" onclick="handleLogin()">Anmelden</button>
-        <p class="modal-footer-text">Noch kein Konto? <a href="#" onclick="showModal('registerModal');closeModal('loginModal')">Registrieren</a></p>
-    </div>
+  <div class="modal-box">
+    <button class="modal-x" onclick="closeModal('loginModal')">×</button>
+    <h2>Anmelden</h2>
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="fg"><label>E-Mail</label><input type="email" id="login-email" required></div>
+      <div class="fg"><label>Passwort</label><input type="password" id="login-pw" required></div>
+      <div class="err hidden" id="login-err"></div>
+      <button type="submit" class="btn btn-pri w-full mt1">Anmelden</button>
+    </form>
+    <p style="text-align:center;margin-top:.8rem;color:var(--txt2);font-size:.85rem">
+      Noch kein Konto? <a href="#" onclick="closeModal('loginModal');openModal('registerModal')" style="color:var(--green)">Registrieren</a>
+    </p>
+  </div>
 </div>
-<!-- REGISTER -->
+
+<!-- Register -->
 <div class="modal" id="registerModal">
-    <div class="modal-content">
-        <button class="modal-close" onclick="closeModal('registerModal')">×</button>
-        <h2>Registrieren</h2>
-        <div class="form-group"><label>Name</label><input type="text" id="regName"></div>
-        <div class="form-group"><label>Geburtsdatum</label><input type="date" id="regBirthdate"></div>
-        <div class="form-group"><label>E-Mail</label><input type="email" id="regEmail"></div>
-        <div class="form-group"><label>Passwort</label><input type="password" id="regPassword" minlength="6"></div>
-        <div class="form-group"><label>Passwort wiederholen</label><input type="password" id="regPassConf"></div>
-        <div class="msg error hidden" id="regError"></div>
-        <div class="msg success hidden" id="regSuccess">
-            ✅ Registrierung erfolgreich! Bitte bestätigen Sie Ihre E-Mail.<br>
-            📧 <strong>Überprüfen Sie auch Ihren Spam-Ordner!</strong>
-        </div>
-        <button class="btn-primary full" onclick="handleRegister()">Registrieren</button>
-    </div>
+  <div class="modal-box">
+    <button class="modal-x" onclick="closeModal('registerModal')">×</button>
+    <h2>Registrieren</h2>
+    <form id="registerForm" onsubmit="handleRegister(event)">
+      <div class="fg"><label>Name</label><input type="text" id="reg-name" required></div>
+      <div class="fg"><label>Geburtsdatum</label><input type="date" id="reg-bd" required></div>
+      <div class="fg"><label>E-Mail</label><input type="email" id="reg-email" required></div>
+      <div class="fg"><label>Passwort</label><input type="password" id="reg-pw" required minlength="6"></div>
+      <div class="fg"><label>Passwort wiederholen</label><input type="password" id="reg-pw2" required></div>
+      <div class="err hidden" id="reg-err"></div>
+      <div class="ok  hidden" id="reg-ok"></div>
+      <div class="info-box" style="margin-top:.6rem">
+        ⚠️ Nach der Registrierung wird eine <strong>Bestätigungsmail</strong> gesendet. Bitte prüfen Sie auch Ihren <strong>Spam-Ordner</strong>, falls diese nicht ankommt!
+      </div>
+      <button type="submit" class="btn btn-pri w-full mt1">Registrieren</button>
+    </form>
+    <p style="text-align:center;margin-top:.7rem;color:var(--txt2);font-size:.85rem">
+      Bereits ein Konto? <a href="#" onclick="closeModal('registerModal');openModal('loginModal')" style="color:var(--green)">Anmelden</a>
+    </p>
+  </div>
 </div>
-<!-- UPLOAD -->
+
+<!-- Upload -->
 <div class="modal" id="uploadModal">
-    <div class="modal-content">
-        <button class="modal-close" onclick="closeModal('uploadModal')">×</button>
-        <h2>3D-Modell hochladen</h2>
-        <div class="form-group"><label>Beschreibung</label><textarea id="uploadDesc" placeholder="Beschreiben Sie Ihr Wunschmodell…"></textarea></div>
-        <div class="form-group"><label>Gewicht (g)</label><input type="number" id="uploadWeight" min="1" step="0.1" oninput="calcUploadPrice()"></div>
-        <div class="form-group">
-            <label>Material</label>
-            <select id="uploadMaterial" onchange="calcUploadPrice(); checkNozzleCompat()">
-                <option value="pla">Bambu Lab PLA (50% Rabatt auf Grundpreis!)</option>
-                <option value="tpu">TPU (+10€)</option>
-                <option value="asa">ASA (+10€)</option>
-                <option value="abs">ABS (+10€)</option>
-                <option value="petg">PETG (+10€)</option>
-                <option value="pla_cf">PLA CF (+10€)</option>
-                <option value="petg_cf">PETG CF (+10€)</option>
-                <option value="pla_wood">PLA Wood (+10€)</option>
-                <option value="pla_glow">PLA Glow (+10€)</option>
-                <option value="pla_marble">PLA Marble (+10€)</option>
-            </select>
+  <div class="modal-box">
+    <button class="modal-x" onclick="closeModal('uploadModal')">×</button>
+    <h2>3D-Modell hochladen / bestellen</h2>
+    <form id="uploadForm" onsubmit="handleUpload(event)">
+      <div class="fg"><label>Beschreibung / STL-Hinweis</label>
+        <textarea id="upload-desc" required placeholder="Beschreiben Sie Ihr Modell oder geben Sie an, dass Sie eine STL-Datei per E-Mail senden…"></textarea>
+      </div>
+      <div class="calc-box">
+        <h3 style="color:var(--green);font-size:.92rem;margin:0 0 .8rem">💰 Preiskalkulator</h3>
+        <div class="fg"><label>Geschätztes Gewicht (g)</label><input type="number" id="upload-weight" min="1" step="0.1" required oninput="calculatePrice()"></div>
+
+        <!-- Material Select -->
+        <div class="fg"><label>Material</label>
+          <select id="upload-material" onchange="onMaterialChange()">
+            <option value="PLA">PLA (Bambu Lab) – 50% Grundpreis-Rabatt!</option>
+            <option value="PETG">PETG (+10€)</option>
+            <option value="ABS">ABS (+10€)</option>
+            <option value="TPU">TPU (+10€)</option>
+            <option value="ASA">ASA (+10€)</option>
+            <option value="PLA CF">PLA Carbon Fiber (+10€)</option>
+            <option value="PETG CF">PETG Carbon Fiber (+10€)</option>
+            <option value="ABS CF">ABS Carbon Fiber (+10€)</option>
+            <option value="PETG HF">PETG High Flow (+10€)</option>
+            <option value="PLA Wood">PLA Wood (+10€)</option>
+            <option value="PLA Glow">PLA Glow in the Dark (+10€)</option>
+            <option value="PLA Marble">PLA Marble (+10€)</option>
+            <option value="Silk PLA">Silk PLA (+10€)</option>
+          </select>
         </div>
-        <div class="form-group">
-            <label>Nozzle</label>
-            <select id="uploadNozzle" onchange="calcUploadPrice(); checkNozzleCompat()">
-                <option value="hardened_04">0.4mm Hardened Steel</option>
-                <option value="stainless_02">0.2mm Stainless Steel (+4€, nur PLA)</option>
-            </select>
+
+        <!-- Nozzle (only for PLA) -->
+        <div class="fg hidden" id="nozzle-wrap"><label>Düse</label>
+          <div style="display:flex;gap:1rem;margin-top:.3rem">
+            <label style="display:flex;align-items:center;gap:.35rem;color:var(--txt);font-size:.88rem"><input type="radio" name="nozzle" id="nozzle-04" checked onchange="calculatePrice()"> 0.4 mm Hardened Steel</label>
+            <label style="display:flex;align-items:center;gap:.35rem;color:var(--txt);font-size:.88rem"><input type="radio" name="nozzle" id="nozzle-02" onchange="calculatePrice()"> 0.2 mm Stainless Steel <span style="color:var(--red);font-size:.78rem">(+4€)</span></label>
+          </div>
         </div>
-        <div class="msg warning hidden" id="nozzleWarning">⚠️ Das 0.2mm Stainless Steel Nozzle ist nur mit PLA kompatibel!</div>
-        <div class="form-group">
-            <label>Express</label>
-            <select id="uploadExpress" onchange="calcUploadPrice()"><option value="no">Nein</option><option value="yes">Ja (+30%)</option></select>
+
+        <div class="fg"><label>Express</label>
+          <select id="upload-express" onchange="calculatePrice()">
+            <option value="no">Nein</option>
+            <option value="yes">Ja (+30%)</option>
+          </select>
         </div>
-        <div class="price-box hidden" id="uploadPriceBox">
-            <div class="price-row"><span>Grundpreis:</span><span id="upBase"></span></div>
-            <div class="price-row hidden" id="upDiscRow"><span class="discount-badge">-50%</span><span class="original-price">8.00€</span></div>
-            <div class="price-row"><span>Material (Gewicht):</span><span id="upMat">0.00€</span></div>
-            <div class="price-row hidden" id="upExtraRow"><span>Extras:</span><span id="upExtras">0.00€</span></div>
-            <div class="price-row total"><span>Gesamt:</span><span id="upTotal">0.00€</span></div>
+
+        <div class="price-res hidden" id="price-result">
+          <p style="font-size:.82rem;opacity:.85">Geschätzter Preis</p>
+          <p class="amt" id="price-amount">0.00€</p>
+          <p style="font-size:.78rem;opacity:.75;text-align:left;margin-top:.4rem" id="price-breakdown"></p>
         </div>
-        <div class="form-group"><label>Anmerkungen</label><textarea id="uploadNotes" placeholder="Farbe, Besonderes…"></textarea></div>
-        <button class="btn-primary full" onclick="addUploadToCart()">In den Warenkorb</button>
-    </div>
+      </div>
+      <div class="fg"><label>Anmerkungen</label><textarea id="upload-notes" placeholder="Farbe, Wünsche, etc."></textarea></div>
+      <button type="submit" class="btn btn-pri w-full mt1">🛒 In den Warenkorb</button>
+    </form>
+  </div>
 </div>
-<!-- PRODUCT DETAIL -->
+
+<!-- Product Detail -->
 <div class="modal" id="productDetailModal">
-    <div class="modal-content wide">
-        <button class="modal-close" onclick="closeModal('productDetailModal')">×</button>
-        <div class="product-detail-layout">
-            <div class="product-detail-images">
-                <div class="detail-main-wrap"><img class="detail-main-img" id="detailMainImg" src="" alt=""><div class="detail-main-emoji hidden" id="detailMainEmoji"></div></div>
-                <div class="detail-thumbs" id="detailThumbs"></div>
-            </div>
-            <div class="product-detail-info">
-                <h2 id="detailName"></h2>
-                <p class="detail-desc" id="detailDesc"></p>
-                <div class="detail-price-wrap"><span class="detail-price" id="detailPrice"></span></div>
-                <div class="form-group"><label>Farbe</label><div class="color-selector" id="detailColors"></div></div>
-                <div class="form-group">
-                    <label>Menge</label>
-                    <div class="qty-selector"><button class="qty-btn" onclick="changeQty(-1)">−</button><span class="qty-val" id="detailQty">1</span><button class="qty-btn" onclick="changeQty(1)">+</button></div>
-                </div>
-                <button class="btn-primary full" onclick="addToCartFromDetail()">In den Warenkorb</button>
-            </div>
+  <div class="modal-box lg">
+    <button class="modal-x" onclick="closeModal('productDetailModal')">×</button>
+    <div class="det-grid">
+      <div>
+        <div class="det-img-wrap" id="det-img-wrap"><span class="emoji">📦</span></div>
+        <div class="det-thumbs" id="det-thumbs"></div>
+      </div>
+      <div>
+        <h2 id="det-name" style="margin-bottom:.4rem"></h2>
+        <p id="det-desc" style="color:var(--txt2);font-size:.9rem;margin-bottom:.6rem"></p>
+        <span class="prod-price" id="det-price" style="font-size:1.4rem"></span>
+        <div class="fg" style="margin-top:.9rem"><label>Farbe wählen</label><div class="col-sel" id="det-colors"></div></div>
+        <div class="fg"><label>Menge</label>
+          <div class="qty-row">
+            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <span class="qty-val" id="det-qty">1</span>
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+          </div>
         </div>
+        <button class="btn btn-pri w-full mt1" onclick="addToCartFromDetail()">🛒 In den Warenkorb</button>
+      </div>
     </div>
+  </div>
 </div>
-<!-- CART -->
+
+<!-- Cart -->
 <div class="modal" id="cartModal">
-    <div class="modal-content">
-        <button class="modal-close" onclick="closeModal('cartModal')">×</button>
-        <h2>🛒 Warenkorb</h2>
-        <div id="cartItemsList"><p class="empty-state">Warenkorb ist leer.</p></div>
-        <div class="cart-total-row"><span>Gesamt:</span><span id="cartTotalDisplay">0.00€</span></div>
-        <button class="btn-primary full" onclick="openCheckout()">Zur Kasse →</button>
+  <div class="modal-box">
+    <button class="modal-x" onclick="closeModal('cartModal')">×</button>
+    <h2>🛒 Warenkorb</h2>
+    <div id="cart-items"></div>
+    <div style="margin-top:1rem;padding-top:.7rem;border-top:2px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:1.1rem;font-weight:600">Gesamt:</span>
+      <span class="prod-price" id="cart-total-val" style="font-size:1.3rem">0.00€</span>
     </div>
+    <button class="btn btn-pri w-full mt1" onclick="proceedToCheckout()">Zur Kasse →</button>
+  </div>
 </div>
-<!-- CHECKOUT -->
+
+<!-- Checkout -->
 <div class="modal" id="checkoutModal">
-    <div class="modal-content">
-        <button class="modal-close" onclick="closeModal('checkoutModal')">×</button>
-        <h2>Bestellung abschließen</h2>
-        <h3 class="sub-heading">Versand</h3>
-        <div class="form-group">
-            <select id="shippingMethod" onchange="onShippingChange()">
-                <option value="">Bitte wählen…</option>
-                <option value="pickup">Selbstabholung (Kostenlos)</option>
-                <option value="standard">Standard (4.99€)</option>
-                <option value="express_ship">Express (9.99€)</option>
-            </select>
+  <div class="modal-box">
+    <button class="modal-x" onclick="closeModal('checkoutModal')">×</button>
+    <h2>💳 Checkout</h2>
+    <form id="checkoutForm" onsubmit="handleCheckout(event)">
+      <h3>Versand</h3>
+      <div class="fg"><label>Versandart</label>
+        <select id="co-shipping-method" onchange="onShippingChange()" required>
+          <option value="">Bitte wählen…</option>
+          <option value="pickup">🏠 Selbstabholung (Kostenlos)</option>
+          <option value="standard">📦 Standard-Versand</option>
+          <option value="express">⚡ Express-Versand (9.99€)</option>
+        </select>
+      </div>
+      <div id="co-address-fields" class="hidden">
+        <div class="fg"><label>Straße & Nr.</label><input type="text" id="co-street"></div>
+        <div style="display:flex;gap:.6rem">
+          <div class="fg" style="flex:0 0 100px"><label>PLZ</label><input type="text" id="co-zip"></div>
+          <div class="fg" style="flex:1"><label>Stadt</label><input type="text" id="co-city"></div>
         </div>
-        <div id="addressBlock" class="hidden">
-            <div class="form-group"><label>Straße</label><input type="text" id="chStreet"></div>
-            <div class="form-group"><label>PLZ</label><input type="text" id="chZip"></div>
-            <div class="form-group"><label>Stadt</label><input type="text" id="chCity"></div>
-            <div class="form-group"><label>Land</label><input type="text" id="chCountry" value="Deutschland"></div>
+        <div class="fg"><label>Land</label><input type="text" id="co-country" value="Deutschland"></div>
+      </div>
+
+      <h3>Gutschein</h3>
+      <div style="display:flex;gap:.4rem">
+        <input type="text" id="co-coupon" placeholder="Gutscheincode" style="flex:1;padding:.55rem .7rem;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--txt);font-size:.88rem">
+        <button type="button" class="btn btn-sec btn-sm" onclick="applyCoupon()">Einlösen</button>
+      </div>
+
+      <h3>Zahlungsmethode</h3>
+      <div class="fg"><label>Zahlung</label>
+        <select id="co-payment" onchange="onPaymentChange()" required>
+          <option value="">Bitte wählen…</option>
+          <option value="paypal">PayPal</option>
+          <option value="stripe">💳 Kreditkarte (Stripe)</option>
+          <option value="transfer">🏦 Überweisung</option>
+          <option value="privat">👤 Privat</option>
+        </select>
+      </div>
+      <div class="info-box danger hidden" id="co-priv-warn">
+        ⚠️ <strong>Privat</strong> ist aktuell nur für bekannte Nutzer nutzbar. Falls Sie diese Option trotzdem wählen, kann Ihre Bestellung möglicherweise ignoriert werden.
+      </div>
+
+      <!-- Summary -->
+      <div style="background:var(--card);padding:1rem;border-radius:10px;margin-top:1rem">
+        <h4 style="color:var(--green);margin-bottom:.6rem">Bestellübersicht</h4>
+        <div style="color:var(--txt2);font-size:.88rem">
+          <div style="display:flex;justify-content:space-between;margin:.3rem 0"><span>Zwischensumme</span><span id="co-subtotal">0.00€</span></div>
+          <div style="display:flex;justify-content:space-between;margin:.3rem 0"><span>Versand</span><span id="co-shipping">0.00€</span></div>
+          <div style="display:flex;justify-content:space-between;margin:.3rem 0"><span>Rabatt</span><span id="co-discount">0.00€</span></div>
+          <div style="display:flex;justify-content:space-between;margin-top:.7rem;padding-top:.6rem;border-top:1px solid var(--border);font-size:1.1rem;color:var(--green);font-weight:700"><span>Gesamt</span><span id="co-total">0.00€</span></div>
         </div>
-        <h3 class="sub-heading">Gutschein</h3>
-        <div class="coupon-row"><input type="text" id="couponInput" placeholder="Code"><button class="btn-secondary small" onclick="applyCoupon()">Einlösen</button></div>
-        <div class="msg success hidden" id="couponMsg"></div>
-        <h3 class="sub-heading">Zahlungsmethode</h3>
-        <div class="form-group">
-            <select id="paymentMethod" onchange="onPaymentChange()">
-                <option value="">Bitte wählen…</option>
-                <option value="paypal">PayPal</option>
-                <option value="stripe">Kreditkarte (Stripe)</option>
-                <option value="transfer">Überweisung</option>
-                <option value="private">Privat</option>
-            </select>
-        </div>
-        <div class="msg warning hidden" id="privateWarning">⚠️ Diese Option ist aktuell <strong>nur von bekannten Nutzern</strong> nutzbar. Falls Sie sie trotzdem wählen, kann Ihre Bestellung möglicherweise <strong>ignoriert</strong> werden.</div>
-        <div class="checkout-summary">
-            <div class="price-row"><span>Zwischensumme:</span><span id="chSubtotal">0.00€</span></div>
-            <div class="price-row"><span>Versand:</span><span id="chShipping">0.00€</span></div>
-            <div class="price-row hidden" id="chDiscRow"><span>Rabatt:</span><span id="chDiscount">-0.00€</span></div>
-            <div class="price-row total"><span>Gesamt:</span><span id="chTotal">0.00€</span></div>
-        </div>
-        <button class="btn-primary full" onclick="placeOrder()">Zahlungspflichtig bestellen</button>
-    </div>
+      </div>
+      <button type="submit" class="btn btn-pri w-full" style="margin-top:1rem">Zahlungspflichtig bestellen</button>
+    </form>
+  </div>
 </div>
-<!-- SETTINGS -->
+
+<!-- Account Settings -->
 <div class="modal" id="settingsModal">
-    <div class="modal-content">
-        <button class="modal-close" onclick="closeModal('settingsModal')">×</button>
-        <h2>⚙️ Accounteinstellungen</h2>
-        <h3 class="sub-heading">Persönliche Daten</h3>
-        <div class="form-group"><label>Name</label><input type="text" id="settingsName"></div>
-        <div class="form-group"><label>E-Mail</label><input type="email" id="settingsEmail" disabled></div>
-        <div class="form-group"><label>Geburtsdatum</label><input type="date" id="settingsBirthdate"></div>
-        <button class="btn-primary" onclick="saveSettings()">Speichern</button>
-        <hr class="divider">
-        <h3 class="sub-heading">Passwort ändern</h3>
-        <div class="form-group"><label>Neues Passwort</label><input type="password" id="settNewPass"></div>
-        <div class="form-group"><label>Wiederholen</label><input type="password" id="settNewPassConf"></div>
-        <button class="btn-secondary" onclick="changePassword()">Ändern</button>
-        <div class="msg error hidden" id="settError"></div>
-        <div class="msg success hidden" id="settSuccess"></div>
-        <hr class="divider">
-        <h3 class="sub-heading">Benachrichtigungen</h3>
-        <div id="notificationsList"></div>
-        <hr class="divider">
-        <button class="btn-danger full" onclick="handleLogout()">Abmelden</button>
-    </div>
+  <div class="modal-box">
+    <button class="modal-x" onclick="closeModal('settingsModal')">×</button>
+    <h2>⚙️ Einstellungen</h2>
+    <form onsubmit="saveSettings(event)">
+      <div class="fg"><label>E-Mail</label><input type="email" id="set-email" disabled style="opacity:.6"></div>
+      <div class="fg"><label>Name</label><input type="text" id="set-name"></div>
+      <button type="submit" class="btn btn-pri w-full">💾 Speichern</button>
+    </form>
+    <button class="btn btn-sec w-full" style="margin-top:.7rem" onclick="closeModal('settingsModal');openModal('changePwModal')">🔐 Passwort ändern</button>
+  </div>
 </div>
-<!-- ADMIN: ADD/EDIT PRODUCT -->
-<div class="modal" id="addProductModal">
-    <div class="modal-content">
-        <button class="modal-close" onclick="closeModal('addProductModal')">×</button>
-        <h2 id="apTitle">+ Neues Produkt</h2>
-        <input type="hidden" id="apId" value="">
-        <div class="form-group"><label>Name</label><input type="text" id="apName"></div>
-        <div class="form-group"><label>Beschreibung</label><textarea id="apDesc"></textarea></div>
-        <div class="form-group"><label>Preis (€)</label><input type="number" id="apPrice" step="0.01"></div>
-        <div class="form-group"><label>Kategorie</label><select id="apCat"><option value="internet">Internet-Modell</option><option value="custom">Eigenes Design</option></select></div>
-        <div class="form-group"><label>Gewicht (g)</label><input type="number" id="apWeight"></div>
-        <div class="form-group"><label>Farben (Hex, kommagetrennt)</label><input type="text" id="apColors" placeholder="#000000, #FFFFFF"></div>
-        <div class="form-group"><label>Bild-URLs (kommagetrennt, eine pro Farbe)</label><textarea id="apImages" placeholder="https://…/rot.png, https://…/blau.png"></textarea></div>
-        <div class="form-group"><label>Fallback-Emoji</label><input type="text" id="apEmoji" value="📦"></div>
-        <button class="btn-primary full" onclick="saveProduct()">Speichern</button>
-    </div>
+
+<!-- Change Password -->
+<div class="modal" id="changePwModal">
+  <div class="modal-box">
+    <button class="modal-x" onclick="closeModal('changePwModal')">×</button>
+    <h2>🔐 Passwort ändern</h2>
+    <form id="changePwForm" onsubmit="changePassword(event)">
+      <div class="fg"><label>Aktuelles Passwort</label><input type="password" id="set-old-pw" required></div>
+      <div class="fg"><label>Neues Passwort</label><input type="password" id="set-new-pw" required minlength="6"></div>
+      <div class="fg"><label>Neues Passwort wiederholen</label><input type="password" id="set-new-pw2" required></div>
+      <div class="err hidden" id="set-pw-err"></div>
+      <button type="submit" class="btn btn-pri w-full mt1">Passwort ändern</button>
+    </form>
+  </div>
 </div>
-<!-- ADMIN: ADD/EDIT GALLERY -->
+
+<!-- Admin: Notify Customer -->
+<div class="modal" id="notifyModal">
+  <div class="modal-box">
+    <button class="modal-x" onclick="closeModal('notifyModal')">×</button>
+    <h2>📨 Kunde benachrichtigen</h2>
+    <div class="fg"><label>Nachricht</label><textarea id="notify-msg" placeholder="Ihre Nachricht an den Kunden…"></textarea></div>
+    <label style="color:var(--txt2);font-size:.85rem;font-weight:500">Änderungen mitteilen</label>
+    <div class="notify-type-btns mt1">
+      <button type="button" class="notify-type-btn" data-type="cost"  onclick="toggleNotifyType('cost')">💰 Kostenänderung</button>
+      <button type="button" class="notify-type-btn" data-type="time"  onclick="toggleNotifyType('time')">⏱️ Zeitänderung</button>
+    </div>
+    <div class="fg hidden" id="notify-cost-change" style="margin-top:.6rem"><label>Kostenänderung (z.B. „wird ca. 5€ mehr kosten")</label><input type="text" id="notify-cost-val"></div>
+    <div class="fg hidden" id="notify-time-change" style="margin-top:.4rem"><label>Zeitänderung (z.B. „dauert ca. 2 Tage länger")</label><input type="text" id="notify-time-val"></div>
+    <button class="btn btn-pri w-full mt1" onclick="sendNotification()">📤 Senden</button>
+  </div>
+</div>
+
+<!-- Admin: Add to Gallery -->
 <div class="modal" id="addGalleryModal">
-    <div class="modal-content">
-        <button class="modal-close" onclick="closeModal('addGalleryModal')">×</button>
-        <h2 id="agTitle">+ Galerie-Bild</h2>
-        <input type="hidden" id="agId" value="">
-        <div class="form-group"><label>Name</label><input type="text" id="agName"></div>
-        <div class="form-group"><label>Beschreibung</label><textarea id="agDesc"></textarea></div>
-        <div class="form-group"><label>Bild-URL</label><input type="text" id="agImage"></div>
-        <div class="form-group"><label>Fallback-Emoji</label><input type="text" id="agEmoji" value="🎨"></div>
-        <button class="btn-primary full" onclick="saveGalleryItem()">Speichern</button>
-    </div>
-</div>
-<!-- ADMIN: ORDER DETAIL -->
-<div class="modal" id="orderDetailModal">
-    <div class="modal-content wide">
-        <button class="modal-close" onclick="closeModal('orderDetailModal')">×</button>
-        <h2>Bestellung <span id="odId"></span></h2>
-        <div class="order-detail-grid">
-            <div>
-                <h3 class="sub-heading">Artikel</h3>
-                <div id="odItems"></div>
-                <h3 class="sub-heading">Kunde</h3>
-                <p id="odCustomer"></p>
-                <h3 class="sub-heading">Zahlung</h3>
-                <p id="odPayment"></p>
-                <h3 class="sub-heading">Versand</h3>
-                <p id="odShipping"></p>
-                <h3 class="sub-heading">Chat-Verlauf</h3>
-                <div class="order-chat-log" id="odChatLog"><p class="empty-state">Kein Chat.</p></div>
-            </div>
-            <div>
-                <h3 class="sub-heading">Status</h3>
-                <select class="status-select" id="odStatus" onchange="updateOrderStatus()">
-                    <option value="aufgegeben">Bestellung wurde aufgegeben</option>
-                    <option value="bearbeitet">Wird bearbeitet</option>
-                    <option value="designed">Wird designed</option>
-                    <option value="gedruckt">Wird gedruckt</option>
-                    <option value="versendet">Wird versendet / auf dem Weg</option>
-                    <option value="fragen">Fragen / Ungeklärte Punkte</option>
-                    <option value="abgelehnt">Bestellung abgelehnt</option>
-                </select>
-                <h3 class="sub-heading">Kunden benachrichtigen</h3>
-                <div class="form-group">
-                    <select id="odNotifyType">
-                        <option value="info">Allgemeine Info</option>
-                        <option value="cost_more">Kosten werden höher</option>
-                        <option value="cost_less">Kosten werden geringer</option>
-                        <option value="takes_longer">Dauert länger als erwartet</option>
-                        <option value="takes_shorter">Fertig früher als erwartet</option>
-                    </select>
-                </div>
-                <div class="form-group"><textarea id="odNotifyMsg" placeholder="Nachricht…"></textarea></div>
-                <button class="btn-primary" onclick="sendAdminNotify()">Benachrichtigung senden</button>
-                <hr class="divider">
-                <button class="btn-danger full" onclick="completeOrder()">✓ Erledigt & Entfernen</button>
-            </div>
-        </div>
-    </div>
+  <div class="modal-box">
+    <button class="modal-x" onclick="closeModal('addGalleryModal')">×</button>
+    <h2>🖼️ Zur Galerie hinzufügen</h2>
+    <div class="prod-list" id="gallery-add-list"></div>
+  </div>
 </div>
 
-<!-- ===================== SCRIPTS ===================== -->
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer>© 2026 JT Print – Alle Rechte vorbehalten</footer>
+
+<!-- ═══════════ FIREBASE MODULE INIT ═══════════ -->
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signOut, updatePassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+  import { initializeApp }           from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+  import { getFirestore, collection, addDoc, getDocs, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-const firebaseConfig = {
+  // ── TODO: Paste your Firebase config here ──
+ const firebaseConfig = {
           apiKey: "AIzaSyDazql6oJx5_z3hASwmo4200-OpQhodZVc",
           authDomain: "d-druckservice-jtprint.firebaseapp.com",
           projectId: "d-druckservice-jtprint",
@@ -406,25 +453,64 @@ const firebaseConfig = {
           appId: "1:247787543764:web:b3cc1e7d05eb8aa2abef41"
      };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db  = getFirestore(app);
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
 
-window.FB = {
-    auth, db,
-    createUser: createUserWithEmailAndPassword,
-    signIn: signInWithEmailAndPassword,
-    sendVerification: sendEmailVerification,
-    onAuth: onAuthStateChanged,
-    signOut: () => signOut(auth),
-    updatePassword,
-    col: (p) => collection(db, p),
-    doc: (p, id) => doc(db, p, id),
-    addDoc, getDocs, setDoc, updateDoc, deleteDoc
-};
+  // Expose helpers globally
+  window.fbAuth = auth;
+  window.fbDb   = db;
+  window.fbFuncs = {
+    createUser:       createUserWithEmailAndPassword,
+    signIn:           signInWithEmailAndPassword,
+    sendVerifyEmail:  sendEmailVerification,
+    signOutFn:        signOut,
+    setDoc:           setDoc,
+    docRef:           doc,
+    addDoc:           (database, collName, data) => addDoc(collection(database, collName), data),
+    getCollectionDocs: async (database, collName) => {
+      const snap = await getDocs(collection(database, collName));
+      const arr  = [];
+      snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
+      return arr;
+    }
+  };
 
-onAuthStateChanged(auth, (user) => { if(window.onAuthChange) window.onAuthChange(user); });
+  // Auth state listener
+  onAuthStateChanged(auth, (user) => {
+    currentUser = user;
+    if (user) {
+      isAdmin = (user.email === ADMIN_EMAIL);
+      renderNav();
+      if (isAdmin) addNotification('Admin-Modus aktiv', 'Sie sind als Administrator angemeldet.');
+    } else {
+      isAdmin = false;
+      renderNav();
+      showShop();
+    }
+  });
 </script>
+
+<!-- ═══════════ SCRIPTS ═══════════ -->
 <script src="script.js"></script>
+<script src="script_shop.js"></script>
+<script src="script_admin.js"></script>
+
+<!-- ═══════════ INLINE GLUE (small helpers that need DOM ready) ═══════════ -->
+<script>
+// Product tab switcher (shop)
+function switchProdTab(name, btn) {
+  document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('internet-tab').classList.toggle('active', name === 'internet');
+  document.getElementById('custom-tab').classList.toggle('active', name === 'custom');
+}
+// Smooth scroll helper
+function scrollTo(id) { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior:'smooth', block:'start' }); }
+// Close modals on backdrop click
+document.querySelectorAll('.modal').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('active'); });
+});
+</script>
 </body>
 </html>
