@@ -19,10 +19,10 @@
       <span class="logo-txt">JT Print</span>
     </a>
     <ul class="nav-links" id="nav-links">
- <li><a href="#" onclick="showShop();appScrollTo('home')">Home</a></li>
-<li><a href="#" onclick="showShop();appScrollTo('services')">Services</a></li>
-<li><a href="#" onclick="showShop();appScrollTo('gallery')">Galerie</a></li>
-<li><a href="#" onclick="showShop();appScrollTo('products')">Produkte</a></li>
+  <li><a href="#" onclick="showShop(); scrollTo('home'); return false;">Home</a></li>
+  <li><a href="#" onclick="showShop(); scrollTo('services'); return false;">Services</a></li>
+  <li><a href="#" onclick="showShop(); scrollTo('gallery'); return false;">Galerie</a></li>
+  <li><a href="#" onclick="showShop(); scrollTo('products'); return false;">Produkte</a></li>
 </ul>
     <div class="nav-right" id="nav-auth">
       <button class="btn btn-sec" onclick="openModal('loginModal')">Anmelden</button>
@@ -507,11 +507,8 @@ function switchProdTab(name, btn) {
   document.getElementById('internet-tab').classList.toggle('active', name === 'internet');
   document.getElementById('custom-tab').classList.toggle('active', name === 'custom');
 }
-// Smooth scroll helper// Ändere den Funktionsnamen hier:
-function appScrollTo(id) { 
-  const el = document.getElementById(id); 
-  if (el) el.scrollIntoView({ behavior:'smooth', block:'start' }); 
-}
+// Smooth scroll helper
+function scrollTo(id) { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior:'smooth', block:'start' }); }
 // Close modals on backdrop click
 document.querySelectorAll('.modal').forEach(m => {
   m.addEventListener('click', e => { if (e.target === m) m.classList.remove('active'); });
