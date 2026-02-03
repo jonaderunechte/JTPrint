@@ -478,13 +478,15 @@
 
   // Auth state listener
   onAuthStateChanged(auth, (user) => {
-    window.currentUser = user; // Explizit auf das globale Objekt zugreifen
+    window.currentUser = user; // WICHTIG: window. nutzen!
     if (user) {
-        window.isAdmin = (user.email === ADMIN_EMAIL);
+        window.isAdmin = (user.email === 'jona.thielgen@gmail.com');
         renderNav();
-        if (window.isAdmin) addNotification('Admin-Modus aktiv', 'Sie sind als Administrator angemeldet.');
+        loadUserNotifications(); // Benachrichtigungen laden!
+        if (window.isAdmin) addNotification('Admin-Modus', 'Willkommen zurück, Jona!');
     } else {
         window.isAdmin = false;
+        window.notifications = []; // Leeren bei Logout
         renderNav();
         showShop();
     }
