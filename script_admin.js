@@ -122,12 +122,19 @@ function renderOrders() {
 }
 
 // ─── ORDER STATUS UPDATE ──────────────────────────────────────
-function updateOrderStatus(orderId, newStatus) {
+async function updateOrderStatus(orderId, newStatus) {
   const order = orders.find(o => o.id === orderId);
   if (!order) return;
+  
   order.status = newStatus;
-  renderOrders();  // re-render
-  addNotification('Status geändert', `${orderId} → ${(STATUS_OPTIONS.find(s=>s.val===newStatus)||{}).label}`);
+  
+  if (window.fbDb) {
+    const orderRef = window.fbFuncs.doc(window.fbDb, 'orders', orderId);
+    await window.fbFuncs.updateDoc(orderRef, { status: newStatus });
+  }
+  
+  renderOrders();
+  addNotification('Status geändert', `${orderId} ist jetzt: ${newStatus}`);
 }
 
 // In script_admin.js
@@ -151,13 +158,22 @@ async function completeOrder(orderId) {
 }
 
 // ─── ADMIN REPLY IN CHAT ──────────────────────────────────────
-function adminReply(orderId) {
+async function adminReply(orderId) {
   const input = document.getElementById('reply-' + orderId);
   if (!input || !input.value.trim()) return;
+  
   const order = orders.find(o => o.id === orderId);
   if (!order) return;
+  
+  const newMsg = { sender:'admin', text: input.value.trim(), time: new Date().toISOString() };
   if (!order.chatHistory) order.chatHistory = [];
-  order.chatHistory.push({ sender:'admin', text: input.value.trim(), time: new Date().toISOString() });
+  order.chatHistory.push(newMsg);
+
+  if (window.fbDb) {
+    const orderRef = window.fbFuncs.doc(window.fbDb, 'orders', orderId);
+    await window.fbFuncs.updateDoc(orderRef, { chatHistory: order.chatHistory });
+  }
+
   input.value = '';
   renderOrders();
   addNotification('Nachricht gesendet', 'An ' + order.userEmail);
@@ -273,12 +289,18 @@ function editProduct(idx) {
   document.getElementById('pe-submit-btn').textContent = '💾 Speichern';
 }
 
-function deleteProduct(idx) {
-  if (!confirm('Produkt „' + allProducts[idx].name + '" löschen?')) return;
+async function deleteProduct(idx) {
+  const product = allProducts[idx];
+  if (!confirm(`Produkt "${product.name}" wirklich löschen?`)) return;
+
+  if (window.fbDb && product.id) {
+    const prodRef = window.fbFuncs.doc(window.fbDb, 'products', product.id);
+    await window.fbFuncs.deleteDoc(prodRef);
+  }
+
   allProducts.splice(idx, 1);
   renderProductEditor();
   renderShop();
-  renderGallery();
 }
 
 function addColorChip() {
@@ -410,4 +432,3 @@ function updateGallerySection() {
     const p = allProducts[idx];
     if (p) grid.appendChild(createProductCard(p));
   });
-}
