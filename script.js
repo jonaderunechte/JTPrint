@@ -104,9 +104,46 @@ const SAMPLE_ORDERS = [
 ];
 
 // ─── NOTIFICATION HELPERS ────────────────────────────────────
-function addNotification(title, body) {
-  notifications.unshift({ id: Date.now(), title, body, time: new Date(), read: false });
-  renderNotifBadge();
+async function addNotification(title, text, targetUserId = null) {
+  const notification = {
+    title,
+    text,
+    time: 'Gerade eben',
+    timestamp: new Date().toISOString(),
+    read: false,
+    userId: targetUserId || (window.currentUser ? window.currentUser.uid : 'system')
+  };
+
+  // 1. Lokal hinzufügen (für sofortige Anzeige)
+  notifications.unshift(notification);
+  updateNotificationBadge();
+
+  // 2. In Firebase speichern, wenn verbunden
+  if (window.fbDb && window.fbFuncs && window.currentUser) {
+    try {
+      await window.fbFuncs.addDoc(window.fbFuncs.collection(window.fbDb, 'notifications'), notification);
+    } catch (err) {
+      console.error("Fehler beim Speichern der Benachrichtigung:", err);
+    }
+  }
+}
+
+// Funktion zum Laden der Benachrichtigungen (NEU)
+async function loadUserNotifications() {
+  if (!window.fbDb || !window.currentUser) return;
+  
+  try {
+    // Hier müssten eigentlich Queries genutzt werden, aber für den Anfang laden wir alle 
+    // und filtern lokal, falls keine komplexen Firebase-Indexe erstellt sind:
+    const allNotifs = await window.fbFuncs.getCollectionDocs(window.fbDb, 'notifications');
+    notifications = allNotifs
+      .filter(n => n.userId === window.currentUser.uid || n.userId === 'system')
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
+    updateNotificationBadge();
+  } catch (err) {
+    console.warn("Benachrichtigungen konnten nicht geladen werden", err);
+  }
 }
 function renderNotifBadge() {
   const unread = notifications.filter(n => !n.read).length;
