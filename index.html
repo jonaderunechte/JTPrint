@@ -19,10 +19,10 @@
       <span class="logo-txt">JT Print</span>
     </a>
     <ul class="nav-links" id="nav-links">
-  <li><a href="#" onclick="showShop(); appScrollTo('home'); return false;">Home</a></li>
-<li><a href="#" onclick="showShop(); appScrollTo('services'); return false;">Services</a></li>
-<li><a href="#" onclick="showShop(); appScrollTo('gallery'); return false;">Galerie</a></li>
-<li><a href="#" onclick="showShop(); appScrollTo('products'); return false;">Produkte</a></li>
+  <li><a href="#" onclick="showShop(); scrollTo('home'); return false;">Home</a></li>
+  <li><a href="#" onclick="showShop(); scrollTo('services'); return false;">Services</a></li>
+  <li><a href="#" onclick="showShop(); scrollTo('gallery'); return false;">Galerie</a></li>
+  <li><a href="#" onclick="showShop(); scrollTo('products'); return false;">Produkte</a></li>
 </ul>
     <div class="nav-right" id="nav-auth">
       <button class="btn btn-sec" onclick="openModal('loginModal')">Anmelden</button>
@@ -161,199 +161,160 @@
 <div class="chat-widget">
   <button class="chat-fab" onclick="toggleChat()">💬</button>
   <div class="chat-win" id="chatWin">
-    <div class="chat-hd">Custom Design Anfrage <button onclick="toggleChat()">✕</button></div>
+    <div class="chat-head">
+      <span>💬 Custom Design Chat</span>
+      <button onclick="toggleChat()">✕</button>
+    </div>
     <div class="chat-msgs" id="chat-msgs">
       <div class="chat-m b">
-        Hallo! 👋 Ich helfe Ihnen bei Ihrem Custom-Design-Auftrag.<br><br>
-        <strong>Stundensatz:</strong> 20 €/h oder Preisvorschlag – wir können verhandeln!<br><br>
-        Bitte beschreiben Sie Ihre Idee. Es ist möglich, dass ich nach <em>weiteren Informationen zum Design</em> nachfrage.
-        <div class="t">gerade eben</div>
+        Hallo! 👋 Beschreiben Sie Ihr Wunschmodell und ich erstelle ein Angebot für Sie.<br><br>
+        <strong>Stundensatz:</strong> 20€/h oder Preisvorschlag
       </div>
     </div>
-    <div class="chat-inp">
-      <input type="text" id="chat-input" placeholder="Ihre Nachricht…" onkeydown="chatKeydown(event)">
-      <button class="btn btn-pri btn-sm" onclick="sendChat()">Send</button>
+    <div class="chat-input-wrap">
+      <input type="text" id="chat-input" placeholder="Nachricht schreiben…" onkeydown="chatKeydown(event)">
+      <button onclick="sendChat()">➤</button>
     </div>
   </div>
 </div>
 
 <!-- ═══════════ MODALS ═══════════ -->
 
-<!-- Login -->
+<!-- Login / Register -->
 <div class="modal" id="loginModal">
   <div class="modal-box">
     <button class="modal-x" onclick="closeModal('loginModal')">×</button>
-    <h2>Anmelden</h2>
-    <form id="loginForm" onsubmit="handleLogin(event)">
-      <div class="fg"><label>E-Mail</label><input type="email" id="login-email" required></div>
-      <div class="fg"><label>Passwort</label><input type="password" id="login-pw" required></div>
-      <div class="err hidden" id="login-err"></div>
-      <button type="submit" class="btn btn-pri w-full mt1">Anmelden</button>
+    <h2>🔐 Anmelden / Registrieren</h2>
+    <form onsubmit="handleLogin(event)">
+      <div class="fg"><label>E-Mail</label><input type="email" id="log-email" required></div>
+      <div class="fg"><label>Passwort</label><input type="password" id="log-pw" required minlength="6"></div>
+      <div class="err hidden" id="log-err"></div>
+      <button type="submit" class="btn btn-pri w-full">Anmelden</button>
+      <button type="button" class="btn btn-sec w-full mt1" onclick="handleRegister(event)">Registrieren</button>
     </form>
-    <p style="text-align:center;margin-top:.8rem;color:var(--txt2);font-size:.85rem">
-      Noch kein Konto? <a href="#" onclick="closeModal('loginModal');openModal('registerModal')" style="color:var(--green)">Registrieren</a>
-    </p>
   </div>
 </div>
 
-<!-- Register -->
-<div class="modal" id="registerModal">
-  <div class="modal-box">
-    <button class="modal-x" onclick="closeModal('registerModal')">×</button>
-    <h2>Registrieren</h2>
-    <form id="registerForm" onsubmit="handleRegister(event)">
-      <div class="fg"><label>Name</label><input type="text" id="reg-name" required></div>
-      <div class="fg"><label>Geburtsdatum</label><input type="date" id="reg-bd" required></div>
-      <div class="fg"><label>E-Mail</label><input type="email" id="reg-email" required></div>
-      <div class="fg"><label>Passwort</label><input type="password" id="reg-pw" required minlength="6"></div>
-      <div class="fg"><label>Passwort wiederholen</label><input type="password" id="reg-pw2" required></div>
-      <div class="err hidden" id="reg-err"></div>
-      <div class="ok  hidden" id="reg-ok"></div>
-      <div class="info-box" style="margin-top:.6rem">
-        ⚠️ Nach der Registrierung wird eine <strong>Bestätigungsmail</strong> gesendet. Bitte prüfen Sie auch Ihren <strong>Spam-Ordner</strong>, falls diese nicht ankommt!
-      </div>
-      <button type="submit" class="btn btn-pri w-full mt1">Registrieren</button>
-    </form>
-    <p style="text-align:center;margin-top:.7rem;color:var(--txt2);font-size:.85rem">
-      Bereits ein Konto? <a href="#" onclick="closeModal('registerModal');openModal('loginModal')" style="color:var(--green)">Anmelden</a>
-    </p>
-  </div>
-</div>
-
-<!-- Upload -->
+<!-- Upload Modal -->
 <div class="modal" id="uploadModal">
-  <div class="modal-box">
+  <div class="modal-box modal-large">
     <button class="modal-x" onclick="closeModal('uploadModal')">×</button>
-    <h2>3D-Modell hochladen / bestellen</h2>
-    <form id="uploadForm" onsubmit="handleUpload(event)">
-      <div class="fg"><label>Beschreibung / STL-Hinweis</label>
-        <textarea id="upload-desc" required placeholder="Beschreiben Sie Ihr Modell oder geben Sie an, dass Sie eine STL-Datei per E-Mail senden…"></textarea>
+    <h2>📁 Design hochladen</h2>
+    <form onsubmit="handleUpload(event)">
+      <div class="fg"><label>Beschreibung / Name</label><textarea id="upload-desc" placeholder="Was soll gedruckt werden?" required></textarea></div>
+      <div class="info-box">Sie können Ihre STL-Datei später per E-Mail an <strong>jona.thielgen@gmail.com</strong> senden oder über Ihre Bestell-Chat hochladen.</div>
+      <div class="fg"><label>Geschätztes Gewicht (g)</label><input type="number" id="upload-weight" min="1" required oninput="calculatePrice()"></div>
+      <div class="fg"><label>Material</label>
+        <select id="upload-material" onchange="onMaterialChange()">
+          <option value="PLA">PLA (50% Rabatt auf Grundpreis!)</option>
+          <option value="TPU">TPU (+10€)</option>
+          <option value="ASA">ASA (+10€)</option>
+          <option value="ABS">ABS (+10€)</option>
+          <option value="PETG">PETG (+10€)</option>
+          <option value="PLA CF">PLA CF (+10€)</option>
+          <option value="PETG CF">PETG CF (+10€)</option>
+          <option value="PLA Wood">PLA Wood (+10€)</option>
+          <option value="PLA Glow">PLA Glow (+10€)</option>
+          <option value="PLA Marble">PLA Marble (+10€)</option>
+          <option value="ABS CF">ABS CF (+10€)</option>
+          <option value="PETG HF">PETG HF (+10€)</option>
+          <option value="Silk PLA">Silk PLA (+10€)</option>
+        </select>
       </div>
-      <div class="calc-box">
-        <h3 style="color:var(--green);font-size:.92rem;margin:0 0 .8rem">💰 Preiskalkulator</h3>
-        <div class="fg"><label>Geschätztes Gewicht (g)</label><input type="number" id="upload-weight" min="1" step="0.1" required oninput="calculatePrice()"></div>
-
-        <!-- Material Select -->
-        <div class="fg"><label>Material</label>
-          <select id="upload-material" onchange="onMaterialChange()">
-            <option value="PLA">PLA (Bambu Lab) – 50% Grundpreis-Rabatt!</option>
-            <option value="PETG">PETG (+10€)</option>
-            <option value="ABS">ABS (+10€)</option>
-            <option value="TPU">TPU (+10€)</option>
-            <option value="ASA">ASA (+10€)</option>
-            <option value="PLA CF">PLA Carbon Fiber (+10€)</option>
-            <option value="PETG CF">PETG Carbon Fiber (+10€)</option>
-            <option value="ABS CF">ABS Carbon Fiber (+10€)</option>
-            <option value="PETG HF">PETG High Flow (+10€)</option>
-            <option value="PLA Wood">PLA Wood (+10€)</option>
-            <option value="PLA Glow">PLA Glow in the Dark (+10€)</option>
-            <option value="PLA Marble">PLA Marble (+10€)</option>
-            <option value="Silk PLA">Silk PLA (+10€)</option>
-          </select>
-        </div>
-
-        <!-- Nozzle (only for PLA) -->
-        <div class="fg hidden" id="nozzle-wrap"><label>Düse</label>
-          <div style="display:flex;gap:1rem;margin-top:.3rem">
-            <label style="display:flex;align-items:center;gap:.35rem;color:var(--txt);font-size:.88rem"><input type="radio" name="nozzle" id="nozzle-04" checked onchange="calculatePrice()"> 0.4 mm Hardened Steel</label>
-            <label style="display:flex;align-items:center;gap:.35rem;color:var(--txt);font-size:.88rem"><input type="radio" name="nozzle" id="nozzle-02" onchange="calculatePrice()"> 0.2 mm Stainless Steel <span style="color:var(--red);font-size:.78rem">(+4€)</span></label>
-          </div>
-        </div>
-
-        <div class="fg"><label>Express</label>
-          <select id="upload-express" onchange="calculatePrice()">
-            <option value="no">Nein</option>
-            <option value="yes">Ja (+30%)</option>
-          </select>
-        </div>
-
-        <div class="price-res hidden" id="price-result">
-          <p style="font-size:.82rem;opacity:.85">Geschätzter Preis</p>
-          <p class="amt" id="price-amount">0.00€</p>
-          <p style="font-size:.78rem;opacity:.75;text-align:left;margin-top:.4rem" id="price-breakdown"></p>
+      <!-- Nozzle selection (only PLA) -->
+      <div class="fg hidden" id="nozzle-wrap">
+        <label>Düse</label>
+        <div style="display:flex;gap:.8rem;margin-top:.3rem">
+          <label style="cursor:pointer;font-weight:400"><input type="radio" name="nozzle" id="nozzle-04" value="0.4" checked onchange="calculatePrice()"> 0.4 Hardened Steel (Standard)</label>
+          <label style="cursor:pointer;font-weight:400"><input type="radio" name="nozzle" id="nozzle-02" value="0.2" onchange="calculatePrice()"> 0.2 Stainless Steel (+4€, PLA only)</label>
         </div>
       </div>
-      <div class="fg"><label>Anmerkungen</label><textarea id="upload-notes" placeholder="Farbe, Wünsche, etc."></textarea></div>
-      <button type="submit" class="btn btn-pri w-full mt1">🛒 In den Warenkorb</button>
+      <div class="fg"><label>Express-Service</label>
+        <select id="upload-express" onchange="calculatePrice()">
+          <option value="no">Nein (Standard)</option>
+          <option value="yes">Ja (+30%)</option>
+        </select>
+      </div>
+      <div class="fg"><label>Zusätzliche Notizen (optional)</label><textarea id="upload-notes" placeholder="Farbe, Besonderheiten, …"></textarea></div>
+      <div class="price-calc hidden" id="price-result">
+        <h4>💰 Geschätzter Preis</h4>
+        <div class="price-amt" id="price-amount">0.00€</div>
+        <div class="price-breakdown" id="price-breakdown"></div>
+      </div>
+      <button type="submit" class="btn btn-pri w-full mt1">🛒 Zum Warenkorb hinzufügen</button>
     </form>
   </div>
 </div>
 
-<!-- Product Detail -->
+<!-- Product Detail Modal -->
 <div class="modal" id="productDetailModal">
-  <div class="modal-box lg">
+  <div class="modal-box modal-large">
     <button class="modal-x" onclick="closeModal('productDetailModal')">×</button>
     <div class="det-grid">
-      <div>
-        <div class="det-img-wrap" id="det-img-wrap"><span class="emoji">📦</span></div>
+      <div class="det-left">
+        <div class="det-img-wrap" id="det-img-wrap"></div>
         <div class="det-thumbs" id="det-thumbs"></div>
       </div>
-      <div>
-        <h2 id="det-name" style="margin-bottom:.4rem"></h2>
-        <p id="det-desc" style="color:var(--txt2);font-size:.9rem;margin-bottom:.6rem"></p>
-        <span class="prod-price" id="det-price" style="font-size:1.4rem"></span>
-        <div class="fg" style="margin-top:.9rem"><label>Farbe wählen</label><div class="col-sel" id="det-colors"></div></div>
-        <div class="fg"><label>Menge</label>
-          <div class="qty-row">
-            <button class="qty-btn" onclick="changeQty(-1)">−</button>
-            <span class="qty-val" id="det-qty">1</span>
-            <button class="qty-btn" onclick="changeQty(1)">+</button>
-          </div>
+      <div class="det-right">
+        <h2 id="det-name">Produktname</h2>
+        <div class="det-price" id="det-price">0.00€</div>
+        <p id="det-desc" style="color:var(--txt2);margin:.6rem 0 1rem">Beschreibung</p>
+        <div class="det-colors" id="det-colors"></div>
+        <div class="det-qty-row">
+          <span>Menge:</span>
+          <button class="qty-btn" onclick="changeQty(-1)">-</button>
+          <span class="qty-val" id="det-qty">1</span>
+          <button class="qty-btn" onclick="changeQty(1)">+</button>
         </div>
-        <button class="btn btn-pri w-full mt1" onclick="addToCartFromDetail()">🛒 In den Warenkorb</button>
+        <button class="btn btn-pri w-full" onclick="addToCartFromDetail()">🛒 Zum Warenkorb</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Cart -->
+<!-- Cart Modal -->
 <div class="modal" id="cartModal">
   <div class="modal-box">
     <button class="modal-x" onclick="closeModal('cartModal')">×</button>
     <h2>🛒 Warenkorb</h2>
     <div id="cart-items"></div>
-    <div style="margin-top:1rem;padding-top:.7rem;border-top:2px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-      <span style="font-size:1.1rem;font-weight:600">Gesamt:</span>
-      <span class="prod-price" id="cart-total-val" style="font-size:1.3rem">0.00€</span>
-    </div>
-    <button class="btn btn-pri w-full mt1" onclick="proceedToCheckout()">Zur Kasse →</button>
+    <div class="cart-total"><span>Gesamt:</span><span id="cart-total-val">0.00€</span></div>
+    <button class="btn btn-pri w-full" onclick="proceedToCheckout()">💳 Zur Kasse</button>
   </div>
 </div>
 
-<!-- Checkout -->
+<!-- Checkout Modal -->
 <div class="modal" id="checkoutModal">
-  <div class="modal-box">
+  <div class="modal-box modal-large">
     <button class="modal-x" onclick="closeModal('checkoutModal')">×</button>
     <h2>💳 Checkout</h2>
     <form id="checkoutForm" onsubmit="handleCheckout(event)">
-      <h3>Versand</h3>
+      <!-- Shipping method -->
       <div class="fg"><label>Versandart</label>
         <select id="co-shipping-method" onchange="onShippingChange()" required>
-          <option value="">Bitte wählen…</option>
-          <option value="pickup">🏠 Selbstabholung (Kostenlos)</option>
-          <option value="standard">📦 Standard-Versand</option>
-          <option value="express">⚡ Express-Versand (9.99€)</option>
+          <option value="pickup">Abholung (kostenlos)</option>
+          <option value="standard">Standard (4.99€ – 8.99€ nach Gewicht)</option>
+          <option value="express">Express (9.99€)</option>
         </select>
       </div>
+      <!-- Address fields (hidden if pickup) -->
       <div id="co-address-fields" class="hidden">
-        <div class="fg"><label>Straße & Nr.</label><input type="text" id="co-street"></div>
-        <div style="display:flex;gap:.6rem">
-          <div class="fg" style="flex:0 0 100px"><label>PLZ</label><input type="text" id="co-zip"></div>
-          <div class="fg" style="flex:1"><label>Stadt</label><input type="text" id="co-city"></div>
+        <div class="fg"><label>Straße & Hausnummer</label><input type="text" id="co-street"></div>
+        <div style="display:flex;gap:.7rem">
+          <div class="fg" style="flex:1"><label>PLZ</label><input type="text" id="co-zip"></div>
+          <div class="fg" style="flex:2"><label>Stadt</label><input type="text" id="co-city"></div>
         </div>
-        <div class="fg"><label>Land</label><input type="text" id="co-country" value="Deutschland"></div>
       </div>
-
-      <h3>Gutschein</h3>
-      <div style="display:flex;gap:.4rem">
-        <input type="text" id="co-coupon" placeholder="Gutscheincode" style="flex:1;padding:.55rem .7rem;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--txt);font-size:.88rem">
-        <button type="button" class="btn btn-sec btn-sm" onclick="applyCoupon()">Einlösen</button>
+      <!-- Coupon -->
+      <div class="fg"><label>Gutschein (optional)</label>
+        <div style="display:flex;gap:.4rem">
+          <input type="text" id="co-coupon" placeholder="Code eingeben…" style="flex:1">
+          <button type="button" class="btn btn-sec btn-sm" onclick="applyCoupon()">Einlösen</button>
+        </div>
       </div>
-
-      <h3>Zahlungsmethode</h3>
-      <div class="fg"><label>Zahlung</label>
+      <!-- Payment -->
+      <div class="fg"><label>Zahlungsart</label>
         <select id="co-payment" onchange="onPaymentChange()" required>
-          <option value="">Bitte wählen…</option>
           <option value="paypal">PayPal</option>
           <option value="stripe">💳 Kreditkarte (Stripe)</option>
           <option value="transfer">🏦 Überweisung</option>
@@ -441,9 +402,9 @@
 <script type="module">
   import { initializeApp }           from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-  import { getFirestore, collection, addDoc, getDocs, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+  import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-  // ── TODO: Paste your Firebase config here ──
+  // ── Firebase Config ──
  const firebaseConfig = {
           apiKey: "AIzaSyDazql6oJx5_z3hASwmo4200-OpQhodZVc",
           authDomain: "d-druckservice-jtprint.firebaseapp.com",
@@ -465,9 +426,12 @@
     signIn:           signInWithEmailAndPassword,
     sendVerifyEmail:  sendEmailVerification,
     signOutFn:        signOut,
+    collection:       collection,
+    doc:              doc,
     setDoc:           setDoc,
-    docRef:           doc,
-    addDoc:           (database, collName, data) => addDoc(collection(database, collName), data),
+    updateDoc:        updateDoc,
+    deleteDoc:        deleteDoc,
+    addDoc:           addDoc,
     getCollectionDocs: async (database, collName) => {
       const snap = await getDocs(collection(database, collName));
       const arr  = [];
@@ -478,15 +442,15 @@
 
   // Auth state listener
   onAuthStateChanged(auth, (user) => {
-    window.currentUser = user; // WICHTIG: window. nutzen!
+    window.currentUser = user;
     if (user) {
         window.isAdmin = (user.email === 'jona.thielgen@gmail.com');
         renderNav();
-        loadUserNotifications(); // Benachrichtigungen laden!
+        loadUserNotifications();
         if (window.isAdmin) addNotification('Admin-Modus', 'Willkommen zurück, Jona!');
     } else {
         window.isAdmin = false;
-        window.notifications = []; // Leeren bei Logout
+        window.notifications = [];
         renderNav();
         showShop();
     }
@@ -508,10 +472,7 @@ function switchProdTab(name, btn) {
   document.getElementById('custom-tab').classList.toggle('active', name === 'custom');
 }
 // Smooth scroll helper
-function appScrollTo(id) { 
-  const el = document.getElementById(id); 
-  if (el) el.scrollIntoView({ behavior:'smooth', block:'start' }); 
-}
+function scrollTo(id) { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior:'smooth', block:'start' }); }
 // Close modals on backdrop click
 document.querySelectorAll('.modal').forEach(m => {
   m.addEventListener('click', e => { if (e.target === m) m.classList.remove('active'); });
