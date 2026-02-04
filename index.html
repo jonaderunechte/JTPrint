@@ -14,16 +14,16 @@
 <!-- ═══════════ HEADER═══════════ -->
 <header>
   <nav>
-    <a href="#" class="logo" onclick="showShop()">
+    <a href="#" class="logo" onclick="showShop(); return false;">
       <img src="https://i.postimg.cc/433yTPrC/296ae7d7-58c3-4968-b8a8-e6b6add85135-removebg-preview.png" alt="JT Print Logo">
       <span class="logo-txt">JT Print</span>
     </a>
     <ul class="nav-links" id="nav-links">
-  <li><a href="#" onclick="showShop(); scrollTo('home'); return false;">Home</a></li>
-  <li><a href="#" onclick="showShop(); scrollTo('services'); return false;">Services</a></li>
-  <li><a href="#" onclick="showShop(); scrollTo('gallery'); return false;">Galerie</a></li>
-  <li><a href="#" onclick="showShop(); scrollTo('products'); return false;">Produkte</a></li>
-</ul>
+      <li><a href="#" onclick="showShop(); smoothScrollTo('home'); return false;">Home</a></li>
+      <li><a href="#" onclick="showShop(); smoothScrollTo('services'); return false;">Services</a></li>
+      <li><a href="#" onclick="showShop(); smoothScrollTo('gallery'); return false;">Galerie</a></li>
+      <li><a href="#" onclick="showShop(); smoothScrollTo('products'); return false;">Produkte</a></li>
+    </ul>
     <div class="nav-right" id="nav-auth">
       <button class="btn btn-sec" onclick="openModal('loginModal')">Anmelden</button>
     </div>
@@ -236,11 +236,18 @@
         </select>
       </div>
       <div class="fg"><label>Zusätzliche Notizen (optional)</label><textarea id="upload-notes" placeholder="Farbe, Besonderheiten, …"></textarea></div>
+      
+      <!-- IMPROVED PRICE DISPLAY -->
       <div class="price-calc hidden" id="price-result">
-        <h4>💰 Geschätzter Preis</h4>
-        <div class="price-amt" id="price-amount">0.00€</div>
-        <div class="price-breakdown" id="price-breakdown"></div>
+        <div class="price-header">
+          <h4>💰 Geschätzter Preis</h4>
+          <div class="price-amt" id="price-amount">0.00€</div>
+        </div>
+        <div class="price-breakdown-wrapper">
+          <div class="price-breakdown" id="price-breakdown"></div>
+        </div>
       </div>
+      
       <button type="submit" class="btn btn-pri w-full mt1">🛒 Zum Warenkorb hinzufügen</button>
     </form>
   </div>
@@ -405,14 +412,14 @@
   import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
   // ── Firebase Config ──
- const firebaseConfig = {
-          apiKey: "AIzaSyDazql6oJx5_z3hASwmo4200-OpQhodZVc",
-          authDomain: "d-druckservice-jtprint.firebaseapp.com",
-          projectId: "d-druckservice-jtprint",
-          storageBucket: "d-druckservice-jtprint.firebasestorage.app",
-          messagingSenderId: "247787543764",
-          appId: "1:247787543764:web:b3cc1e7d05eb8aa2abef41"
-     };
+  const firebaseConfig = {
+    apiKey: "AIzaSyDazql6oJx5_z3hASwmo4200-OpQhodZVc",
+    authDomain: "d-druckservice-jtprint.firebaseapp.com",
+    projectId: "d-druckservice-jtprint",
+    storageBucket: "d-druckservice-jtprint.firebasestorage.app",
+    messagingSenderId: "247787543764",
+    appId: "1:247787543764:web:b3cc1e7d05eb8aa2abef41"
+  };
 
   const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);
@@ -444,17 +451,17 @@
   onAuthStateChanged(auth, (user) => {
     window.currentUser = user;
     if (user) {
-        window.isAdmin = (user.email === 'jona.thielgen@gmail.com');
-        renderNav();
-        loadUserNotifications();
-        if (window.isAdmin) addNotification('Admin-Modus', 'Willkommen zurück, Jona!');
+      window.isAdmin = (user.email === 'jona.thielgen@gmail.com');
+      renderNav();
+      loadUserNotifications();
+      if (window.isAdmin) addNotification('Admin-Modus', 'Willkommen zurück, Jona!');
     } else {
-        window.isAdmin = false;
-        window.notifications = [];
-        renderNav();
-        showShop();
+      window.isAdmin = false;
+      window.notifications = [];
+      renderNav();
+      showShop();
     }
-});
+  });
 </script>
 
 <!-- ═══════════ SCRIPTS ═══════════ -->
@@ -462,7 +469,7 @@
 <script src="script_shop.js"></script>
 <script src="script_admin.js"></script>
 
-<!-- ═══════════ INLINE GLUE (small helpers that need DOM ready) ═══════════ -->
+<!-- ═══════════ INLINE GLUE ═══════════ -->
 <script>
 // Product tab switcher (shop)
 function switchProdTab(name, btn) {
@@ -471,12 +478,87 @@ function switchProdTab(name, btn) {
   document.getElementById('internet-tab').classList.toggle('active', name === 'internet');
   document.getElementById('custom-tab').classList.toggle('active', name === 'custom');
 }
-// Smooth scroll helper
-function scrollTo(id) { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior:'smooth', block:'start' }); }
+
+// Smooth scroll helper - RENAMED to avoid conflict with window.scrollTo
+function smoothScrollTo(id) { 
+  const el = document.getElementById(id); 
+  if (el) el.scrollIntoView({ behavior:'smooth', block:'start' }); 
+}
+
 // Close modals on backdrop click
 document.querySelectorAll('.modal').forEach(m => {
   m.addEventListener('click', e => { if (e.target === m) m.classList.remove('active'); });
 });
 </script>
+
+<!-- IMPROVED PRICE CALC STYLES -->
+<style>
+.price-calc {
+  background: linear-gradient(135deg, var(--card) 0%, rgba(0, 204, 153, 0.05) 100%);
+  border: 2px solid var(--green);
+  border-radius: 12px;
+  padding: 0;
+  margin-top: 1.5rem;
+  overflow: hidden;
+}
+
+.price-header {
+  background: var(--green);
+  padding: 1rem 1.2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price-header h4 {
+  margin: 0;
+  color: var(--bg);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.price-amt {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--bg);
+  font-family: 'Orbitron', sans-serif;
+}
+
+.price-breakdown-wrapper {
+  padding: 1.2rem;
+}
+
+.price-breakdown {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 0.92rem;
+  line-height: 1.8;
+  color: var(--txt2);
+}
+
+.price-breakdown strong {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.disc-badge {
+  background: var(--green);
+  color: var(--bg);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-left: 0.3rem;
+}
+
+.orig-price {
+  text-decoration: line-through;
+  opacity: 0.5;
+  margin-left: 0.3rem;
+  font-size: 0.85rem;
+}
+</style>
 </body>
 </html>
