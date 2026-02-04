@@ -10,7 +10,6 @@ function openUploadModal() {
 function onMaterialChange() {
   const mat = document.getElementById('upload-material').value;
   const nozzleWrap = document.getElementById('nozzle-wrap');
-  const nozzle02 = document.getElementById('nozzle-02');
 
   if (mat === 'PLA') {
     nozzleWrap.classList.remove('hidden');
@@ -32,28 +31,53 @@ function calculatePrice() {
   const amtEl    = document.getElementById('price-amount');
   const breakEl  = document.getElementById('price-breakdown');
 
-  if (weight <= 0) { if(resEl) resEl.classList.add('hidden'); return 0; }
+  if (weight <= 0) { 
+    if(resEl) resEl.classList.add('hidden'); 
+    return 0; 
+  }
 
+  // NEUE PREISKALKULATION: 5ct pro Gramm (statt 20ct)
   const isPLA       = mat === 'PLA';
   const baseFull    = 8;
-  const baseDisc    = isPLA ? 4 : baseFull;
-  const perGram     = 0.20;
-  let   materialAdd = 0;
-  if (!isPLA) materialAdd = 10;
+  const baseDisc    = isPLA ? 4 : baseFull;   // 50% Rabatt nur für PLA
+  const perGram     = 0.05;                    // 5ct pro Gramm (3ct Gewinn)
+  let   materialAdd = 0;                       
+  if (!isPLA) materialAdd = 10;                // Spezial-Material Aufpreis
 
   let subtotal = baseDisc + (weight * perGram) + materialAdd + (nozzle02 ? 4 : 0);
 
   if (express === 'yes') subtotal *= 1.30;
 
+  // ── Breakdown HTML ──
   let html = '';
   if (isPLA) {
-    html += `Grundpreis: <strong>4€</strong> <span class="disc-badge">-50%</span> <span class="orig-price">8€</span><br>`;
+    html += `<div style="margin-bottom:0.5rem">
+      <strong>Grundpreis:</strong> 4.00€ 
+      <span class="disc-badge">-50%</span> 
+      <span class="orig-price">8.00€</span>
+    </div>`;
   } else {
-    html += `Grundpreis: <strong>${baseFull}€</strong> + Material-Aufpreis: <strong>10€</strong><br>`;
+    html += `<div style="margin-bottom:0.5rem">
+      <strong>Grundpreis:</strong> ${baseFull.toFixed(2)}€<br>
+      <strong>Material-Aufpreis:</strong> ${materialAdd.toFixed(2)}€
+    </div>`;
   }
-  html += `Material (${weight}g × 0.20€): <strong>${(weight*perGram).toFixed(2)}€</strong><br>`;
-  if (nozzle02) html += `Düse 0.2 Stainless Steel: <strong>+4€</strong><br>`;
-  if (express === 'yes') html += `Express (+30%): angewendet<br>`;
+  
+  html += `<div style="margin-bottom:0.5rem">
+    <strong>Filament:</strong> ${weight}g × 0.05€ = ${(weight*perGram).toFixed(2)}€
+  </div>`;
+  
+  if (nozzle02) {
+    html += `<div style="margin-bottom:0.5rem">
+      <strong>Düse 0.2mm Stainless Steel:</strong> +4.00€
+    </div>`;
+  }
+  
+  if (express === 'yes') {
+    html += `<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px dashed var(--border)">
+      <strong style="color:var(--blue)">⚡ Express-Service (+30%):</strong> angewendet
+    </div>`;
+  }
 
   if (amtEl) amtEl.textContent = subtotal.toFixed(2) + '€';
   if (breakEl) breakEl.innerHTML = html;
@@ -75,9 +99,18 @@ function handleUpload(e) {
   const price   = calculatePrice();
 
   cart.push({
-    type:'upload', name:'Custom Upload (' + mat + ')',
-    desc, weight, material:mat, nozzle, express, notes, price
+    type:'upload', 
+    name:'Custom Upload (' + mat + ')',
+    desc, 
+    weight: parseFloat(weight), 
+    material: mat, 
+    nozzle, 
+    express, 
+    notes, 
+    price,
+    qty: 1
   });
+  
   updateCartBadge();
   closeModal('uploadModal');
   document.getElementById('uploadForm').reset();
@@ -160,8 +193,13 @@ function changeQty(delta) {
 function addToCartFromDetail() {
   if (!detProduct) return;
   cart.push({
-    type:'product', name:detProduct.name, emoji:detProduct.emoji,
-    productId:detProduct.id, qty:detQty, color:detColor,
+    type:'product', 
+    name:detProduct.name, 
+    emoji:detProduct.emoji,
+    productId:detProduct.id, 
+    qty:detQty, 
+    color:detColor,
+    weight: detProduct.weight || 0,
     price:detProduct.price * detQty
   });
   updateCartBadge();
@@ -202,7 +240,9 @@ function appendChatMsg(type, html) {
   el.scrollTop = el.scrollHeight;
 }
 
-function chatKeydown(e) { if (e.key === 'Enter') sendChat(); }
+function chatKeydown(e) { 
+  if (e.key === 'Enter') sendChat(); 
+}
 
 // ─── CHECKOUT ─────────────────────────────────────────────────
 let shippingCost = 0;
@@ -215,7 +255,8 @@ function proceedToCheckout() {
   document.getElementById('co-shipping').textContent = '0.00€';
   document.getElementById('co-discount').textContent = '0.00€';
   document.getElementById('co-total').textContent    = sub.toFixed(2) + '€';
-  shippingCost = 0; discountAmount = 0;
+  shippingCost = 0; 
+  discountAmount = 0;
   closeModal('cartModal');
   openModal('checkoutModal');
 }
@@ -230,10 +271,10 @@ function onShippingChange() {
   } else if (method === 'standard') {
     addrEl.classList.remove('hidden');
     const totalW = cart.reduce((s,i) => s + ((i.weight||0) * (i.qty||1)), 0);
-    if      (totalW < 100) shippingCost = 4.99;
-    else if (totalW < 500) shippingCost = 5.99;
+    if      (totalW < 100)  shippingCost = 4.99;
+    else if (totalW < 500)  shippingCost = 5.99;
     else if (totalW < 1000) shippingCost = 6.99;
-    else                   shippingCost = 8.99;
+    else                    shippingCost = 8.99;
   } else if (method === 'express') {
     addrEl.classList.remove('hidden');
     shippingCost = 9.99;
@@ -244,14 +285,21 @@ function onShippingChange() {
 
 function applyCoupon() {
   const code = document.getElementById('co-coupon').value.toUpperCase().trim();
-  const coupons = { 'WELCOME10':0.10, 'SAVE20':0.20, 'FIRST50':0.50 };
+  const coupons = { 
+    'WELCOME10':0.10, 
+    'SAVE20':0.20, 
+    'FIRST50':0.50 
+  };
+  
   if (coupons[code]) {
     const sub = cart.reduce((s,i) => s + i.price, 0);
     discountAmount = sub * coupons[code];
     document.getElementById('co-discount').textContent = '-' + discountAmount.toFixed(2) + '€';
     recalcTotal();
     alert('✅ Gutschein erfolgreich eingelöst!');
-  } else { alert('❌ Ungültiger Gutscheincode'); }
+  } else { 
+    alert('❌ Ungültiger Gutscheincode'); 
+  }
 }
 
 function recalcTotal() {
@@ -351,6 +399,9 @@ async function handleCheckout(e) {
 
 // ─── OPEN CUSTOM DESIGN (opens chat) ─────────────────────────
 function openCustomDesign() {
-  if (!window.currentUser) { openModal('loginModal'); return; }
+  if (!window.currentUser) { 
+    openModal('loginModal'); 
+    return; 
+  }
   toggleChat();
 }
