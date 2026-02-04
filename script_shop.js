@@ -2,25 +2,20 @@
 
 // ─── UPLOAD MODAL ─────────────────────────────────────────────
 function openUploadModal() {
-  if (!currentUser) { openModal('loginModal'); return; }
+  if (!window.currentUser) { openModal('loginModal'); return; }
   openModal('uploadModal');
 }
 
 // Material & Nozzle logic
-// Nozzle: 0.4 hardened steel (default), 0.2 stainless steel (+4€, PLA only)
-// Materials: PLA (50% Grundpreis-Rabatt), TPU, ASA, ABS, PETG, PLA CF, PETG CF, PLA Wood, PLA Glow, PLA Marble, ABS CF, PETG HF, Silk PLA
-
 function onMaterialChange() {
   const mat = document.getElementById('upload-material').value;
   const nozzleWrap = document.getElementById('nozzle-wrap');
   const nozzle02 = document.getElementById('nozzle-02');
 
-  // 0.2 stainless steel only available with PLA
   if (mat === 'PLA') {
     nozzleWrap.classList.remove('hidden');
   } else {
     nozzleWrap.classList.add('hidden');
-    // force 0.4 if user had 0.2 selected
     document.getElementById('nozzle-04').checked = true;
   }
   calculatePrice();
@@ -41,16 +36,15 @@ function calculatePrice() {
 
   const isPLA       = mat === 'PLA';
   const baseFull    = 8;
-  const baseDisc    = isPLA ? 4 : baseFull;   // 50 % only for PLA
+  const baseDisc    = isPLA ? 4 : baseFull;
   const perGram     = 0.20;
-  let   materialAdd = 0;                       // PLA = 0, others = +10 €
+  let   materialAdd = 0;
   if (!isPLA) materialAdd = 10;
 
   let subtotal = baseDisc + (weight * perGram) + materialAdd + (nozzle02 ? 4 : 0);
 
   if (express === 'yes') subtotal *= 1.30;
 
-  // ── breakdown HTML ──
   let html = '';
   if (isPLA) {
     html += `Grundpreis: <strong>4€</strong> <span class="disc-badge">-50%</span> <span class="orig-price">8€</span><br>`;
@@ -70,7 +64,7 @@ function calculatePrice() {
 
 function handleUpload(e) {
   e.preventDefault();
-  if (!currentUser) { openModal('loginModal'); return; }
+  if (!window.currentUser) { openModal('loginModal'); return; }
 
   const desc    = document.getElementById('upload-desc').value;
   const weight  = document.getElementById('upload-weight').value;
@@ -120,14 +114,12 @@ function renderDetImage(p, idx) {
   const wrap = document.getElementById('det-img-wrap');
   if (!wrap) return;
   wrap.innerHTML = `<span class="emoji">${p.emoji || '📦'}</span>`;
-  // If product has real images we could show them; for now show emoji with color tint
   wrap.style.background = `linear-gradient(135deg, ${detColor}22, ${detColor}44)`;
 }
 
 function renderDetThumbnails(p) {
   const el = document.getElementById('det-thumbs');
   if (!el) return;
-  // Show color swatches as thumbnail previews
   el.innerHTML = (p.colors || []).slice(0,5).map((c,i) =>
     `<div class="det-thumb ${i===0?'active':''}" style="background:${c}33" onclick="switchDetThumb(${i},'${c}')">
       <span class="emoji" style="font-size:1.1rem">${p.emoji||'📦'}</span></div>`
@@ -137,12 +129,9 @@ function renderDetThumbnails(p) {
 function switchDetThumb(i, color) {
   detThumbIdx = i;
   detColor    = color;
-  // highlight
   document.querySelectorAll('.det-thumb').forEach((t,idx) => t.classList.toggle('active', idx===i));
-  // update main image tint
   const wrap = document.getElementById('det-img-wrap');
   if (wrap) wrap.style.background = `linear-gradient(135deg, ${color}22, ${color}44)`;
-  // update color selector
   document.querySelectorAll('.col-opt').forEach((c,idx) => c.classList.toggle('active', idx===i));
 }
 
@@ -157,10 +146,8 @@ function renderDetColors(p) {
 function pickColor(i, color) {
   detColor = color;
   document.querySelectorAll('.col-opt').forEach((c,idx) => c.classList.toggle('active', idx===i));
-  // sync thumbnail
   document.querySelectorAll('.det-thumb').forEach((t,idx) => t.classList.toggle('active', idx===i));
   detThumbIdx = i;
-  // update main image tint
   const wrap = document.getElementById('det-img-wrap');
   if (wrap) wrap.style.background = `linear-gradient(135deg, ${color}22, ${color}44)`;
 }
@@ -197,7 +184,6 @@ function sendChat() {
 
   appendChatMsg('u', msg);
 
-  // Auto-reply after 1.2s
   setTimeout(() => {
     appendChatMsg('b',
       `Danke für Ihre Nachricht! Ich werde Ihre Anfrage bearbeiten und ggf. nach weiteren Informationen zum Design nachfragen.<br><br>
@@ -243,7 +229,6 @@ function onShippingChange() {
     shippingCost = 0;
   } else if (method === 'standard') {
     addrEl.classList.remove('hidden');
-    // staffel
     const totalW = cart.reduce((s,i) => s + ((i.weight||0) * (i.qty||1)), 0);
     if      (totalW < 100) shippingCost = 4.99;
     else if (totalW < 500) shippingCost = 5.99;
@@ -287,6 +272,11 @@ function onPaymentChange() {
 
 async function handleCheckout(e) {
   e.preventDefault();
+  if (!window.currentUser) {
+    alert('Bitte melden Sie sich an!');
+    return;
+  }
+
   const method  = document.getElementById('co-shipping-method').value;
   const payment = document.getElementById('co-payment').value;
 
@@ -295,22 +285,44 @@ async function handleCheckout(e) {
     const street = document.getElementById('co-street').value.trim();
     const zip    = document.getElementById('co-zip').value.trim();
     const city   = document.getElementById('co-city').value.trim();
-    if (!street || !zip || !city) { alert('Bitte füllen Sie die Lieferadresse aus!'); return; }
+    if (!street || !zip || !city) { 
+      alert('Bitte füllen Sie die Lieferadresse aus!'); 
+      return; 
+    }
   }
 
   const total = parseFloat(document.getElementById('co-total').textContent.replace('€',''));
   const orderId = 'ORD-' + Date.now();
 
-  // Save to Firestore (if available)
-  if (window.fbDb) {
+  // Save to Firestore
+  if (window.fbDb && window.fbFuncs) {
     try {
       const orderData = {
-        userId: currentUser.uid, userEmail: currentUser.email,
-        items: cart, total, shippingMethod: method, paymentMethod: payment,
-        status:'pending', createdAt: new Date().toISOString()
+        userId: window.currentUser.uid, 
+        userEmail: window.currentUser.email,
+        userName: window.currentUser.displayName || window.currentUser.email.split('@')[0],
+        items: cart, 
+        total, 
+        shipping: shippingCost,
+        shippingMethod: method, 
+        paymentMethod: payment,
+        status:'pending', 
+        createdAt: new Date().toISOString(),
+        chatHistory: [],
+        notes: ''
       };
-      await window.fbFuncs.addDoc(window.fbDb, 'orders', orderData);
-    } catch(err) { console.warn('Firestore save failed', err); }
+      
+      await window.fbFuncs.addDoc(
+        window.fbFuncs.collection(window.fbDb, 'orders'), 
+        orderData
+      );
+      
+      console.log("✅ Bestellung in Firebase gespeichert:", orderId);
+    } catch(err) { 
+      console.error('❌ Firestore save failed:', err); 
+      alert('Fehler beim Speichern der Bestellung. Bitte versuchen Sie es erneut.');
+      return;
+    }
   }
 
   // Payment flow
@@ -324,8 +336,10 @@ async function handleCheckout(e) {
     alert('✅ Bestellung aufgegeben!\n\nBei der Zahlungsart „Privat" wird die Zahlung persönlich vereinbart.\n\nBestellnummer: ' + orderId);
   }
 
-  // Notify admin (demo)
-  if (isAdmin) addNotification('Neue Bestellung', orderId + ' – ' + total.toFixed(2) + '€');
+  // Notify admin
+  if (window.isAdmin) {
+    addNotification('Neue Bestellung', orderId + ' – ' + total.toFixed(2) + '€');
+  }
 
   cart = [];
   updateCartBadge();
@@ -337,6 +351,6 @@ async function handleCheckout(e) {
 
 // ─── OPEN CUSTOM DESIGN (opens chat) ─────────────────────────
 function openCustomDesign() {
-  if (!currentUser) { openModal('loginModal'); return; }
+  if (!window.currentUser) { openModal('loginModal'); return; }
   toggleChat();
 }
