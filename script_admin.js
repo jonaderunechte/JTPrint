@@ -1,13 +1,28 @@
 /* ===== script_admin.js — Admin Panel: Orders, Products, Gallery, Chat Mgmt ===== */
 
 // ─── LOAD ORDERS ──────────────────────────────────────────────
-function loadOrders() {
-  // Try Firestore; fallback to SAMPLE_ORDERS from script.js
-  if (window.fbDb) {
-    window.fbFuncs.getCollectionDocs(window.fbDb, 'orders').then(docs => {
-      if (docs.length > 0) orders = docs; else orders = [...SAMPLE_ORDERS];
+async function loadOrders() {
+  if (window.fbDb && window.fbFuncs) {
+    try {
+      const docs = await window.fbFuncs.getCollectionDocs(window.fbDb, 'orders');
+      if (docs.length > 0) {
+        orders = docs;
+      } else {
+        orders = [...SAMPLE_ORDERS];
+        // Optional: Speichere Sample-Orders in Firebase für Demo
+        for (const order of SAMPLE_ORDERS) {
+          await window.fbFuncs.setDoc(
+            window.fbFuncs.doc(window.fbDb, 'orders', order.id), 
+            order
+          );
+        }
+      }
       renderAdminTab('orders');
-    }).catch(() => { orders = [...SAMPLE_ORDERS]; renderAdminTab('orders'); });
+    } catch(err) {
+      console.warn("Bestellungen konnten nicht geladen werden:", err);
+      orders = [...SAMPLE_ORDERS]; 
+      renderAdminTab('orders');
+    }
   } else {
     orders = [...SAMPLE_ORDERS];
     renderAdminTab('orders');
@@ -44,7 +59,10 @@ const STATUS_OPTIONS = [
 function renderOrders() {
   const el = document.getElementById('orders-list');
   if (!el) return;
-  if (orders.length === 0) { el.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>Keine aktiven Bestellungen</p></div>'; return; }
+  if (orders.length === 0) { 
+    el.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>Keine aktiven Bestellungen</p></div>'; 
+    return; 
+  }
 
   el.innerHTML = orders.map(o => {
     const statusCls = 'status-' + o.status;
@@ -127,35 +145,48 @@ async function updateOrderStatus(orderId, newStatus) {
   if (!order) return;
   
   order.status = newStatus;
+  renderOrders();
   
-  if (window.fbDb) {
+  // Update in Firebase
+  if (window.fbDb && window.fbFuncs) {
     try {
-      const orderRef = window.fbFuncs.doc(window.fbDb, 'orders', orderId);
-      await window.fbFuncs.updateDoc(orderRef, { status: newStatus });
-      renderOrders();
+      await window.fbFuncs.updateDoc(
+        window.fbFuncs.doc(window.fbDb, 'orders', orderId),
+        { status: newStatus }
+      );
+      console.log("✅ Status in Firebase aktualisiert:", orderId, newStatus);
     } catch (err) {
-      console.error("Status-Update Fehler:", err);
+      console.error("❌ Fehler beim Status-Update:", err);
     }
   }
+  
+  addNotification('Status geändert', `${orderId} → ${(STATUS_OPTIONS.find(s=>s.val===newStatus)||{}).label}`);
 }
-// In script_admin.js
+
+// ─── COMPLETE ORDER ───────────────────────────────────────────
 async function completeOrder(orderId) {
   if (!confirm('Bestellung wirklich als erledigt markieren und löschen?')) return;
-  
-  if (window.fbDb) {
+
+  // 1. Aus lokalem Array löschen
+  orders = orders.filter(o => o.id !== orderId);
+  renderOrders();
+
+  // 2. In Firestore löschen
+  if (window.fbDb && window.fbFuncs) {
     try {
-      await window.fbFuncs.deleteDoc(window.fbFuncs.doc(window.fbDb, 'orders', orderId));
-      orders = orders.filter(o => o.id !== orderId);
-      renderOrders();
-      addNotification('Bestellung abgeschlossen', `Auftrag ${orderId} wurde entfernt.`);
+      await window.fbFuncs.deleteDoc(
+        window.fbFuncs.doc(window.fbDb, 'orders', orderId)
+      );
+      console.log("✅ Bestellung in Firebase gelöscht:", orderId);
+      addNotification('System', 'Bestellung wurde dauerhaft gelöscht.');
     } catch (err) {
-      console.error("Löschfehler:", err);
+      console.error("❌ Löschen fehlgeschlagen:", err);
+      alert('Fehler beim Löschen der Bestellung!');
     }
   }
 }
 
 // ─── ADMIN REPLY IN CHAT ──────────────────────────────────────
-// Admin-Antwort dauerhaft speichern
 async function adminReply(orderId) {
   const input = document.getElementById('reply-' + orderId);
   if (!input || !input.value.trim()) return;
@@ -163,20 +194,32 @@ async function adminReply(orderId) {
   const order = orders.find(o => o.id === orderId);
   if (!order) return;
   
-  const msg = { sender: 'admin', text: input.value.trim(), time: new Date().toISOString() };
   if (!order.chatHistory) order.chatHistory = [];
-  order.chatHistory.push(msg);
-
-  if (window.fbDb) {
+  
+  const message = {
+    sender: 'admin', 
+    text: input.value.trim(), 
+    time: new Date().toISOString()
+  };
+  
+  order.chatHistory.push(message);
+  input.value = '';
+  renderOrders();
+  
+  // Update in Firebase
+  if (window.fbDb && window.fbFuncs) {
     try {
-      const orderRef = window.fbFuncs.doc(window.fbDb, 'orders', orderId);
-      await window.fbFuncs.updateDoc(orderRef, { chatHistory: order.chatHistory });
-      input.value = '';
-      renderOrders();
+      await window.fbFuncs.updateDoc(
+        window.fbFuncs.doc(window.fbDb, 'orders', orderId),
+        { chatHistory: order.chatHistory }
+      );
+      console.log("✅ Chat in Firebase gespeichert:", orderId);
     } catch (err) {
-      console.error("Chat-Fehler:", err);
+      console.error("❌ Fehler beim Chat-Speichern:", err);
     }
   }
+  
+  addNotification('Nachricht gesendet', 'An ' + order.userEmail);
 }
 
 // ─── NOTIFY MODAL (cost / time changes) ──────────────────────
@@ -184,7 +227,6 @@ let notifyOrderId = null;
 
 function openNotifyModal(orderId) {
   notifyOrderId = orderId;
-  // reset fields
   document.getElementById('notify-msg').value = '';
   document.querySelectorAll('.notify-type-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('notify-cost-change').classList.add('hidden');
@@ -201,40 +243,56 @@ function toggleNotifyType(type) {
   if (type === 'time') document.getElementById('notify-time-change').classList.toggle('hidden', !btn.classList.contains('active'));
 }
 
-function sendNotification() {
+async function sendNotification() {
   const msg       = document.getElementById('notify-msg').value.trim();
   const costChg   = document.getElementById('notify-cost-val')  ? document.getElementById('notify-cost-val').value  : '';
   const timeChg   = document.getElementById('notify-time-val')  ? document.getElementById('notify-time-val').value  : '';
-  const order     = orders.find(o => o.id === notifyOrderId);
+
+  if (!msg && !costChg && !timeChg) { 
+    alert('Bitte eine Nachricht eingeben!'); 
+    return; 
+  }
+
+  const order = orders.find(o => o.id === notifyOrderId);
+  if (!order) return;
 
   let fullMsg = msg;
   if (costChg) fullMsg += '\n💰 Kostenänderung: ' + costChg;
-  if (timeChg) fullMsg += '\n⏱️ Zeitänderung: '   + timeChg;
-
-  if (!fullMsg.trim()) { alert('Bitte geben Sie eine Nachricht ein.'); return; }
+  if (timeChg) fullMsg += '\n⏱️ Zeitänderung: ' + timeChg;
 
   // Add to order chat
-  if (order) {
-    if (!order.chatHistory) order.chatHistory = [];
-    order.chatHistory.push({ sender:'admin', text: fullMsg.replace(/\n/g,'<br>'), time: new Date().toISOString() });
+  if (!order.chatHistory) order.chatHistory = [];
+  order.chatHistory.push({ 
+    sender:'admin', 
+    text: fullMsg, 
+    time: new Date().toISOString() 
+  });
+  
+  // Update in Firebase
+  if (window.fbDb && window.fbFuncs) {
+    try {
+      await window.fbFuncs.updateDoc(
+        window.fbFuncs.doc(window.fbDb, 'orders', notifyOrderId),
+        { chatHistory: order.chatHistory }
+      );
+      console.log("✅ Benachrichtigung in Firebase gespeichert:", notifyOrderId);
+    } catch (err) {
+      console.error("❌ Fehler beim Benachrichtigung-Speichern:", err);
+    }
   }
 
-  addNotification('Benachrichtigung gesendet', notifyOrderId + ' – ' + (order?order.userEmail:''));
-  closeModal('notifyModal');
   renderOrders();
+  closeModal('notifyModal');
+  alert('✅ Benachrichtigung gesendet an ' + order.userEmail);
 }
 
 // ─── PRODUCT EDITOR ───────────────────────────────────────────
-let editingProduct = null;  // null = new, else product object
+let editingProduct = null;
 
 function renderProductEditor() {
-  renderProductList();
-  resetProductForm();
-}
-
-function renderProductList() {
   const el = document.getElementById('prod-editor-list');
   if (!el) return;
+  
   el.innerHTML = allProducts.map((p,i) => `
     <div class="prod-list-item">
       <div><div class="pli-name">${p.emoji||'📦'} ${p.name}</div><div class="pli-info">${p.price.toFixed(2)}€ | ${p.category}</div></div>
@@ -289,9 +347,25 @@ function editProduct(idx) {
   document.getElementById('pe-submit-btn').textContent = '💾 Speichern';
 }
 
-function deleteProduct(idx) {
-  if (!confirm('Produkt „' + allProducts[idx].name + '" löschen?')) return;
+async function deleteProduct(idx) {
+  const product = allProducts[idx];
+  if (!confirm('Produkt „' + product.name + '" löschen?')) return;
+  
+  // Delete from local array
   allProducts.splice(idx, 1);
+  
+  // Delete from Firebase
+  if (window.fbDb && window.fbFuncs && product.id) {
+    try {
+      await window.fbFuncs.deleteDoc(
+        window.fbFuncs.doc(window.fbDb, 'products', product.id)
+      );
+      console.log("✅ Produkt in Firebase gelöscht:", product.id);
+    } catch (err) {
+      console.error("❌ Fehler beim Produkt-Löschen:", err);
+    }
+  }
+  
   renderProductEditor();
   renderShop();
   renderGallery();
@@ -329,7 +403,6 @@ function removeImgUrl(btn) {
 }
 
 async function saveProduct() {
-  // 1. Daten aus den Feldern sammeln
   const name     = document.getElementById('pe-name').value.trim();
   const desc     = document.getElementById('pe-desc').value.trim();
   const price    = parseFloat(document.getElementById('pe-price').value) || 0;
@@ -339,53 +412,78 @@ async function saveProduct() {
   const inStock  = document.getElementById('pe-instock').checked;
 
   if (!name || price <= 0) { 
-    alert('Bitte Name und Preis korrekt ausfüllen!'); 
+    alert('Bitte Name und Preis ausfüllen!'); 
     return; 
   }
 
-  // Farben und Bilder sammeln
+  // collect colors
   const colors = [...document.querySelectorAll('#pe-colors .color-chip')].map(c => c.title || c.style.background);
+  // collect images
   const images = [...document.querySelectorAll('#pe-images input')].map(i => i.value.trim()).filter(Boolean);
 
-  const productData = { name, desc, price, weight, emoji, category, inStock, colors, images };
+  const product = { 
+    name, desc, price, weight, emoji, category, inStock, colors, images, 
+    id: editingProduct !== null ? allProducts[editingProduct].id : 'p_'+Date.now() 
+  };
 
-  try {
-    if (window.fbDb && window.fbFuncs) {
-      if (editingProduct !== null && allProducts[editingProduct].id) {
-        // UPDATE: Bestehendes Produkt in Firebase aktualisieren
-        const prodId = allProducts[editingProduct].id;
-        const docRef = window.fbFuncs.doc(window.fbDb, 'products', prodId);
-        await window.fbFuncs.updateDoc(docRef, productData);
-        addNotification('System', `Produkt "${name}" wurde aktualisiert.`);
-      } else {
-        // NEU: Produkt in Firebase erstellen (Firebase generiert die ID)
-        const colRef = window.fbFuncs.collection(window.fbDb, 'products');
-        await window.fbFuncs.addDoc(colRef, productData);
-        addNotification('System', `Neues Produkt "${name}" erstellt.`);
-      }
-    }
-
-    // 2. UI & Lokale Daten aktualisieren
-    if (typeof loadProducts === 'function') {
-      await loadProducts(); // Lädt die frische Liste vom Server
-    }
-    
-    editingProduct = null;
-    switchAdminTab('products'); // Zurück zur Liste
-  } catch (err) {
-    console.error("Fehler beim Speichern:", err);
-    alert("Fehler beim Speichern in der Datenbank!");
+  if (editingProduct !== null) {
+    allProducts[editingProduct] = product;
+  } else {
+    allProducts.push(product);
   }
+
+  // Save to Firestore
+  if (window.fbDb && window.fbFuncs) {
+    try {
+      await window.fbFuncs.setDoc(
+        window.fbFuncs.doc(window.fbDb, 'products', product.id), 
+        product
+      );
+      console.log("✅ Produkt in Firebase gespeichert:", product.id);
+    } catch (err) {
+      console.error("❌ Fehler beim Produkt-Speichern:", err);
+    }
+  }
+
+  renderProductEditor();
+  renderShop();
+  renderGallery();
+  resetProductForm();
+  addNotification('Produkt gespeichert', product.name);
 }
 
 // ─── GALLERY EDITOR ───────────────────────────────────────────
-// Gallery = first N products shown in gallery section.
-// Admin can reorder / remove items from gallery or add new ones.
+let galleryItems = [];
 
-let galleryItems = [];   // indices into allProducts
+async function loadGallerySettings() {
+  if (window.fbDb && window.fbFuncs) {
+    try {
+      const docs = await window.fbFuncs.getCollectionDocs(window.fbDb, 'settings');
+      const gallerySetting = docs.find(d => d.id === 'gallery');
+      if (gallerySetting && gallerySetting.items) {
+        galleryItems = gallerySetting.items;
+      }
+    } catch (err) {
+      console.warn("Galerie-Einstellungen konnten nicht geladen werden:", err);
+    }
+  }
+}
+
+async function saveGallerySettings() {
+  if (window.fbDb && window.fbFuncs) {
+    try {
+      await window.fbFuncs.setDoc(
+        window.fbFuncs.doc(window.fbDb, 'settings', 'gallery'),
+        { items: galleryItems }
+      );
+      console.log("✅ Galerie-Einstellungen gespeichert");
+    } catch (err) {
+      console.error("❌ Fehler beim Galerie-Speichern:", err);
+    }
+  }
+}
 
 function renderGalleryEditor() {
-  // default: first 6
   if (galleryItems.length === 0) galleryItems = allProducts.map((_,i) => i).slice(0,6);
   const el = document.getElementById('gallery-editor-grid');
   if (!el) return;
@@ -404,16 +502,19 @@ function renderGalleryEditor() {
     </div>`;
 }
 
-function removeGalleryItem(prodIdx) {
+async function removeGalleryItem(prodIdx) {
   galleryItems = galleryItems.filter(i => i !== prodIdx);
+  await saveGallerySettings();
   renderGalleryEditor();
   updateGallerySection();
 }
 
 function openAddGalleryModal() {
-  // show products not yet in gallery
   const available = allProducts.filter((_,i) => !galleryItems.includes(i));
-  if (available.length === 0) { alert('Alle Produkte sind bereits in der Galerie!'); return; }
+  if (available.length === 0) { 
+    alert('Alle Produkte sind bereits in der Galerie!'); 
+    return; 
+  }
   const el = document.getElementById('gallery-add-list');
   el.innerHTML = available.map((p,i) => {
     const realIdx = allProducts.indexOf(p);
@@ -425,15 +526,15 @@ function openAddGalleryModal() {
   openModal('addGalleryModal');
 }
 
-function addGalleryItem(idx) {
+async function addGalleryItem(idx) {
   if (!galleryItems.includes(idx)) galleryItems.push(idx);
+  await saveGallerySettings();
   closeModal('addGalleryModal');
   renderGalleryEditor();
   updateGallerySection();
 }
 
 function updateGallerySection() {
-  // update the live gallery on the shop page
   const grid = document.getElementById('gallery-grid');
   if (!grid) return;
   grid.innerHTML = '';
@@ -441,4 +542,9 @@ function updateGallerySection() {
     const p = allProducts[idx];
     if (p) grid.appendChild(createProductCard(p));
   });
+}
+
+// Load gallery settings on admin panel init
+if (window.isAdmin) {
+  loadGallerySettings();
 }
