@@ -1,4 +1,4 @@
-/* ===== script.js — Core: Firebase, Auth, State, Products, Notifications ===== */
+/* ===== script.js — Core: Firebase, Auth,  State, Products, Notifications ===== */
 
 // ─── GLOBAL STATE ─────────────────────────────────────────────
 const ADMIN_EMAIL = 'jona.thielgen@gmail.com';
