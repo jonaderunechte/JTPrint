@@ -1,26 +1,49 @@
 /* ===== script_shop.js — Upload, PriceCalc, ProductDetail, Chat, Checkout ===== */
 
+// ─── FILE UPLOAD HANDLING ────────────────────────────────────
+let uploadedFile = null;
+
+function switchUploadTab(tab) {
+  document.querySelectorAll('.up-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.up-tab-content').forEach(c => c.classList.remove('active'));
+  
+  document.querySelector(`.up-tab[onclick*="${tab}"]`).classList.add('active');
+  document.getElementById(`upload-${tab}-tab`).classList.add('active');
+}
+
+function handleFileSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  uploadedFile = file;
+  const preview = document.getElementById('file-preview');
+  const fileName = preview.querySelector('.file-name');
+  
+  fileName.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+  preview.classList.remove('hidden');
+}
+
+function clearFile() {
+  uploadedFile = null;
+  document.getElementById('upload-file').value = '';
+  document.getElementById('file-preview').classList.add('hidden');
+}
+
 // ─── UPLOAD MODAL ─────────────────────────────────────────────
 function openUploadModal() {
-  if (!currentUser) { openModal('loginModal'); return; }
+  if (!window.currentUser) { openModal('loginModal'); return; }
   openModal('uploadModal');
 }
 
-// Material & Nozzle logic
-// Nozzle: 0.4 hardened steel (default), 0.2 stainless steel (+4€, PLA only)
-// Materials: PLA (50% Grundpreis-Rabatt), TPU, ASA, ABS, PETG, PLA CF, PETG CF, PLA Wood, PLA Glow, PLA Marble, ABS CF, PETG HF, Silk PLA
-
+// Material & Nozzle logic - FIXED: 0.05€/g statt 0.20€/g
 function onMaterialChange() {
   const mat = document.getElementById('upload-material').value;
   const nozzleWrap = document.getElementById('nozzle-wrap');
-  const nozzle02 = document.getElementById('nozzle-02');
 
-  // 0.2 stainless steel only available with PLA
   if (mat === 'PLA') {
     nozzleWrap.classList.remove('hidden');
   } else {
     nozzleWrap.classList.add('hidden');
-    // force 0.4 if user had 0.2 selected
     document.getElementById('nozzle-04').checked = true;
   }
   calculatePrice();
@@ -42,8 +65,8 @@ function calculatePrice() {
   const isPLA       = mat === 'PLA';
   const baseFull    = 8;
   const baseDisc    = isPLA ? 4 : baseFull;   // 50 % only for PLA
-  const perGram     = 0.20;
-  let   materialAdd = 0;                       // PLA = 0, others = +10 €
+  const perGram     = 0.05;  // FIXED: 5ct statt 20ct!
+  let   materialAdd = 0;
   if (!isPLA) materialAdd = 10;
 
   let subtotal = baseDisc + (weight * perGram) + materialAdd + (nozzle02 ? 4 : 0);
@@ -57,7 +80,7 @@ function calculatePrice() {
   } else {
     html += `Grundpreis: <strong>${baseFull}€</strong> + Material-Aufpreis: <strong>10€</strong><br>`;
   }
-  html += `Material (${weight}g × 0.20€): <strong>${(weight*perGram).toFixed(2)}€</strong><br>`;
+  html += `Material (${weight}g × 0.05€): <strong>${(weight*perGram).toFixed(2)}€</strong><br>`;
   if (nozzle02) html += `Düse 0.2 Stainless Steel: <strong>+4€</strong><br>`;
   if (express === 'yes') html += `Express (+30%): angewendet<br>`;
 
@@ -70,7 +93,22 @@ function calculatePrice() {
 
 function handleUpload(e) {
   e.preventDefault();
-  if (!currentUser) { openModal('loginModal'); return; }
+  if (!window.currentUser) { openModal('loginModal'); return; }
+
+  const fileTab = document.getElementById('upload-file-tab').classList.contains('active');
+  let fileInfo = '';
+  
+  if (fileTab && uploadedFile) {
+    fileInfo = uploadedFile.name;
+  } else if (!fileTab) {
+    const link = document.getElementById('upload-link').value.trim();
+    if (link) fileInfo = link;
+  }
+  
+  if (!fileInfo) {
+    alert('Bitte Datei hochladen oder Link angeben!');
+    return;
+  }
 
   const desc    = document.getElementById('upload-desc').value;
   const weight  = document.getElementById('upload-weight').value;
@@ -81,15 +119,19 @@ function handleUpload(e) {
   const price   = calculatePrice();
 
   cart.push({
-    type:'upload', name:'Custom Upload (' + mat + ')',
+    type:'upload', 
+    name:'Custom Upload (' + mat + ')',
+    fileInfo: fileInfo,
     desc, weight, material:mat, nozzle, express, notes, price
   });
+  
   updateCartBadge();
   closeModal('uploadModal');
   document.getElementById('uploadForm').reset();
   document.getElementById('price-result').classList.add('hidden');
   document.getElementById('nozzle-wrap').classList.add('hidden');
   document.getElementById('nozzle-04').checked = true;
+  clearFile();
 }
 
 // ─── PRODUCT DETAIL MODAL ─────────────────────────────────────
@@ -120,14 +162,12 @@ function renderDetImage(p, idx) {
   const wrap = document.getElementById('det-img-wrap');
   if (!wrap) return;
   wrap.innerHTML = `<span class="emoji">${p.emoji || '📦'}</span>`;
-  // If product has real images we could show them; for now show emoji with color tint
   wrap.style.background = `linear-gradient(135deg, ${detColor}22, ${detColor}44)`;
 }
 
 function renderDetThumbnails(p) {
   const el = document.getElementById('det-thumbs');
   if (!el) return;
-  // Show color swatches as thumbnail previews
   el.innerHTML = (p.colors || []).slice(0,5).map((c,i) =>
     `<div class="det-thumb ${i===0?'active':''}" style="background:${c}33" onclick="switchDetThumb(${i},'${c}')">
       <span class="emoji" style="font-size:1.1rem">${p.emoji||'📦'}</span></div>`
@@ -137,12 +177,9 @@ function renderDetThumbnails(p) {
 function switchDetThumb(i, color) {
   detThumbIdx = i;
   detColor    = color;
-  // highlight
   document.querySelectorAll('.det-thumb').forEach((t,idx) => t.classList.toggle('active', idx===i));
-  // update main image tint
   const wrap = document.getElementById('det-img-wrap');
   if (wrap) wrap.style.background = `linear-gradient(135deg, ${color}22, ${color}44)`;
-  // update color selector
   document.querySelectorAll('.col-opt').forEach((c,idx) => c.classList.toggle('active', idx===i));
 }
 
@@ -157,10 +194,8 @@ function renderDetColors(p) {
 function pickColor(i, color) {
   detColor = color;
   document.querySelectorAll('.col-opt').forEach((c,idx) => c.classList.toggle('active', idx===i));
-  // sync thumbnail
   document.querySelectorAll('.det-thumb').forEach((t,idx) => t.classList.toggle('active', idx===i));
   detThumbIdx = i;
-  // update main image tint
   const wrap = document.getElementById('det-img-wrap');
   if (wrap) wrap.style.background = `linear-gradient(135deg, ${color}22, ${color}44)`;
 }
@@ -197,11 +232,11 @@ function sendChat() {
 
   appendChatMsg('u', msg);
 
-  // Auto-reply after 1.2s
   setTimeout(() => {
     appendChatMsg('b',
       `Danke für Ihre Nachricht! Ich werde Ihre Anfrage bearbeiten und ggf. nach weiteren Informationen zum Design nachfragen.<br><br>
-       <strong>Stundensatz:</strong> 20€/h oder Preisvorschlag – wir können über den Preis verhandeln! 😊`
+       <strong>Stundensatz:</strong> 20€/h oder Preisvorschlag – wir können über den Preis verhandeln! 😊<br><br>
+       <button class="btn btn-pri btn-sm" onclick="openCustomDesignModal()">Custom Design bestellen</button>`
     );
   }, 1200);
 }
@@ -217,6 +252,54 @@ function appendChatMsg(type, html) {
 }
 
 function chatKeydown(e) { if (e.key === 'Enter') sendChat(); }
+
+// ─── CUSTOM DESIGN ORDER ──────────────────────────────────────
+function openCustomDesign() {
+  if (!window.currentUser) { openModal('loginModal'); return; }
+  toggleChat();
+}
+
+function openCustomDesignModal() {
+  closeAllPanels();
+  calculateCustomPrice();
+  openModal('customDesignModal');
+}
+
+function calculateCustomPrice() {
+  const hours = parseFloat(document.getElementById('custom-hours').value) || 2;
+  const rate = parseFloat(document.getElementById('custom-rate').value) || 20;
+  const price = hours * rate;
+  document.getElementById('custom-price-amount').textContent = price.toFixed(2) + '€';
+}
+
+function handleCustomDesignOrder(e) {
+  e.preventDefault();
+  if (!window.currentUser) { openModal('loginModal'); return; }
+
+  const desc = document.getElementById('custom-desc').value;
+  const hours = parseFloat(document.getElementById('custom-hours').value) || 2;
+  const rate = parseFloat(document.getElementById('custom-rate').value) || 20;
+  const printToo = document.getElementById('custom-print').value;
+  const price = hours * rate;
+
+  cart.push({
+    type: 'custom-design',
+    name: 'Custom Design Service',
+    desc: desc,
+    hours: hours,
+    rate: rate,
+    includePrint: printToo === 'yes',
+    price: price,
+    emoji: '✏️'
+  });
+
+  updateCartBadge();
+  closeModal('customDesignModal');
+  document.getElementById('customDesignForm').reset();
+  calculateCustomPrice();
+  
+  alert('✅ Custom Design wurde zum Warenkorb hinzugefügt!\n\nNach der Bestellung werden wir uns mit Ihnen in Verbindung setzen, um die Details zu besprechen.');
+}
 
 // ─── CHECKOUT ─────────────────────────────────────────────────
 let shippingCost = 0;
@@ -243,7 +326,6 @@ function onShippingChange() {
     shippingCost = 0;
   } else if (method === 'standard') {
     addrEl.classList.remove('hidden');
-    // staffel
     const totalW = cart.reduce((s,i) => s + ((i.weight||0) * (i.qty||1)), 0);
     if      (totalW < 100) shippingCost = 4.99;
     else if (totalW < 500) shippingCost = 5.99;
@@ -290,7 +372,6 @@ async function handleCheckout(e) {
   const method  = document.getElementById('co-shipping-method').value;
   const payment = document.getElementById('co-payment').value;
 
-  // Validate address if not pickup
   if (method !== 'pickup') {
     const street = document.getElementById('co-street').value.trim();
     const zip    = document.getElementById('co-zip').value.trim();
@@ -301,16 +382,29 @@ async function handleCheckout(e) {
   const total = parseFloat(document.getElementById('co-total').textContent.replace('€',''));
   const orderId = 'ORD-' + Date.now();
 
-  // Save to Firestore (if available)
-  if (window.fbDb) {
+  // Save to Firestore
+  if (window.fbDb && window.currentUser) {
     try {
       const orderData = {
-        userId: currentUser.uid, userEmail: currentUser.email,
-        items: cart, total, shippingMethod: method, paymentMethod: payment,
-        status:'pending', createdAt: new Date().toISOString()
+        userId: window.currentUser.uid, 
+        userEmail: window.currentUser.email,
+        userName: window.currentUser.displayName || window.currentUser.email.split('@')[0],
+        items: cart, 
+        total, 
+        shipping: shippingCost,
+        shippingMethod: method, 
+        paymentMethod: payment,
+        status:'pending', 
+        createdAt: new Date().toISOString(),
+        chatHistory: []
       };
-      await window.fbFuncs.addDoc(window.fbDb, 'orders', orderData);
-    } catch(err) { console.warn('Firestore save failed', err); }
+      await window.fbFuncs.setDoc(
+        window.fbFuncs.docRef(window.fbDb, 'orders', orderId),
+        orderData
+      );
+    } catch(err) { 
+      console.warn('Firestore save failed', err); 
+    }
   }
 
   // Payment flow
@@ -324,8 +418,8 @@ async function handleCheckout(e) {
     alert('✅ Bestellung aufgegeben!\n\nBei der Zahlungsart „Privat" wird die Zahlung persönlich vereinbart.\n\nBestellnummer: ' + orderId);
   }
 
-  // Notify admin (demo)
-  if (isAdmin) addNotification('Neue Bestellung', orderId + ' – ' + total.toFixed(2) + '€');
+  // Notify admin
+  if (window.isAdmin) addNotification('Neue Bestellung', orderId + ' – ' + total.toFixed(2) + '€');
 
   cart = [];
   updateCartBadge();
@@ -333,10 +427,4 @@ async function handleCheckout(e) {
   document.getElementById('checkoutForm').reset();
   document.getElementById('co-address-fields').classList.add('hidden');
   document.getElementById('co-priv-warn').classList.add('hidden');
-}
-
-// ─── OPEN CUSTOM DESIGN (opens chat) ─────────────────────────
-function openCustomDesign() {
-  if (!currentUser) { openModal('loginModal'); return; }
-  toggleChat();
 }

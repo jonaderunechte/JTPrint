@@ -213,3 +213,20 @@ footer { text-align:center; padding:1.8rem; color:var(--txt2); font-size:.82rem;
     .chat-widget{right:.8rem;bottom:.8rem}
     .modal-box{padding:1.1rem}
 }
+
+/* ===== UPLOAD TABS ===== */
+.up-tabs { display:flex; gap:.5rem; margin-bottom:1rem; }
+.up-tab { flex:1; background:var(--card); border:1px solid var(--border); color:var(--txt2); padding:.6rem 1rem; border-radius:8px; font-size:.88rem; cursor:pointer; transition:all .3s; }
+.up-tab.active { background:var(--grad); color:#fff; border-color:transparent; font-weight:600; }
+.up-tab-content { display:none; }
+.up-tab-content.active { display:block; }
+
+/* ===== FILE PREVIEW ===== */
+.file-preview { display:flex; align-items:center; justify-content:space-between; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:.7rem 1rem; margin-top:.5rem; }
+.file-preview.hidden { display:none; }
+.file-name { color:var(--green); font-size:.88rem; font-weight:500; }
+.file-remove { background:none; border:none; color:var(--red); font-size:1.2rem; cursor:pointer; padding:.2rem .4rem; transition:opacity .2s; }
+.file-remove:hover { opacity:.7; }
+
+/* ===== CUSTOM DESIGN PRICE ===== */
+.price-res .amt { font-size:1.8rem; color:var(--green); font-weight:700; margin:.3rem 0; }
