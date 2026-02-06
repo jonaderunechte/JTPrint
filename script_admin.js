@@ -1,13 +1,28 @@
 /* ===== script_admin.js — Admin Panel: Orders, Products, Gallery, Chat Mgmt ===== */
 
 // ─── LOAD ORDERS ──────────────────────────────────────────────
-function loadOrders() {
-  // Try Firestore; fallback to SAMPLE_ORDERS from script.js
+async function loadOrders() {
   if (window.fbDb) {
-    window.fbFuncs.getCollectionDocs(window.fbDb, 'orders').then(docs => {
-      if (docs.length > 0) orders = docs; else orders = [...SAMPLE_ORDERS];
+    try {
+      const docs = await window.fbFuncs.getCollectionDocs(window.fbDb, 'orders');
+      if (docs.length > 0) { 
+        orders = docs; 
+      } else { 
+        orders = [...SAMPLE_ORDERS];
+        // Sample-Orders in Firebase speichern
+        for (const o of SAMPLE_ORDERS) {
+          await window.fbFuncs.setDoc(
+            window.fbFuncs.docRef(window.fbDb, 'orders', o.id), 
+            o
+          );
+        }
+      }
       renderAdminTab('orders');
-    }).catch(() => { orders = [...SAMPLE_ORDERS]; renderAdminTab('orders'); });
+    } catch (err) {
+      console.warn('Firestore error:', err);
+      orders = [...SAMPLE_ORDERS]; 
+      renderAdminTab('orders');
+    }
   } else {
     orders = [...SAMPLE_ORDERS];
     renderAdminTab('orders');
@@ -44,7 +59,10 @@ const STATUS_OPTIONS = [
 function renderOrders() {
   const el = document.getElementById('orders-list');
   if (!el) return;
-  if (orders.length === 0) { el.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>Keine aktiven Bestellungen</p></div>'; return; }
+  if (orders.length === 0) { 
+    el.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>Keine aktiven Bestellungen</p></div>'; 
+    return; 
+  }
 
   el.innerHTML = orders.map(o => {
     const statusCls = 'status-' + o.status;
@@ -122,15 +140,28 @@ function renderOrders() {
 }
 
 // ─── ORDER STATUS UPDATE ──────────────────────────────────────
-function updateOrderStatus(orderId, newStatus) {
+async function updateOrderStatus(orderId, newStatus) {
   const order = orders.find(o => o.id === orderId);
   if (!order) return;
   order.status = newStatus;
-  renderOrders();  // re-render
+  
+  // In Firebase aktualisieren
+  if (window.fbDb) {
+    try {
+      await window.fbFuncs.updateDoc(
+        window.fbFuncs.docRef(window.fbDb, 'orders', orderId),
+        { status: newStatus }
+      );
+    } catch (err) {
+      console.error('Status update failed:', err);
+    }
+  }
+  
+  renderOrders();
   addNotification('Status geändert', `${orderId} → ${(STATUS_OPTIONS.find(s=>s.val===newStatus)||{}).label}`);
 }
 
-// In script_admin.js
+// FIXED: deleteDoc war nicht in fbFuncs exportiert
 async function completeOrder(orderId) {
   if (!confirm('Bestellung wirklich als erledigt markieren und löschen?')) return;
 
@@ -138,11 +169,12 @@ async function completeOrder(orderId) {
   orders = orders.filter(o => o.id !== orderId);
   renderOrders();
 
-  // 2. In Firestore löschen (Das fehlt wahrscheinlich!)
-  if (window.fbDb) {
+  // 2. In Firestore löschen
+  if (window.fbDb && window.fbFuncs.deleteDoc) {
     try {
-      const { deleteDoc, doc } = window.fbFuncs;
-      await deleteDoc(doc(window.fbDb, 'orders', orderId));
+      await window.fbFuncs.deleteDoc(
+        window.fbFuncs.docRef(window.fbDb, 'orders', orderId)
+      );
       addNotification('System', 'Bestellung wurde dauerhaft gelöscht.');
     } catch (e) {
       console.error("Löschen fehlgeschlagen:", e);
@@ -151,14 +183,36 @@ async function completeOrder(orderId) {
 }
 
 // ─── ADMIN REPLY IN CHAT ──────────────────────────────────────
-function adminReply(orderId) {
+async function adminReply(orderId) {
   const input = document.getElementById('reply-' + orderId);
   if (!input || !input.value.trim()) return;
+  
   const order = orders.find(o => o.id === orderId);
   if (!order) return;
+  
   if (!order.chatHistory) order.chatHistory = [];
-  order.chatHistory.push({ sender:'admin', text: input.value.trim(), time: new Date().toISOString() });
+  
+  const newMsg = { 
+    sender: 'admin', 
+    text: input.value.trim(), 
+    time: new Date().toISOString() 
+  };
+  
+  order.chatHistory.push(newMsg);
   input.value = '';
+  
+  // In Firebase speichern
+  if (window.fbDb) {
+    try {
+      await window.fbFuncs.updateDoc(
+        window.fbFuncs.docRef(window.fbDb, 'orders', orderId),
+        { chatHistory: order.chatHistory }
+      );
+    } catch (err) {
+      console.error('Chat save failed:', err);
+    }
+  }
+  
   renderOrders();
   addNotification('Nachricht gesendet', 'An ' + order.userEmail);
 }
@@ -189,36 +243,36 @@ function sendNotification() {
   const msg       = document.getElementById('notify-msg').value.trim();
   const costChg   = document.getElementById('notify-cost-val')  ? document.getElementById('notify-cost-val').value  : '';
   const timeChg   = document.getElementById('notify-time-val')  ? document.getElementById('notify-time-val').value  : '';
-  const order     = orders.find(o => o.id === notifyOrderId);
+
+  if (!msg && !costChg && !timeChg) { alert('Bitte Nachricht oder Änderungen eingeben!'); return; }
+
+  const order = orders.find(o => o.id === notifyOrderId);
+  if (!order) return;
 
   let fullMsg = msg;
-  if (costChg) fullMsg += '\n💰 Kostenänderung: ' + costChg;
-  if (timeChg) fullMsg += '\n⏱️ Zeitänderung: '   + timeChg;
+  if (costChg) fullMsg += `\n💰 Kostenänderung: ${costChg}`;
+  if (timeChg) fullMsg += `\n⏱️ Zeitänderung: ${timeChg}`;
 
-  if (!fullMsg.trim()) { alert('Bitte geben Sie eine Nachricht ein.'); return; }
+  // Add to chat
+  if (!order.chatHistory) order.chatHistory = [];
+  order.chatHistory.push({ sender:'admin', text: fullMsg, time: new Date().toISOString() });
 
-  // Add to order chat
-  if (order) {
-    if (!order.chatHistory) order.chatHistory = [];
-    order.chatHistory.push({ sender:'admin', text: fullMsg.replace(/\n/g,'<br>'), time: new Date().toISOString() });
-  }
+  // Send notification to customer
+  addNotification('Neue Nachricht von Admin', fullMsg, order.userId);
 
-  addNotification('Benachrichtigung gesendet', notifyOrderId + ' – ' + (order?order.userEmail:''));
   closeModal('notifyModal');
   renderOrders();
+  alert('✅ Kunde wurde benachrichtigt!');
 }
 
 // ─── PRODUCT EDITOR ───────────────────────────────────────────
-let editingProduct = null;  // null = new, else product object
+let editingProduct = null;
 
 function renderProductEditor() {
-  renderProductList();
-  resetProductForm();
-}
-
-function renderProductList() {
   const el = document.getElementById('prod-editor-list');
   if (!el) return;
+  if (allProducts.length === 0) { el.innerHTML = '<p style="color:var(--txt2);text-align:center;padding:1rem">Noch keine Produkte</p>'; return; }
+
   el.innerHTML = allProducts.map((p,i) => `
     <div class="prod-list-item">
       <div><div class="pli-name">${p.emoji||'📦'} ${p.name}</div><div class="pli-info">${p.price.toFixed(2)}€ | ${p.category}</div></div>
@@ -273,9 +327,25 @@ function editProduct(idx) {
   document.getElementById('pe-submit-btn').textContent = '💾 Speichern';
 }
 
-function deleteProduct(idx) {
+async function deleteProduct(idx) {
   if (!confirm('Produkt „' + allProducts[idx].name + '" löschen?')) return;
+  
+  const product = allProducts[idx];
+  
+  // Aus lokalem Array löschen
   allProducts.splice(idx, 1);
+  
+  // Aus Firebase löschen
+  if (window.fbDb && product.id && window.fbFuncs.deleteDoc) {
+    try {
+      await window.fbFuncs.deleteDoc(
+        window.fbFuncs.docRef(window.fbDb, 'products', product.id)
+      );
+    } catch (err) {
+      console.error('Delete failed:', err);
+    }
+  }
+  
   renderProductEditor();
   renderShop();
   renderGallery();
@@ -312,7 +382,7 @@ function removeImgUrl(btn) {
   else { const inp = parent.querySelector('input'); if (inp) inp.value = ''; }
 }
 
-function saveProduct() {
+async function saveProduct() {
   const name     = document.getElementById('pe-name').value.trim();
   const desc     = document.getElementById('pe-desc').value.trim();
   const price    = parseFloat(document.getElementById('pe-price').value) || 0;
@@ -328,7 +398,10 @@ function saveProduct() {
   // collect images
   const images = [...document.querySelectorAll('#pe-images input')].map(i => i.value.trim()).filter(Boolean);
 
-  const product = { name, desc, price, weight, emoji, category, inStock, colors, images, id: editingProduct !== null ? allProducts[editingProduct].id : 'p_'+Date.now() };
+  const product = { 
+    name, desc, price, weight, emoji, category, inStock, colors, images, 
+    id: editingProduct !== null ? allProducts[editingProduct].id : 'p_'+Date.now() 
+  };
 
   if (editingProduct !== null) {
     allProducts[editingProduct] = product;
@@ -336,9 +409,16 @@ function saveProduct() {
     allProducts.push(product);
   }
 
-  // Try persist to Firestore
+  // In Firebase speichern
   if (window.fbDb) {
-    window.fbFuncs.setDoc(window.fbFuncs.docRef(window.fbDb, 'products', product.id), product).catch(e => console.warn(e));
+    try {
+      await window.fbFuncs.setDoc(
+        window.fbFuncs.docRef(window.fbDb, 'products', product.id), 
+        product
+      );
+    } catch (e) {
+      console.warn('Product save failed:', e);
+    }
   }
 
   renderProductEditor();
@@ -348,10 +428,7 @@ function saveProduct() {
 }
 
 // ─── GALLERY EDITOR ───────────────────────────────────────────
-// Gallery = first N products shown in gallery section.
-// Admin can reorder / remove items from gallery or add new ones.
-
-let galleryItems = [];   // indices into allProducts
+let galleryItems = [];
 
 function renderGalleryEditor() {
   // default: first 6
