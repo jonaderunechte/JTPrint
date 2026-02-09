@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGB - JT Print</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .logo {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #764ba2;
+            font-size: 1.8em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        h3 {
+            color: #555;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p, li {
+            color: #333;
+            line-height: 1.8;
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .info-block {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            margin-top: 30px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-weight: bold;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .warning strong {
+            color: #856404;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+            color: #777;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="https://i.postimg.cc/433yTPrC/296ae7d7-58c3-4968-b8a8-e6b6add85135-removebg-preview.png" alt="JT Print Logo" class="logo">
+            <h1>Allgemeine Geschäftsbedingungen</h1>
+            <p>Gültig ab Februar 2026</p>
+        </header>
+
+        <section>
+            <h2>§ 1 Geltungsbereich</h2>
+            <p>Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Verträge über 3D-Druck-Dienstleistungen und den Verkauf von Produkten zwischen:</p>
+            <div class="info-block">
+                <p><strong>[Jona Alexander Thielgen / JTPrint]</strong><br>
+                   [Laufener Straße 5]<br>
+                   [79114] [Freiburg]<br>
+                   (nachfolgend "Anbieter" genannt)</p>
+            </div>
+            <p>und dem Kunden (nachfolgend "Kunde" genannt), die über die Website https://jonaderunechte.github.io/JTPrint/ abgeschlossen werden.</p>
+        </section>
+
+        <section>
+            <h2>§ 2 Vertragsabschluss</h2>
+            <ol>
+                <li>Die Präsentation der Produkte und Dienstleistungen auf unserer Website stellt kein bindendes Angebot dar, sondern einen unverbindlichen Online-Katalog.</li>
+                <li>Durch das Absenden einer Bestellung gibt der Kunde ein verbindliches Angebot zum Abschluss eines Kaufvertrages ab.</li>
+                <li>Der Anbieter bestätigt den Eingang der Bestellung per E-Mail. Diese Bestellbestätigung stellt noch keine Annahme des Vertragsangebots dar.</li>
+                <li>Der Vertrag kommt erst mit der Versandbestätigung oder Übergabe der Ware zustande.</li>
+                <li>Bei Custom Design Aufträgen kommt der Vertrag mit der Auftragsbestätigung durch den Anbieter zustande.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>§ 3 Leistungsumfang</h2>
+            
+            <h3>3.1 3D-Druck Service</h3>
+            <ul>
+                <li>Der Kunde lädt eine druckbare 3D-Datei (STL, 3MF) hoch oder gibt einen Link zur Datei an</li>
+                <li>Der Anbieter prüft die Datei auf Druckbarkeit und technische Machbarkeit</li>
+                <li>Maximale Druckgröße: 25cm × 25cm × 25cm (Bambu Lab P1S)</li>
+                <li>Verfügbare Materialien: PLA, PETG, ABS, TPU, ASA und Spezialfilamente</li>
+                <li>Düsenoptionen: 0.4mm Hardened Steel (Standard), 0.2mm Stainless Steel (+4€)</li>
+            </ul>
+
+            <h3>3.2 Custom Design Service</h3>
+            <ul>
+                <li>Professionelle CAD-Modellierung nach Kundenwunsch</li>
+                <li>Stundensatz: 20€/h (Standard), Preisverhandlung möglich</li>
+                <li>Nachfragen zu Details sind Teil des Prozesses</li>
+                <li>Optional: Fertigung des erstellten Designs</li>
+            </ul>
+
+            <h3>3.3 Express-Service</h3>
+            <ul>
+                <li>Bevorzugte Bearbeitung innerhalb von 3-5 Werktagen</li>
+                <li>Aufpreis: +30% auf den Druckpreis</li>
+                <li>Status-Updates während der Produktion</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>§ 4 Preise und Zahlung</h2>
+            <ol>
+                <li>Alle Preise verstehen sich in Euro (€) und enthalten die gesetzliche Mehrwertsteuer.</li>
+                <li>Die Berechnung des 3D-Drucks erfolgt nach Gewicht:
+                    <ul>
+                        <li>Grundpreis: 8€</li>
+                        <li>PLA: 50% Rabatt auf Grundpreis (4€) + 0,05€/g</li>
+                        <li>Andere Materialien: 8€ Grundpreis + Materialzuschlag (10€) + 0,05€/g</li>
+                        <li>0.2mm Düse: +4€</li>
+                        <li>Express: +30% auf Gesamtpreis</li>
+                    </ul>
+                </li>
+                <li>Versandkosten:
+                    <ul>
+                        <li>Abholung: Kostenlos</li>
+                        <li>Standard-Versand: 4,99€ - 8,99€ (je nach Gewicht)</li>
+                        <li>Express-Versand: 9,99€</li>
+                    </ul>
+                </li>
+                <li>Verfügbare Zahlungsarten:
+                    <ul>
+                        <li>PayPal</li>
+                        <li>Kreditkarte (Stripe)</li>
+                        <li>Überweisung (Vorkasse)</li>
+                        <li>Privat (nur für bekannte Kunden)</li>
+                    </ul>
+                </li>
+                <li>Bei Vorkasse ist die Zahlung innerhalb von 7 Tagen nach Bestellbestätigung fällig.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>§ 5 Lieferung und Versand</h2>
+            <ol>
+                <li>Die Lieferzeit beträgt in der Regel 5-10 Werktage, sofern nichts anderes vereinbart wurde.</li>
+                <li>Bei Express-Service: 3-5 Werktage</li>
+                <li>Bei Abholung wird der Kunde per E-Mail benachrichtigt, sobald die Ware abholbereit ist.</li>
+                <li>Die Gefahr des zufälligen Untergangs geht bei Versendung auf den Kunden über.</li>
+                <li>Teillieferungen sind zulässig, sofern dies für den Kunden zumutbar ist.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>§ 6 Widerrufsrecht für Verbraucher</h2>
+            <p><strong>Widerrufsbelehrung</strong></p>
+            <div class="info-block">
+                <p><strong>Widerrufsrecht</strong></p>
+                <p>Sie haben das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen.</p>
+                <p>Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag, an dem Sie oder ein von Ihnen benannter Dritter, der nicht der Beförderer ist, die Waren in Besitz genommen haben bzw. hat.</p>
+                <p>Um Ihr Widerrufsrecht auszuüben, müssen Sie uns mittels einer eindeutigen Erklärung (z.B. per E-Mail) über Ihren Entschluss, diesen Vertrag zu widerrufen, informieren.</p>
+                <p><strong>Kontakt für Widerruf:</strong><br>
+                   [Ihre E-Mail-Adresse]</p>
+            </div>
+            
+            <p><strong>Ausschluss des Widerrufsrechts</strong></p>
+            <p>Das Widerrufsrecht besteht nicht bei:</p>
+            <ul>
+                <li>Lieferung von Waren, die nach Kundenspezifikation angefertigt wurden (Custom Design, individueller 3D-Druck)</li>
+                <li>Lieferung versiegelter Waren, die aus Gründen des Gesundheitsschutzes oder der Hygiene nicht zur Rückgabe geeignet sind</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>§ 7 Gewährleistung</h2>
+            <ol>
+                <li>Es gelten die gesetzlichen Gewährleistungsrechte.</li>
+                <li>Bei gebrauchten Waren kann die Gewährleistung auf ein Jahr verkürzt werden.</li>
+                <li>Reklamationen sind unverzüglich nach Erhalt der Ware schriftlich anzuzeigen.</li>
+                <li>Bei berechtigter Mängelrüge erfolgt nach unserer Wahl Nachbesserung oder Ersatzlieferung.</li>
+                <li>3D-gedruckte Objekte können produktionsbedingte kleine Unregelmäßigkeiten aufweisen, die keinen Mangel darstellen.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>§ 8 Haftung</h2>
+            <ol>
+                <li>Der Anbieter haftet unbeschränkt für Vorsatz und grobe Fahrlässigkeit.</li>
+                <li>Bei leicht fahrlässiger Verletzung wesentlicher Vertragspflichten ist die Haftung auf den vorhersehbaren, vertragstypischen Schaden begrenzt.</li>
+                <li>Die Haftung für leicht fahrlässige Verletzung unwesentlicher Vertragspflichten ist ausgeschlossen.</li>
+                <li>Die vorstehenden Haftungsbeschränkungen gelten nicht bei Verletzung von Leben, Körper und Gesundheit sowie bei Übernahme einer Garantie.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>§ 9 Eigentumsvorbehalt</h2>
+            <p>Die gelieferte Ware bleibt bis zur vollständigen Bezahlung Eigentum des Anbieters.</p>
+        </section>
+
+        <section>
+            <h2>§ 10 Urheberrecht und Nutzungsrechte</h2>
+            <ol>
+                <li>Bei Custom Design Services verbleiben die Urheberrechte beim Anbieter, sofern nichts anderes vereinbart wurde.</li>
+                <li>Der Kunde erhält ein einfaches Nutzungsrecht für den privaten Gebrauch.</li>
+                <li>Eine kommerzielle Nutzung oder Weitergabe an Dritte bedarf der schriftlichen Zustimmung.</li>
+                <li>Der Kunde garantiert, dass hochgeladene Dateien keine Rechte Dritter verletzen.</li>
+                <li>Der Kunde stellt den Anbieter von allen Ansprüchen Dritter frei, die aus einer Rechtsverletzung durch hochgeladene Dateien entstehen.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>§ 11 Datenschutz</h2>
+            <p>Informationen zur Verarbeitung personenbezogener Daten finden Sie in unserer <a href="datenschutz.html" style="color: #667eea;">Datenschutzerklärung</a>.</p>
+        </section>
+
+        <section>
+            <h2>§ 12 Streitbeilegung</h2>
+            <ol>
+                <li>Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a href="https://ec.europa.eu/consumers/odr/" target="_blank" style="color: #667eea;">https://ec.europa.eu/consumers/odr/</a></li>
+                <li>Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>§ 13 Schlussbestimmungen</h2>
+            <ol>
+                <li>Es gilt das Recht der Bundesrepublik Deutschland unter Ausschluss des UN-Kaufrechts.</li>
+                <li>Ist der Kunde Kaufmann, juristische Person des öffentlichen Rechts oder öffentlich-rechtliches Sondervermögen, ist ausschließlicher Gerichtsstand für alle Streitigkeiten aus Vertragsverhältnissen zwischen dem Kunden und dem Anbieter der Sitz des Anbieters.</li>
+                <li>Sollten einzelne Bestimmungen dieser AGB unwirksam sein oder werden, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt.</li>
+            </ol>
+        </section>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="index.html" class="back-button">← Zurück zur Startseite</a>
+        </div>
+
+        <footer>
+            <p>© 2026 JT Print – Alle Rechte vorbehalten</p>
+            <p style="margin-top: 10px;">
+                <a href="impressum.html" style="color: #667eea; text-decoration: none;">Impressum</a> | 
+                <a href="datenschutz.html" style="color: #667eea; text-decoration: none;">Datenschutz</a> | 
+                <a href="agb.html" style="color: #667eea; text-decoration: none;">AGB</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
