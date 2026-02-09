@@ -56,6 +56,264 @@ const STATUS_OPTIONS = [
   { val:'completed',   label:'✓ Fertig' }
 ];
 
+// ─── OPEN ORDER DETAIL MODAL ──────────────────────────────────
+function openOrderDetail(orderId) {
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+  
+  const statusCls = 'status-' + order.status;
+  const statusLabel = (STATUS_OPTIONS.find(s => s.val === order.status) || {}).label || order.status;
+  
+  // Items HTML mit erweiterten Details
+  const itemsHtml = order.items.map((item, idx) => {
+    let itemDetails = '';
+    
+    if (item.type === 'upload') {
+      itemDetails = `
+        <div class="item-detail-card">
+          <div class="item-detail-header">
+            <div class="item-detail-emoji">${item.emoji || '📁'}</div>
+            <div>
+              <div class="item-detail-name">${item.productName || 'Custom Upload'}</div>
+              <div style="color:var(--txt2);font-size:0.8rem">3D-Druck Upload</div>
+            </div>
+          </div>
+          
+          <div class="item-detail-specs">
+            <div class="item-spec"><strong>Material:</strong> ${item.material || 'N/A'}</div>
+            <div class="item-spec"><strong>Gewicht:</strong> ${item.weight || 'N/A'}g</div>
+            <div class="item-spec"><strong>Düse:</strong> ${item.nozzle || 'N/A'}</div>
+            <div class="item-spec"><strong>Express:</strong> ${item.express === 'yes' ? 'Ja (+30%)' : 'Nein'}</div>
+            <div class="item-spec" style="grid-column: 1/-1"><strong>Preis:</strong> <span style="color:var(--green);font-size:1.1rem">${item.price.toFixed(2)}€</span></div>
+          </div>
+          
+          ${item.desc ? `
+            <div class="design-requirements">
+              <div class="design-req-title">📝 Beschreibung / Besondere Wünsche:</div>
+              <div class="design-req-text">${item.desc}</div>
+            </div>
+          ` : ''}
+          
+          ${item.notes ? `
+            <div class="design-requirements">
+              <div class="design-req-title">💬 Anmerkungen:</div>
+              <div class="design-req-text">${item.notes}</div>
+            </div>
+          ` : ''}
+          
+          ${item.fileInfo ? `
+            <div class="file-download-area">
+              <div class="file-download-icon">📥</div>
+              <div style="font-weight:600;color:var(--green);margin-bottom:0.5rem">Hochgeladene Datei</div>
+              <div class="file-info-text">${item.fileInfo}</div>
+              <button class="file-download-btn" onclick="downloadFile('${item.fileInfo}', '${order.id}')">
+                ⬇️ Datei herunterladen
+              </button>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    } else if (item.type === 'custom-design') {
+      itemDetails = `
+        <div class="item-detail-card">
+          <div class="item-detail-header">
+            <div class="item-detail-emoji">${item.emoji || '✏️'}</div>
+            <div>
+              <div class="item-detail-name">${item.name || 'Custom Design Service'}</div>
+              <div style="color:var(--txt2);font-size:0.8rem">Design-Auftrag</div>
+            </div>
+          </div>
+          
+          <div class="item-detail-specs">
+            <div class="item-spec"><strong>Stunden:</strong> ${item.hours || 'N/A'}h</div>
+            <div class="item-spec"><strong>Stundensatz:</strong> ${item.rate || 'N/A'}€/h</div>
+            <div class="item-spec"><strong>Fertigung:</strong> ${item.includePrint ? 'Ja (Design + Druck)' : 'Nein (nur Design)'}</div>
+            <div class="item-spec" style="grid-column: 1/-1"><strong>Preis:</strong> <span style="color:var(--green);font-size:1.1rem">${item.price.toFixed(2)}€</span></div>
+          </div>
+          
+          ${item.desc ? `
+            <div class="design-requirements">
+              <div class="design-req-title">✏️ Design-Anforderungen:</div>
+              <div class="design-req-text">${item.desc}</div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    } else if (item.type === 'product') {
+      itemDetails = `
+        <div class="item-detail-card">
+          <div class="item-detail-header">
+            <div class="item-detail-emoji">${item.emoji || '📦'}</div>
+            <div>
+              <div class="item-detail-name">${item.productName || 'Produkt'}</div>
+              <div style="color:var(--txt2);font-size:0.8rem">Shop-Produkt</div>
+            </div>
+          </div>
+          
+          <div class="item-detail-specs">
+            <div class="item-spec"><strong>Menge:</strong> ${item.qty || 1}</div>
+            <div class="item-spec"><strong>Farbe:</strong> ${item.color ? `<span style="display:inline-block;width:16px;height:16px;background:${item.color};border-radius:3px;vertical-align:middle;border:1px solid var(--border)"></span>` : 'Standard'}</div>
+            <div class="item-spec"><strong>Produkt-ID:</strong> ${item.productId || 'N/A'}</div>
+            <div class="item-spec" style="grid-column: 1/-1"><strong>Preis:</strong> <span style="color:var(--green);font-size:1.1rem">${item.price.toFixed(2)}€</span></div>
+          </div>
+        </div>
+      `;
+    }
+    
+    return itemDetails;
+  }).join('');
+  
+  // Chat HTML
+  const chatHtml = (order.chatHistory && order.chatHistory.length > 0) ? 
+    order.chatHistory.map(msg => `
+      <div class="chat-detail-message ${msg.sender === 'customer' ? 'customer' : 'admin'}">
+        <div class="chat-message-header">
+          <span class="chat-message-sender">${msg.sender === 'customer' ? '👤 Kunde' : '🛡️ Admin'}</span>
+          <span class="chat-message-time">${formatTime(msg.time)}</span>
+        </div>
+        <div class="chat-message-text">${msg.text}</div>
+      </div>
+    `).join('') : 
+    '<div style="text-align:center;color:var(--txt2);padding:2rem">Kein Chat-Verlauf vorhanden</div>';
+  
+  // Status Select Options
+  const selectOpts = STATUS_OPTIONS.map(s =>
+    `<option value="${s.val}" ${order.status===s.val?'selected':''}>${s.label}</option>`
+  ).join('');
+  
+  // Versandadresse
+  const shippingAddress = order.shippingAddress ? `
+    <div class="order-detail-row">
+      <div class="order-detail-label">Straße</div>
+      <div class="order-detail-value">${order.shippingAddress.street || 'N/A'}</div>
+    </div>
+    <div class="order-detail-row">
+      <div class="order-detail-label">PLZ / Stadt</div>
+      <div class="order-detail-value">${order.shippingAddress.zip || ''} ${order.shippingAddress.city || ''}</div>
+    </div>
+  ` : '<div style="text-align:center;color:var(--txt2);padding:1rem">Abholung - Keine Lieferadresse</div>';
+  
+  const content = `
+    <h2 style="font-family:'Orbitron',sans-serif;color:var(--green);margin-bottom:1.5rem">
+      📦 Bestellung ${order.id}
+    </h2>
+    
+    <div class="order-detail-grid">
+      <!-- Linke Spalte: Kundeninfo & Bestelldetails -->
+      <div>
+        <div class="order-detail-section">
+          <h3>👤 Kundeninformationen</h3>
+          <div class="order-detail-row">
+            <div class="order-detail-label">Name</div>
+            <div class="order-detail-value">${order.userName || 'Nicht angegeben'}</div>
+          </div>
+          <div class="order-detail-row">
+            <div class="order-detail-label">E-Mail</div>
+            <div class="order-detail-value">${order.userEmail}</div>
+          </div>
+          <div class="order-detail-row">
+            <div class="order-detail-label">User ID</div>
+            <div class="order-detail-value" style="font-size:0.75rem;opacity:0.7">${order.userId}</div>
+          </div>
+        </div>
+        
+        <div class="order-detail-section" style="margin-top:1rem">
+          <h3>📋 Bestelldetails</h3>
+          <div class="order-detail-row">
+            <div class="order-detail-label">Bestelldatum</div>
+            <div class="order-detail-value">${formatTime(order.createdAt)}</div>
+          </div>
+          <div class="order-detail-row">
+            <div class="order-detail-label">Status</div>
+            <div class="order-detail-value"><span class="status-badge ${statusCls}">${statusLabel}</span></div>
+          </div>
+          <div class="order-detail-row">
+            <div class="order-detail-label">Zahlungsmethode</div>
+            <div class="order-detail-value">${order.paymentMethod}</div>
+          </div>
+          <div class="order-detail-row">
+            <div class="order-detail-label">Versandart</div>
+            <div class="order-detail-value">${order.shippingMethod}</div>
+          </div>
+          <div class="order-detail-row">
+            <div class="order-detail-label">Versandkosten</div>
+            <div class="order-detail-value">${(order.shipping || 0).toFixed(2)}€</div>
+          </div>
+          <div class="order-detail-row" style="border-top:2px solid var(--border);margin-top:0.5rem;padding-top:0.8rem">
+            <div class="order-detail-label" style="font-size:1.05rem;font-weight:700">Gesamtsumme</div>
+            <div class="order-detail-value" style="font-size:1.3rem;color:var(--green)">${order.total.toFixed(2)}€</div>
+          </div>
+          ${order.notes ? `
+          <div class="order-detail-row" style="border-top:1px dashed var(--border);margin-top:0.5rem;padding-top:0.8rem;flex-direction:column;align-items:flex-start">
+            <div class="order-detail-label" style="margin-bottom:0.3rem">📝 Notizen:</div>
+            <div style="color:var(--txt);font-size:0.85rem;font-weight:normal">${order.notes}</div>
+          </div>
+          ` : ''}
+        </div>
+        
+        <div class="order-detail-section" style="margin-top:1rem">
+          <h3>📍 Lieferadresse</h3>
+          ${shippingAddress}
+        </div>
+      </div>
+      
+      <!-- Rechte Spalte: Items & Chat -->
+      <div>
+        <div class="order-detail-section">
+          <h3>🛒 Bestellte Items (${order.items.length})</h3>
+          ${itemsHtml}
+        </div>
+        
+        <div class="order-detail-section" style="margin-top:1rem">
+          <h3>💬 Chat-Verlauf</h3>
+          <div class="chat-detail-area">
+            ${chatHtml}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Admin Actions -->
+    <div class="order-detail-section" style="margin-top:1.5rem">
+      <h3>⚙️ Admin-Aktionen</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem">
+        <div class="fg" style="margin-bottom:0">
+          <label>Status ändern</label>
+          <select class="status-select" onchange="updateOrderStatus('${order.id}', this.value); updateOrderDetailView('${order.id}')" style="width:100%">
+            ${selectOpts}
+          </select>
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:flex-end">
+          <button class="btn btn-sec" onclick="openNotifyModal('${order.id}')">📨 Kunde benachrichtigen</button>
+          <button class="btn btn-pri" onclick="completeOrder('${order.id}'); closeModal('orderDetailModal')">✓ Fertig</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.getElementById('order-detail-content').innerHTML = content;
+  openModal('orderDetailModal');
+}
+
+// Funktion zum Aktualisieren der Detail-Ansicht nach Status-Änderung
+function updateOrderDetailView(orderId) {
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+  
+  const statusCls = 'status-' + order.status;
+  const statusLabel = (STATUS_OPTIONS.find(s => s.val === order.status) || {}).label || order.status;
+  
+  // Finde alle Status-Badges im Modal und aktualisiere sie
+  const modal = document.getElementById('orderDetailModal');
+  if (modal) {
+    const badges = modal.querySelectorAll('.status-badge');
+    badges.forEach(badge => {
+      badge.className = 'status-badge ' + statusCls;
+      badge.textContent = statusLabel;
+    });
+  }
+}
+
 function renderOrders() {
   const el = document.getElementById('orders-list');
   if (!el) return;
@@ -71,7 +329,7 @@ function renderOrders() {
       <div class="order-item-thumb">
         <div class="thumb-img">${i.emoji||'📦'}</div>
         <div class="thumb-info">
-          <strong>${i.productName || 'Upload'}</strong>
+          <strong>${i.productName || i.name || 'Upload'}</strong>
           <span>Menge: ${i.qty||1} | ${i.color ? '<span style="display:inline-block;width:12px;height:12px;background:'+i.color+';border-radius:50%;vertical-align:middle"></span>' : ''} ${i.price.toFixed(2)}€</span>
         </div>
       </div>`
@@ -88,7 +346,7 @@ function renderOrders() {
     ).join('');
 
     return `
-    <div class="order-card" id="order-${o.id}">
+    <div class="order-card order-clickable" id="order-${o.id}" onclick="openOrderDetail('${o.id}')" style="cursor:pointer">
       <div class="order-card-header">
         <div>
           <div class="order-id">${o.id}</div>
@@ -122,19 +380,21 @@ function renderOrders() {
       </div>` : ''}
 
       <!-- Actions row -->
-      <div class="order-actions">
-        <select class="status-select" onchange="updateOrderStatus('${o.id}', this.value)">${selectOpts}</select>
-        <button class="btn btn-sm btn-notify" onclick="openNotifyModal('${o.id}')">📨 Benachrichtigen</button>
-        <button class="btn btn-sm btn-complete" onclick="completeOrder('${o.id}')">✓ Fertig & Entfernen</button>
+      <div class="order-actions" onclick="event.stopPropagation()">
+        <select class="status-select" onchange="updateOrderStatus('${o.id}', this.value); event.stopPropagation()">${selectOpts}</select>
+        <button class="btn btn-sm btn-notify" onclick="openNotifyModal('${o.id}'); event.stopPropagation()">📨 Benachrichtigen</button>
+        <button class="btn btn-sm btn-complete" onclick="completeOrder('${o.id}'); event.stopPropagation()">✓ Fertig & Entfernen</button>
       </div>
 
       <!-- Admin reply input -->
-      <div style="margin-top:.7rem;display:flex;gap:.4rem;align-items:flex-end">
+      <div style="margin-top:.7rem;display:flex;gap:.4rem;align-items:flex-end" onclick="event.stopPropagation()">
         <div class="fg" style="flex:1;margin-bottom:0"><label style="font-size:.77rem;color:var(--txt2)">Antwort an Kunde</label>
-          <input type="text" id="reply-${o.id}" placeholder="Nachricht an Kunde…" style="padding:.5rem .7rem;font-size:.84rem" onkeydown="if(event.key==='Enter')adminReply('${o.id}')">
+          <input type="text" id="reply-${o.id}" placeholder="Nachricht an Kunde…" style="padding:.5rem .7rem;font-size:.84rem" onkeydown="if(event.key==='Enter')adminReply('${o.id}')" onclick="event.stopPropagation()">
         </div>
-        <button class="btn btn-pri btn-sm" onclick="adminReply('${o.id}')">Senden</button>
+        <button class="btn btn-pri btn-sm" onclick="adminReply('${o.id}'); event.stopPropagation()">Senden</button>
       </div>
+      
+      <div class="detail-hint">💡 Klicke auf die Bestellung für erweiterte Details & Datei-Download</div>
     </div>`;
   }).join('');
 }
@@ -180,6 +440,26 @@ async function completeOrder(orderId) {
       console.error("Löschen fehlgeschlagen:", e);
     }
   }
+}
+
+// ─── FILE DOWNLOAD HELPER ─────────────────────────────────────
+function downloadFile(fileInfo, orderId) {
+  // Wenn fileInfo eine URL ist (Link-Upload)
+  if (fileInfo.startsWith('http://') || fileInfo.startsWith('https://')) {
+    window.open(fileInfo, '_blank');
+    addNotification('Download', 'Datei-Link in neuem Tab geöffnet');
+    return;
+  }
+  
+  // Wenn fileInfo ein Dateiname ist (File-Upload)
+  // In einer echten Implementierung würde hier Firebase Storage verwendet
+  // Für Demo: Zeige Info-Alert
+  alert(`📁 Datei-Download: ${fileInfo}\n\nHinweis: In der produktiven Version würde die Datei hier von Firebase Storage heruntergeladen werden.\n\nBestellung: ${orderId}`);
+  
+  // TODO: Echte Firebase Storage Integration
+  // const storageRef = firebase.storage().ref(`uploads/${orderId}/${fileInfo}`);
+  // const url = await storageRef.getDownloadURL();
+  // window.open(url, '_blank');
 }
 
 // ─── ADMIN REPLY IN CHAT ──────────────────────────────────────
@@ -487,4 +767,247 @@ function updateGallerySection() {
     const p = allProducts[idx];
     if (p) grid.appendChild(createProductCard(p));
   });
+}
+
+// ─── EXTENDED ORDER DETAIL MODAL ──────────────────────────────────
+function openOrderDetail(orderId) {
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+  
+  const statusCls = 'status-' + order.status;
+  const statusLabel = (STATUS_OPTIONS.find(s => s.val === order.status) || {}).label || order.status;
+  
+  // Bestellinformationen
+  const orderInfoHtml = `
+    <div class="order-info-grid">
+      <div class="order-info-item">
+        <div class="order-info-label">Bestell-ID</div>
+        <div class="order-info-value">${order.id}</div>
+      </div>
+      <div class="order-info-item">
+        <div class="order-info-label">Status</div>
+        <div class="order-info-value"><span class="status-badge ${statusCls}">${statusLabel}</span></div>
+      </div>
+      <div class="order-info-item">
+        <div class="order-info-label">Bestelldatum</div>
+        <div class="order-info-value">${formatTime(order.createdAt)}</div>
+      </div>
+      <div class="order-info-item">
+        <div class="order-info-label">Kunde</div>
+        <div class="order-info-value">${order.userName || order.userEmail}</div>
+      </div>
+      <div class="order-info-item">
+        <div class="order-info-label">E-Mail</div>
+        <div class="order-info-value">${order.userEmail}</div>
+      </div>
+      <div class="order-info-item">
+        <div class="order-info-label">Zahlung</div>
+        <div class="order-info-value">${order.paymentMethod}</div>
+      </div>
+      <div class="order-info-item">
+        <div class="order-info-label">Versandart</div>
+        <div class="order-info-value">${order.shippingMethod} (${(order.shipping||0).toFixed(2)}€)</div>
+      </div>
+      <div class="order-info-item">
+        <div class="order-info-label">Gesamtbetrag</div>
+        <div class="order-info-value" style="color:var(--green);font-size:1.2rem;font-weight:700">${order.total.toFixed(2)}€</div>
+      </div>
+    </div>
+  `;
+  
+  // Items mit Details
+  const itemsDetailHtml = order.items.map(item => {
+    let specsHtml = '';
+    let fileHtml = '';
+    let designReqHtml = '';
+    
+    // Spezifikationen basierend auf Item-Typ
+    if (item.type === 'product') {
+      specsHtml = `
+        <div class="order-item-specs">
+          <span class="spec-badge">📦 Produkt</span>
+          <span class="spec-badge">Menge: ${item.qty}</span>
+          ${item.color ? `<span class="spec-badge">Farbe: <span style="display:inline-block;width:12px;height:12px;background:${item.color};border-radius:50%;vertical-align:middle;margin-left:4px"></span></span>` : ''}
+          <span class="spec-badge">Preis: ${item.price.toFixed(2)}€</span>
+        </div>
+      `;
+    } else if (item.type === 'upload') {
+      specsHtml = `
+        <div class="order-item-specs">
+          <span class="spec-badge">📁 Upload</span>
+          <span class="spec-badge">${item.material || 'PLA'}</span>
+          <span class="spec-badge">${item.weight || 0}g</span>
+          ${item.nozzle ? `<span class="spec-badge">Düse: ${item.nozzle}</span>` : ''}
+          ${item.express === 'yes' ? `<span class="spec-badge" style="background:rgba(255,170,0,.15);color:#fa0;border-color:rgba(255,170,0,.3)">⚡ Express</span>` : ''}
+          <span class="spec-badge">Preis: ${item.price.toFixed(2)}€</span>
+        </div>
+      `;
+      
+      // Datei-Download Box
+      if (item.fileInfo) {
+        const isLink = item.fileInfo.startsWith('http');
+        const fileName = isLink ? item.fileInfo.split('/').pop() : item.fileInfo;
+        fileHtml = `
+          <div class="file-download-box">
+            <div class="file-info">
+              <div class="file-icon">📄</div>
+              <div class="file-details">
+                <div class="file-name">${fileName}</div>
+                <div class="file-meta">${isLink ? 'Link' : 'Hochgeladene Datei'} • STL/3MF</div>
+              </div>
+            </div>
+            ${isLink ? 
+              `<a href="${item.fileInfo}" target="_blank" class="download-btn">🔗 Link öffnen</a>` :
+              `<button class="download-btn" onclick="alert('Download-Funktion würde hier die Datei von Firebase Storage herunterladen')">⬇️ Herunterladen</button>`
+            }
+          </div>
+        `;
+      }
+      
+      // Beschreibung & Notizen
+      if (item.desc || item.notes) {
+        designReqHtml = `
+          <div class="design-requirements">
+            ${item.desc ? `<div class="requirement-item"><div class="requirement-label">Beschreibung</div><div class="requirement-value">${item.desc}</div></div>` : ''}
+            ${item.notes ? `<div class="requirement-item"><div class="requirement-label">Anmerkungen</div><div class="requirement-value">${item.notes}</div></div>` : ''}
+          </div>
+        `;
+      }
+    } else if (item.type === 'custom-design') {
+      specsHtml = `
+        <div class="order-item-specs">
+          <span class="spec-badge">✏️ Custom Design</span>
+          <span class="spec-badge">${item.hours || 2}h × ${item.rate || 20}€/h</span>
+          ${item.includePrint ? `<span class="spec-badge" style="background:rgba(0,204,153,.15);color:var(--green);border-color:rgba(0,204,153,.3)">+ Druck</span>` : ''}
+          <span class="spec-badge">Preis: ${item.price.toFixed(2)}€</span>
+        </div>
+      `;
+      
+      if (item.desc) {
+        designReqHtml = `
+          <div class="design-requirements">
+            <div class="requirement-item">
+              <div class="requirement-label">Projektbeschreibung</div>
+              <div class="requirement-value">${item.desc}</div>
+            </div>
+            <div class="requirement-item">
+              <div class="requirement-label">Geschätzter Zeitaufwand</div>
+              <div class="requirement-value">${item.hours || 2} Stunden</div>
+            </div>
+            <div class="requirement-item">
+              <div class="requirement-label">Stundensatz</div>
+              <div class="requirement-value">${item.rate || 20}€/h</div>
+            </div>
+            <div class="requirement-item">
+              <div class="requirement-label">Druck gewünscht?</div>
+              <div class="requirement-value">${item.includePrint ? '✅ Ja, Design + Druck' : '❌ Nein, nur Design'}</div>
+            </div>
+          </div>
+        `;
+      }
+    }
+    
+    return `
+      <div class="order-item-detail">
+        <div class="order-item-icon">${item.emoji || '📦'}</div>
+        <div class="order-item-details">
+          <div class="order-item-name">${item.productName || item.name || 'Custom Upload'}</div>
+          ${specsHtml}
+          ${fileHtml}
+          ${designReqHtml}
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  // Chat-Verlauf
+  let chatHtml = '';
+  if (order.chatHistory && order.chatHistory.length > 0) {
+    const chatMsgs = order.chatHistory.map(m => `
+      <div class="chat-message-detail ${m.sender === 'customer' ? 'customer' : 'admin'}">
+        <div class="chat-sender">${m.sender === 'customer' ? '👤 Kunde' : '🛡️ Admin'}</div>
+        <div class="chat-text">${m.text}</div>
+        <div class="chat-time">${formatTime(m.time)}</div>
+      </div>
+    `).join('');
+    
+    chatHtml = `
+      <div class="order-detail-section">
+        <h3>💬 Chat-Verlauf</h3>
+        <div class="chat-detail-box">
+          ${chatMsgs}
+        </div>
+      </div>
+    `;
+  }
+  
+  // Versandadresse
+  let addressHtml = '';
+  if (order.shippingMethod !== 'pickup' && order.address) {
+    addressHtml = `
+      <div class="order-detail-section">
+        <h3>📍 Versandadresse</h3>
+        <div class="order-info-grid">
+          <div class="order-info-item">
+            <div class="order-info-label">Straße & Hausnummer</div>
+            <div class="order-info-value">${order.address.street || 'Nicht angegeben'}</div>
+          </div>
+          <div class="order-info-item">
+            <div class="order-info-label">PLZ</div>
+            <div class="order-info-value">${order.address.zip || 'Nicht angegeben'}</div>
+          </div>
+          <div class="order-info-item">
+            <div class="order-info-label">Stadt</div>
+            <div class="order-info-value">${order.address.city || 'Nicht angegeben'}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (order.shippingMethod === 'pickup') {
+    addressHtml = `
+      <div class="order-detail-section">
+        <h3>🏪 Abholung</h3>
+        <div class="order-info-item">
+          <div class="order-info-label">Hinweis</div>
+          <div class="order-info-value">Der Kunde möchte die Bestellung persönlich abholen.</div>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Notizen
+  let notesHtml = '';
+  if (order.notes) {
+    notesHtml = `
+      <div class="order-detail-section">
+        <h3>📝 Notizen</h3>
+        <div class="order-info-item">
+          <div class="order-info-value">${order.notes}</div>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Komplettes Detail-Modal
+  const detailContent = `
+    <div class="order-detail-section">
+      <h3>📋 Bestellinformationen</h3>
+      ${orderInfoHtml}
+    </div>
+    
+    <div class="order-detail-section">
+      <h3>🛒 Bestellte Artikel (${order.items.length})</h3>
+      <div class="order-items-detail">
+        ${itemsDetailHtml}
+      </div>
+    </div>
+    
+    ${chatHtml}
+    ${addressHtml}
+    ${notesHtml}
+  `;
+  
+  document.getElementById('order-detail-title').textContent = `📦 Bestellung ${order.id}`;
+  document.getElementById('order-detail-content').innerHTML = detailContent;
+  openModal('orderDetailModal');
 }
