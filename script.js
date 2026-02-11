@@ -407,11 +407,34 @@ function renderCartModal() {
   el.innerHTML = cart.map((item, i) => {
     total += item.price;
     const colorDot = item.color ? `<span style="display:inline-block;width:13px;height:13px;background:${item.color};border-radius:50%;vertical-align:middle;"></span>` : '';
+    
+    // Datei-Info anzeigen
+    let fileInfo = '';
+    if (item.fileData && typeof item.fileData === 'object') {
+      if (item.fileData.type === 'file') {
+        fileInfo = `📁 ${item.fileData.fileName} (${(item.fileData.fileSize / 1024).toFixed(1)} KB)`;
+      } else if (item.fileData.type === 'link') {
+        fileInfo = `🔗 Link-Upload`;
+      }
+    } else if (item.fileInfo) {
+      fileInfo = `📁 ${item.fileInfo}`;
+    }
+    
     return `<div style="background:var(--card);padding:.8rem;border-radius:8px;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center;">
-      <div><strong style="color:var(--green);font-size:.88rem">${item.name||'Custom Upload'}</strong><br>
-        <span style="color:var(--txt2);font-size:.8rem">${item.type==='product'?'Menge: '+item.qty+' | ':''} ${colorDot} ${item.material||''} ${item.express==='yes'?'| Express':''}</span></div>
-      <div style="text-align:right"><strong style="color:var(--blue)">${item.price.toFixed(2)}€</strong><br>
-        <button class="btn btn-danger btn-sm" onclick="removeCartItem(${i})">✕</button></div>
+      <div>
+        <strong style="color:var(--green);font-size:.88rem">${item.name||'Custom Upload'}</strong><br>
+        <span style="color:var(--txt2);font-size:.8rem">
+          ${item.type==='product'?'Menge: '+item.qty+' | ':''} 
+          ${colorDot} 
+          ${item.material||''} 
+          ${item.express==='yes'?'| Express':''}
+          ${fileInfo ? '<br>' + fileInfo : ''}
+        </span>
+      </div>
+      <div style="text-align:right">
+        <strong style="color:var(--blue)">${item.price.toFixed(2)}€</strong><br>
+        <button class="btn btn-danger btn-sm" onclick="removeCartItem(${i})">✕</button>
+      </div>
     </div>`;
   }).join('');
   document.getElementById('cart-total-val').textContent = total.toFixed(2) + '€';

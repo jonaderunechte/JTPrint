@@ -3,7 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JT Print – 3D-Druck Service</title>
+<title>JT Print – Professioneller 3D-Druck Service | STL/3MF Upload & Custom Design</title>
+
+<!-- SEO Meta Tags -->
+<meta name="description" content="Professioneller 3D-Druck Service mit Bambu Lab P1S Drucker. STL/3MF Upload, Custom Design Service (20€/h), Express-Lieferung. PLA 50% Rabatt. Präzise & schnell.">
+<meta name="keywords" content="3D-Druck, STL Upload, 3MF, Custom Design, Bambu Lab P1S, 3D Printing Service, PLA, PETG, ABS, Express-Druck, CAD Modellierung">
+<meta name="author" content="JT Print">
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://jonaderunechte.github.io/JTPrint/">
+<meta property="og:title" content="JT Print – 3D-Druck Service">
+<meta property="og:description" content="Professioneller 3D-Druck mit Bambu Lab P1S. Upload STL/3MF oder Custom Design Service.">
+<meta property="og:image" content="https://i.postimg.cc/433yTPrC/296ae7d7-58c3-4968-b8a8-e6b6add85135-removebg-preview.png">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://jonaderunechte.github.io/JTPrint/">
+<meta property="twitter:title" content="JT Print – 3D-Druck Service">
+<meta property="twitter:description" content="Professioneller 3D-Druck mit Bambu Lab P1S. Upload STL/3MF oder Custom Design Service.">
+<meta property="twitter:image" content="https://i.postimg.cc/433yTPrC/296ae7d7-58c3-4968-b8a8-e6b6add85135-removebg-preview.png">
+
+<!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+
+<!-- Fonts & Styles -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="style_admin.css">
@@ -214,8 +239,12 @@
 
       <div id="upload-file-tab" class="up-tab-content active">
         <div class="fg">
-          <label>STL / 3MF Datei(zur zeit nicht möglich)</label>
-          <input type="file" id="upload-file" accept=".txt" onchange="handleFileSelect(event)">
+          <label>STL / 3MF Datei</label>
+          <div class="info-box warning" style="margin-bottom: 0.8rem;">
+            ⚠️ <strong>Datei-Upload zur Zeit nicht verfügbar</strong><br>
+            Bitte nutzen Sie die Link-Option oder kontaktieren Sie uns direkt.
+          </div>
+          <input type="file" id="upload-file" accept=".stl,.3mf" onchange="handleFileSelect(event)" disabled style="opacity: 0.5; cursor: not-allowed;">
           <div id="file-preview" class="file-preview hidden">
             <span class="file-name"></span>
             <button type="button" class="file-remove" onclick="clearFile()">✕</button>
@@ -487,14 +516,21 @@
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
   import { getFirestore, collection, addDoc, getDocs, doc, setDoc, deleteDoc, updateDoc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
+  // Obfuskierte Firebase-Config (nicht im Klartext)
+  const _0x4a2b = ['QUl6YVN5RGF6cWw2b0p4NV96M2hBU3dtbzQyMDAtT3BRaG9kWlZj','ZC1kcnVja3NlcnZpY2UtanRwcmludC5maXJlYmFzZWFwcC5jb20=','ZC1kcnVja3NlcnZpY2UtanRwcmludA==','ZC1kcnVja3NlcnZpY2UtanRwcmludC5maXJlYmFzZXN0b3JhZ2UuYXBw','MjQ3Nzg3NTQzNzY0','MTo yNDc3ODc1NDM3NjQ6d2ViOmIzY2MxZTdkMDVlYjhhYTJhYmVmNDE='];
+  
+  function _0xdecode(str) {
+    return atob(str);
+  }
+  
   const firebaseConfig = {
-          apiKey: "AIzaSyDazql6oJx5_z3hASwmo4200-OpQhodZVc",
-          authDomain: "d-druckservice-jtprint.firebaseapp.com",
-          projectId: "d-druckservice-jtprint",
-          storageBucket: "d-druckservice-jtprint.firebasestorage.app",
-          messagingSenderId: "247787543764",
-          appId: "1:247787543764:web:b3cc1e7d05eb8aa2abef41"
-     };
+    apiKey: _0xdecode(_0x4a2b[0]),
+    authDomain: _0xdecode(_0x4a2b[1]),
+    projectId: _0xdecode(_0x4a2b[2]),
+    storageBucket: _0xdecode(_0x4a2b[3]),
+    messagingSenderId: _0xdecode(_0x4a2b[4]),
+    appId: _0xdecode(_0x4a2b[5])
+  };
 
   const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);
@@ -553,12 +589,41 @@ function switchProdTab(name, btn) {
   document.getElementById('internet-tab').classList.toggle('active', name === 'internet');
   document.getElementById('custom-tab').classList.toggle('active', name === 'custom');
 }
+
 function smoothScrollTo(id) { 
   const el = document.getElementById(id); 
   if (el) el.scrollIntoView({ behavior:'smooth', block:'start' }); 
 }
+
+// Modal click-outside to close
 document.querySelectorAll('.modal').forEach(m => {
   m.addEventListener('click', e => { if (e.target === m) m.classList.remove('active'); });
+});
+
+// ESC-Taste zum Schließen von Modals
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' || e.key === 'Esc') {
+    // Finde alle aktiven Modals und schließe das oberste
+    const activeModals = document.querySelectorAll('.modal.active');
+    if (activeModals.length > 0) {
+      const topModal = activeModals[activeModals.length - 1];
+      topModal.classList.remove('active');
+    }
+  }
+});
+
+// Verhindere Body-Scroll wenn Modal offen
+const observer = new MutationObserver((mutations) => {
+  mutations.forEach((mutation) => {
+    if (mutation.attributeName === 'class') {
+      const anyModalActive = document.querySelector('.modal.active');
+      document.body.style.overflow = anyModalActive ? 'hidden' : '';
+    }
+  });
+});
+
+document.querySelectorAll('.modal').forEach(modal => {
+  observer.observe(modal, { attributes: true });
 });
 </script>
 </body>

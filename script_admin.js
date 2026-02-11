@@ -101,14 +101,46 @@ function openOrderDetail(orderId) {
             </div>
           ` : ''}
           
-          ${item.fileInfo ? `
+          ${item.fileData || item.fileInfo ? `
             <div class="file-download-area">
               <div class="file-download-icon">📥</div>
               <div style="font-weight:600;color:var(--green);margin-bottom:0.5rem">Hochgeladene Datei</div>
-              <div class="file-info-text">${item.fileInfo}</div>
-              <button class="file-download-btn" onclick="downloadFile('${item.fileInfo}', '${order.id}')">
-                ⬇️ Datei herunterladen
-              </button>
+              ${(() => {
+                // Neue Struktur: fileData Objekt
+                if (item.fileData && typeof item.fileData === 'object') {
+                  if (item.fileData.type === 'file') {
+                    return `
+                      <div class="file-info-text">
+                        <strong>${item.fileData.fileName}</strong><br>
+                        <span style="font-size:0.85rem;opacity:0.8">
+                          Größe: ${(item.fileData.fileSize / 1024).toFixed(1)} KB
+                          ${item.fileData.fileType ? ' • ' + item.fileData.fileType : ''}
+                        </span>
+                      </div>
+                      <button class="file-download-btn" onclick='downloadFile(${JSON.stringify(item.fileData).replace(/'/g, "\\'")}, "${order.id}")'>
+                        ⬇️ Datei herunterladen
+                      </button>
+                    `;
+                  } else if (item.fileData.type === 'link') {
+                    return `
+                      <div class="file-info-text">${item.fileData.url}</div>
+                      <button class="file-download-btn" onclick='downloadFile(${JSON.stringify(item.fileData).replace(/'/g, "\\'")}, "${order.id}")'>
+                        🔗 Link öffnen
+                      </button>
+                    `;
+                  }
+                }
+                // Alte Struktur: fileInfo String (Abwärtskompatibilität)
+                else if (item.fileInfo) {
+                  return `
+                    <div class="file-info-text">${item.fileInfo}</div>
+                    <button class="file-download-btn" onclick='downloadFile("${item.fileInfo}", "${order.id}")'>
+                      ⬇️ Datei herunterladen
+                    </button>
+                  `;
+                }
+                return '';
+              })()}
             </div>
           ` : ''}
         </div>
@@ -443,23 +475,72 @@ async function completeOrder(orderId) {
 }
 
 // ─── FILE DOWNLOAD HELPER ─────────────────────────────────────
-function downloadFile(fileInfo, orderId) {
-  // Wenn fileInfo eine URL ist (Link-Upload)
-  if (fileInfo.startsWith('http://') || fileInfo.startsWith('https://')) {
-    window.open(fileInfo, '_blank');
+function downloadFile(fileData, orderId) {
+  // Wenn fileData ein String ist (alte Struktur - Abwärtskompatibilität)
+  if (typeof fileData === 'string') {
+    if (fileData.startsWith('http://') || fileData.startsWith('https://')) {
+      window.open(fileData, '_blank');
+      addNotification('Download', 'Datei-Link in neuem Tab geöffnet');
+    } else {
+      alert(`📁 Datei: ${fileData}\n\nHinweis: Alte Dateistruktur - Datei wurde nicht als Base64 gespeichert.\nBestellung: ${orderId}`);
+    }
+    return;
+  }
+  
+  // Neue Struktur mit fileData Objekt
+  if (!fileData || typeof fileData !== 'object') {
+    alert('Keine Datei-Daten vorhanden');
+    return;
+  }
+  
+  // Link-Upload
+  if (fileData.type === 'link') {
+    window.open(fileData.url, '_blank');
     addNotification('Download', 'Datei-Link in neuem Tab geöffnet');
     return;
   }
   
-  // Wenn fileInfo ein Dateiname ist (File-Upload)
-  // In einer echten Implementierung würde hier Firebase Storage verwendet
-  // Für Demo: Zeige Info-Alert
-  alert(`📁 Datei-Download: ${fileInfo}\n\nHinweis: In der produktiven Version würde die Datei hier von Firebase Storage heruntergeladen werden.\n\nBestellung: ${orderId}`);
+  // File-Upload (Base64 aus Firestore)
+  if (fileData.type === 'file' && fileData.base64Data) {
+    try {
+      // Konvertiere Base64 zurück zu Blob
+      const byteCharacters = atob(fileData.base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      
+      // Bestimme MIME-Type
+      let mimeType = fileData.fileType || 'application/octet-stream';
+      if (fileData.fileName.endsWith('.stl')) {
+        mimeType = 'model/stl';
+      } else if (fileData.fileName.endsWith('.3mf')) {
+        mimeType = 'application/vnd.ms-package.3dmanufacturing-3dmodel+xml';
+      }
+      
+      const blob = new Blob([byteArray], { type: mimeType });
+      
+      // Erstelle Download-Link
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileData.fileName || 'download.stl';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      addNotification('Download', `Datei "${fileData.fileName}" wird heruntergeladen (${(fileData.fileSize / 1024).toFixed(1)} KB)`);
+    } catch (error) {
+      console.error('Download-Fehler:', error);
+      alert('Fehler beim Herunterladen der Datei. Bitte kontaktieren Sie den Support.\n\nFehler: ' + error.message);
+    }
+    return;
+  }
   
-  // TODO: Echte Firebase Storage Integration
-  // const storageRef = firebase.storage().ref(`uploads/${orderId}/${fileInfo}`);
-  // const url = await storageRef.getDownloadURL();
-  // window.open(url, '_blank');
+  // Fallback
+  alert('Unbekanntes Datei-Format');
 }
 
 // ─── ADMIN REPLY IN CHAT ──────────────────────────────────────

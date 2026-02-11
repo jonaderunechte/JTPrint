@@ -2,6 +2,10 @@
 
 // ─── FILE UPLOAD HANDLING ────────────────────────────────────
 let uploadedFile = null;
+let uploadedFileBase64 = null;
+
+// Upload-Status-Flag (kann hier aktiviert/deaktiviert werden)
+const FILE_UPLOAD_ENABLED = false;
 
 function switchUploadTab(tab) {
   document.querySelectorAll('.up-tab').forEach(t => t.classList.remove('active'));
@@ -11,9 +15,29 @@ function switchUploadTab(tab) {
   document.getElementById(`upload-${tab}-tab`).classList.add('active');
 }
 
-function handleFileSelect(event) {
+async function handleFileSelect(event) {
+  // Prüfe ob Upload aktiviert ist
+  if (!FILE_UPLOAD_ENABLED) {
+    event.target.value = ''; // Leere Input
+    alert('⚠️ Datei-Upload ist zur Zeit nicht verfügbar.\n\n' +
+          'Bitte nutzen Sie die Link-Option oder kontaktieren Sie uns direkt:\n' +
+          'E-Mail: [Ihre E-Mail]\n' +
+          'Telefon: [Ihre Telefonnummer]');
+    
+    // Wechsle automatisch zum Link-Tab
+    switchUploadTab('link');
+    return;
+  }
+  
   const file = event.target.files[0];
   if (!file) return;
+  
+  // Prüfe Dateigröße (max 10MB für Firestore)
+  const maxSize = 10 * 1024 * 1024; // 10MB
+  if (file.size > maxSize) {
+    alert('⚠️ Datei zu groß! Maximum: 10MB\nIhre Datei: ' + (file.size / 1024 / 1024).toFixed(2) + 'MB');
+    return;
+  }
   
   uploadedFile = file;
   const preview = document.getElementById('file-preview');
@@ -21,10 +45,35 @@ function handleFileSelect(event) {
   
   fileName.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
   preview.classList.remove('hidden');
+  
+  // Konvertiere Datei zu Base64
+  try {
+    uploadedFileBase64 = await fileToBase64(file);
+    console.log('Datei erfolgreich konvertiert:', file.name, 'Größe:', (uploadedFileBase64.length / 1024).toFixed(1), 'KB (Base64)');
+  } catch (error) {
+    console.error('Fehler bei Base64-Konvertierung:', error);
+    alert('Fehler beim Verarbeiten der Datei. Bitte versuchen Sie es erneut.');
+    clearFile();
+  }
+}
+
+// Hilfsfunktion: Datei zu Base64 konvertieren
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      // Entferne "data:application/octet-stream;base64," Prefix
+      const base64 = reader.result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 function clearFile() {
   uploadedFile = null;
+  uploadedFileBase64 = null;
   document.getElementById('upload-file').value = '';
   document.getElementById('file-preview').classList.add('hidden');
 }
@@ -96,16 +145,28 @@ function handleUpload(e) {
   if (!window.currentUser) { openModal('loginModal'); return; }
 
   const fileTab = document.getElementById('upload-file-tab').classList.contains('active');
-  let fileInfo = '';
+  let fileData = null;
   
   if (fileTab && uploadedFile) {
-    fileInfo = uploadedFile.name;
+    // Speichere Datei-Informationen + Base64-Daten
+    fileData = {
+      type: 'file',
+      fileName: uploadedFile.name,
+      fileSize: uploadedFile.size,
+      fileType: uploadedFile.type,
+      base64Data: uploadedFileBase64
+    };
   } else if (!fileTab) {
     const link = document.getElementById('upload-link').value.trim();
-    if (link) fileInfo = link;
+    if (link) {
+      fileData = {
+        type: 'link',
+        url: link
+      };
+    }
   }
   
-  if (!fileInfo) {
+  if (!fileData) {
     alert('Bitte Datei hochladen oder Link angeben!');
     return;
   }
@@ -121,8 +182,9 @@ function handleUpload(e) {
   cart.push({
     type:'upload', 
     name:'Custom Upload (' + mat + ')',
-    fileInfo: fileInfo,
-    desc, weight, material:mat, nozzle, express, notes, price
+    fileData: fileData,  // Vollständige Datei-Daten inkl. Base64
+    desc, weight, material:mat, nozzle, express, notes, price,
+    emoji: '📁'
   });
   
   updateCartBadge();
@@ -132,6 +194,8 @@ function handleUpload(e) {
   document.getElementById('nozzle-wrap').classList.add('hidden');
   document.getElementById('nozzle-04').checked = true;
   clearFile();
+  
+  addNotification('In den Warenkorb', 'Upload wurde zum Warenkorb hinzugefügt');
 }
 
 // ─── PRODUCT DETAIL MODAL ─────────────────────────────────────
@@ -372,11 +436,14 @@ async function handleCheckout(e) {
   const method  = document.getElementById('co-shipping-method').value;
   const payment = document.getElementById('co-payment').value;
 
+  let shippingAddress = null;
   if (method !== 'pickup') {
     const street = document.getElementById('co-street').value.trim();
     const zip    = document.getElementById('co-zip').value.trim();
     const city   = document.getElementById('co-city').value.trim();
     if (!street || !zip || !city) { alert('Bitte füllen Sie die Lieferadresse aus!'); return; }
+    
+    shippingAddress = { street, zip, city };
   }
 
   const total = parseFloat(document.getElementById('co-total').textContent.replace('€',''));
@@ -389,21 +456,29 @@ async function handleCheckout(e) {
         userId: window.currentUser.uid, 
         userEmail: window.currentUser.email,
         userName: window.currentUser.displayName || window.currentUser.email.split('@')[0],
-        items: cart, 
+        items: cart,  // Enthält fileData mit Base64!
         total, 
         shipping: shippingCost,
-        shippingMethod: method, 
+        shippingMethod: method,
+        shippingAddress: shippingAddress,  // Neu: Versandadresse speichern
         paymentMethod: payment,
         status:'pending', 
         createdAt: new Date().toISOString(),
-        chatHistory: []
+        chatHistory: [],
+        notes: ''
       };
+      
       await window.fbFuncs.setDoc(
         window.fbFuncs.docRef(window.fbDb, 'orders', orderId),
         orderData
       );
+      
+      console.log('✅ Bestellung in Firestore gespeichert:', orderId);
+      console.log('📦 Items mit Dateien:', cart.filter(i => i.fileData).length);
     } catch(err) { 
-      console.warn('Firestore save failed', err); 
+      console.error('❌ Firestore save failed:', err); 
+      alert('Fehler beim Speichern der Bestellung. Bitte versuchen Sie es erneut.');
+      return;
     }
   }
 
