@@ -620,3 +620,59 @@
         max-height: 95vh;
     }
 }
+
+/* ===== COLOR CHIPS WITH IMAGE PREVIEW ===== */
+.color-chip {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: transform 0.2s;
+}
+
+.color-chip:hover {
+  transform: scale(1.05);
+}
+
+.color-chip img {
+  pointer-events: none;
+  opacity: 0.95;
+}
+
+.color-chip .remove-chip {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: rgba(255,68,85,0.9);
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 10;
+  transition: background 0.2s;
+}
+
+.color-chip .remove-chip:hover {
+  background: var(--red);
+}
+
+/* Info-Box im Admin-Panel */
+.pe-info-box {
+  background: rgba(0, 204, 153, 0.08);
+  border: 1px solid rgba(0, 204, 153, 0.3);
+  border-radius: 8px;
+  padding: 0.7rem;
+  font-size: 0.8rem;
+  color: var(--txt2);
+  margin-bottom: 0.8rem;
+}
+
+.pe-info-box strong {
+  color: var(--green);
+}

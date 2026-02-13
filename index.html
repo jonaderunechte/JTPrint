@@ -147,10 +147,14 @@
               <label><input type="checkbox" id="pe-instock" checked> Auf Lager</label>
             </div>
           </div>
-          <label style="color:var(--txt2);font-size:.85rem;font-weight:500">Farben</label>
+          <label style="color:var(--txt2);font-size:.85rem;font-weight:500">Farben & Bilder</label>
+          <p style="font-size:0.75rem;color:var(--txt2);margin-top:0.2rem;margin-bottom:0.5rem">
+            💡 Jeder Farbe kann optional ein eigenes Bild zugeordnet werden. Emoji wird als Fallback verwendet.
+          </p>
           <div class="color-input-row mt1" id="pe-colors"></div>
           <div style="display:flex;gap:.4rem;align-items:center;margin-top:.5rem">
             <input type="color" id="pe-new-color" style="width:36px;height:28px;border:none;background:none;cursor:pointer">
+            <input type="text" id="pe-new-color-image" placeholder="Bild-URL für diese Farbe (optional)" style="flex:1;padding:0.4rem 0.6rem;font-size:0.85rem">
             <button class="btn btn-sec btn-sm" onclick="addColorChip()">+ Farbe</button>
           </div>
           <label style="color:var(--txt2);font-size:.85rem;font-weight:500;margin-top:.7rem;display:block">Bilder (URLs)</label>

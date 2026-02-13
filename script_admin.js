@@ -672,13 +672,24 @@ function editProduct(idx) {
   document.getElementById('pe-category').value = p.category;
   document.getElementById('pe-instock').checked= p.inStock !== false;
 
-  // colors
+  // Colors mit Bildern
   const colEl = document.getElementById('pe-colors');
-  colEl.innerHTML = (p.colors||[]).map(c =>
-    `<div class="color-chip" style="background:${c}" title="${c}"><span class="remove-chip" onclick="removeColor(this)">✕</span></div>`
-  ).join('');
+  colEl.innerHTML = (p.colors||[]).map(color => {
+    const imageUrl = (p.colorImages && p.colorImages[color]) || '';
+    
+    if (imageUrl) {
+      return `<div class="color-chip" style="background:${color}" title="${color}" data-image-url="${imageUrl}">
+        <img src="${imageUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:4px" onerror="this.style.display='none'">
+        <span class="remove-chip" onclick="removeColor(this)" style="position:absolute;top:-4px;right:-4px;background:rgba(255,68,85,0.9);border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;z-index:10">✕</span>
+      </div>`;
+    } else {
+      return `<div class="color-chip" style="background:${color}" title="${color}">
+        <span class="remove-chip" onclick="removeColor(this)">✕</span>
+      </div>`;
+    }
+  }).join('');
 
-  // images
+  // Images
   const imgEl = document.getElementById('pe-images');
   imgEl.innerHTML = (p.images||[]).map(url =>
     `<div class="img-url-item"><input type="text" value="${url}" placeholder="Bild-URL"><button onclick="removeImgUrl(this)">✕</button></div>`
@@ -713,16 +724,35 @@ async function deleteProduct(idx) {
 }
 
 function addColorChip() {
-  const input = document.getElementById('pe-new-color');
-  if (!input || !input.value) return;
+  const colorInput = document.getElementById('pe-new-color');
+  const imageInput = document.getElementById('pe-new-color-image');
+  if (!colorInput || !colorInput.value) return;
+  
+  const color = colorInput.value;
+  const imageUrl = imageInput ? imageInput.value.trim() : '';
+  
   const el = document.getElementById('pe-colors');
   const chip = document.createElement('div');
   chip.className = 'color-chip';
-  chip.style.background = input.value;
-  chip.title = input.value;
-  chip.innerHTML = '<span class="remove-chip" onclick="removeColor(this)">✕</span>';
+  chip.style.background = color;
+  chip.title = color;
+  chip.dataset.imageUrl = imageUrl; // Speichere Bild-URL als Data-Attribut
+  
+  // Zeige Vorschau wenn Bild-URL vorhanden
+  if (imageUrl) {
+    chip.innerHTML = `
+      <img src="${imageUrl}" 
+           style="width:100%;height:100%;object-fit:cover;border-radius:4px" 
+           onerror="this.style.display='none'">
+      <span class="remove-chip" onclick="removeColor(this)" style="position:absolute;top:-4px;right:-4px">✕</span>
+    `;
+  } else {
+    chip.innerHTML = '<span class="remove-chip" onclick="removeColor(this)">✕</span>';
+  }
+  
   el.appendChild(chip);
-  input.value = '';
+  colorInput.value = '#000000';
+  if (imageInput) imageInput.value = '';
 }
 
 function removeColor(chipX) {
@@ -754,13 +784,33 @@ async function saveProduct() {
 
   if (!name || price <= 0) { alert('Bitte Name und Preis ausfüllen!'); return; }
 
-  // collect colors
-  const colors = [...document.querySelectorAll('#pe-colors .color-chip')].map(c => c.title || c.style.background);
-  // collect images
+  // Collect colors mit zugehörigen Bildern
+  const colorChips = [...document.querySelectorAll('#pe-colors .color-chip')];
+  const colors = colorChips.map(c => c.title || c.style.background);
+  const colorImages = {}; // Objekt: { "#ff0000": "url-to-image.jpg", ... }
+  
+  colorChips.forEach(chip => {
+    const color = chip.title || chip.style.background;
+    const imageUrl = chip.dataset.imageUrl || '';
+    if (imageUrl) {
+      colorImages[color] = imageUrl;
+    }
+  });
+  
+  // Collect images (Haupt-Produktbilder)
   const images = [...document.querySelectorAll('#pe-images input')].map(i => i.value.trim()).filter(Boolean);
 
   const product = { 
-    name, desc, price, weight, emoji, category, inStock, colors, images, 
+    name, 
+    desc, 
+    price, 
+    weight, 
+    emoji, 
+    category, 
+    inStock, 
+    colors,
+    colorImages,  // NEU: Farb-zu-Bild-Mapping
+    images,
     id: editingProduct !== null ? allProducts[editingProduct].id : 'p_'+Date.now() 
   };
 
@@ -777,6 +827,7 @@ async function saveProduct() {
         window.fbFuncs.docRef(window.fbDb, 'products', product.id), 
         product
       );
+      console.log('✅ Produkt gespeichert mit', Object.keys(colorImages).length, 'Farb-Bildern');
     } catch (e) {
       console.warn('Product save failed:', e);
     }
