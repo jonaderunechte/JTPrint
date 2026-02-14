@@ -226,11 +226,22 @@ function renderDetImage(p, idx) {
   const wrap = document.getElementById('det-img-wrap');
   if (!wrap) return;
   
-  // Prüfe ob Produkt Bilder hat
-  const hasImages = p.images && p.images.length > 0 && p.images[idx];
+  // Prüfe ob die aktuelle Farbe ein Bild hat
+  const currentColor = (p.colors && p.colors[idx]) || detColor;
+  const colorImage = (p.colorImages && p.colorImages[currentColor]) || null;
   
-  if (hasImages) {
-    // Zeige echtes Produktbild
+  if (colorImage) {
+    // Zeige Farb-Bild
+    wrap.innerHTML = `
+      <img src="${colorImage}" 
+           alt="${p.name} - ${currentColor}" 
+           style="width:100%;height:100%;object-fit:cover;border-radius:12px"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <span class="emoji" style="display:none">${p.emoji || '📦'}</span>
+    `;
+    wrap.style.background = '#f5f5f5';
+  } else if (p.images && p.images.length > 0 && p.images[idx]) {
+    // Zeige normales Produktbild
     wrap.innerHTML = `
       <img src="${p.images[idx]}" 
            alt="${p.name}" 
@@ -238,14 +249,12 @@ function renderDetImage(p, idx) {
            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <span class="emoji" style="display:none">${p.emoji || '📦'}</span>
     `;
+    wrap.style.background = '#f5f5f5';
   } else {
     // Fallback: Emoji mit Farbhintergrund
     wrap.innerHTML = `<span class="emoji">${p.emoji || '📦'}</span>`;
+    wrap.style.background = `linear-gradient(135deg, ${currentColor || detColor}22, ${currentColor || detColor}44)`;
   }
-  
-  wrap.style.background = hasImages 
-    ? '#f5f5f5' 
-    : `linear-gradient(135deg, ${detColor}22, ${detColor}44)`;
 }
 
 function renderDetThumbnails(p) {
@@ -253,6 +262,7 @@ function renderDetThumbnails(p) {
   if (!el) return;
   
   const hasImages = p.images && p.images.length > 0;
+  const hasColors = p.colors && p.colors.length > 0;
   
   if (hasImages) {
     // Zeige Bild-Thumbnails
@@ -266,15 +276,42 @@ function renderDetThumbnails(p) {
         <span class="emoji" style="display:none;font-size:1.1rem">${p.emoji || '📦'}</span>
       </div>
     `).join('');
+  } else if (hasColors) {
+    // Zeige Farb-Thumbnails - MIT Bildern falls vorhanden
+    el.innerHTML = p.colors.slice(0, 5).map((c, i) => {
+      const color = typeof c === 'string' ? c : c.color;
+      const colorImage = (p.colorImages && p.colorImages[color]) || null;
+      
+      if (colorImage) {
+        // Thumbnail mit Farb-Bild
+        return `
+          <div class="det-thumb ${i === 0 ? 'active' : ''}" 
+               onclick="switchDetThumb(${i}, '${color}')">
+            <img src="${colorImage}" 
+                 alt="${p.name} - ${color}" 
+                 style="width:100%;height:100%;object-fit:cover;border-radius:6px"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <span class="emoji" style="display:none;font-size:1.1rem">${p.emoji || '📦'}</span>
+          </div>
+        `;
+      } else {
+        // Thumbnail mit Farbe + Emoji
+        return `
+          <div class="det-thumb ${i === 0 ? 'active' : ''}" 
+               style="background:${color}33" 
+               onclick="switchDetThumb(${i}, '${color}')">
+            <span class="emoji" style="font-size:1.1rem">${p.emoji || '📦'}</span>
+          </div>
+        `;
+      }
+    }).join('');
   } else {
-    // Fallback: Farb-Thumbnails mit Emoji
-    el.innerHTML = (p.colors || []).slice(0, 5).map((c, i) => `
-      <div class="det-thumb ${i === 0 ? 'active' : ''}" 
-           style="background:${c}33" 
-           onclick="switchDetThumb(${i}, '${c}')">
+    // Fallback: Nur Emoji
+    el.innerHTML = `
+      <div class="det-thumb active">
         <span class="emoji" style="font-size:1.1rem">${p.emoji || '📦'}</span>
       </div>
-    `).join('');
+    `;
   }
 }
 
@@ -287,8 +324,30 @@ function switchDetThumb(i, color) {
     t.classList.toggle('active', idx === i)
   );
   
-  // Update main image
-  renderDetImage(detProduct, i);
+  // Prüfe ob diese Farbe ein Bild hat
+  const colorImage = (detProduct.colorImages && detProduct.colorImages[color]) || null;
+  
+  const wrap = document.getElementById('det-img-wrap');
+  if (!wrap) return;
+  
+  if (colorImage) {
+    // Zeige Farb-Bild
+    wrap.innerHTML = `
+      <img src="${colorImage}" 
+           alt="${detProduct.name} - ${color}" 
+           style="width:100%;height:100%;object-fit:cover;border-radius:12px"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <span class="emoji" style="display:none">${detProduct.emoji || '📦'}</span>
+    `;
+    wrap.style.background = '#f5f5f5';
+  } else if (detProduct.images && detProduct.images[i]) {
+    // Zeige normales Produktbild
+    renderDetImage(detProduct, i);
+  } else {
+    // Fallback: Emoji mit Farbhintergrund
+    wrap.innerHTML = `<span class="emoji">${detProduct.emoji || '📦'}</span>`;
+    wrap.style.background = `linear-gradient(135deg, ${color}22, ${color}44)`;
+  }
   
   // Update color selection
   document.querySelectorAll('.col-opt').forEach((c, idx) => 

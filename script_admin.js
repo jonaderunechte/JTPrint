@@ -735,6 +735,7 @@ function addColorChip() {
   const chip = document.createElement('div');
   chip.className = 'color-chip';
   chip.style.background = color;
+  chip.style.position = 'relative';
   chip.title = color;
   chip.dataset.imageUrl = imageUrl; // Speichere Bild-URL als Data-Attribut
   
@@ -744,10 +745,20 @@ function addColorChip() {
       <img src="${imageUrl}" 
            style="width:100%;height:100%;object-fit:cover;border-radius:4px" 
            onerror="this.style.display='none'">
-      <span class="remove-chip" onclick="removeColor(this)" style="position:absolute;top:-4px;right:-4px">✕</span>
+      <span class="remove-chip" onclick="removeColor(this)" 
+            style="position:absolute;top:-4px;right:-4px;background:rgba(255,68,85,0.9);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:white;z-index:10;box-shadow:0 2px 4px rgba(0,0,0,0.2)">✕</span>
     `;
   } else {
-    chip.innerHTML = '<span class="remove-chip" onclick="removeColor(this)">✕</span>';
+    chip.innerHTML = `
+      <span class="remove-chip" onclick="removeColor(this)" 
+            style="position:absolute;top:-4px;right:-4px;background:rgba(255,68,85,0.9);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:white;z-index:10;box-shadow:0 2px 4px rgba(0,0,0,0.2)">✕</span>
+    `;
+  }
+  
+  el.appendChild(chip);
+  colorInput.value = '#000000';
+  if (imageInput) imageInput.value = '';
+}
   }
   
   el.appendChild(chip);
