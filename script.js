@@ -18,6 +18,7 @@ const SAMPLE_PRODUCTS = [
     desc:'Verstellbare Smartphone-Halterung für den Schreibtisch. Kompatibel mit allen gängigen Smartphones. Stabiles Design.',
     price:12.99, category:'internet', weight:45, inStock:true,
     colors:['#000000','#FFFFFF','#0066cc','#ff4444','#00cc99'],
+    colorImages:{'#000000':'','#FFFFFF':'','#0066cc':'','#ff4444':'','#00cc99':''}, // Bild-URL pro Farbe
     images:['https://i.imgur.com/placeholder1.jpg'],
     emoji:'📱'
   },
@@ -26,6 +27,7 @@ const SAMPLE_PRODUCTS = [
     desc:'Praktisches 5er-Set Kabelhalter für einen aufgeräumten Schreibtisch. Selbstklebend, sehr robust.',
     price:8.99, category:'internet', weight:20, inStock:true,
     colors:['#000000','#FFFFFF','#808080'],
+    colorImages:{'#000000':'','#FFFFFF':'','#808080':''},
     images:[],
     emoji:'🔌'
   },
@@ -34,6 +36,7 @@ const SAMPLE_PRODUCTS = [
     desc:'Modularer Würfel-Organizer für Stifte, Büroklammern und Kleinteile. Stapelbar und praktisch.',
     price:15.99, category:'custom', weight:80, inStock:true,
     colors:['#0066cc','#00cc99','#ff4444','#ffaa00','#9933cc'],
+    colorImages:{'#0066cc':'','#00cc99':'','#ff4444':'','#ffaa00':'','#9933cc':''},
     images:[],
     emoji:'📦'
   },
@@ -42,6 +45,7 @@ const SAMPLE_PRODUCTS = [
     desc:'Eleganter Kopfhörer-Ständer mit rutschfester Basis. Passend für alle Kopfhörer-Größen.',
     price:18.99, category:'custom', weight:120, inStock:true,
     colors:['#000000','#FFFFFF','#808080','#0066cc'],
+    colorImages:{'#000000':'','#FFFFFF':'','#808080':'','#0066cc':''},
     images:[],
     emoji:'🎧'
   },
@@ -50,6 +54,7 @@ const SAMPLE_PRODUCTS = [
     desc:'Dekorativer Mini-Pflanztopf mit geometrischem Design. Ideal für kleine Sukkulenten.',
     price:9.99, category:'internet', weight:35, inStock:true,
     colors:['#FFFFFF','#00cc99','#ffaa00','#ff69b4'],
+    colorImages:{'#FFFFFF':'','#00cc99':'','#ffaa00':'','#ff69b4':''},
     images:[],
     emoji:'🌱'
   },
@@ -58,6 +63,7 @@ const SAMPLE_PRODUCTS = [
     desc:'Personalisierter Schlüsselanhänger mit Ihrem Namen oder Logo. Robust und langlebig.',
     price:6.99, category:'custom', weight:15, inStock:true,
     colors:['#000000','#0066cc','#ff4444','#00cc99','#ffaa00'],
+    colorImages:{'#000000':'','#0066cc':'','#ff4444':'','#00cc99':'','#ffaa00':''},
     images:[],
     emoji:'🔑'
   }

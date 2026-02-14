@@ -674,9 +674,17 @@ function editProduct(idx) {
 
   // colors
   const colEl = document.getElementById('pe-colors');
-  colEl.innerHTML = (p.colors||[]).map(c =>
-    `<div class="color-chip" style="background:${c}" title="${c}"><span class="remove-chip" onclick="removeColor(this)">✕</span></div>`
-  ).join('');
+  colEl.innerHTML = (p.colors||[]).map(c => {
+    const imageUrl = p.colorImages && p.colorImages[c] ? p.colorImages[c] : '';
+    return `
+      <div class="color-chip-container">
+        <div class="color-chip" style="background:${c}" title="${c}">
+          <span class="remove-chip" onclick="removeColor(this.parentElement.parentElement)">✕</span>
+        </div>
+        <input type="text" class="color-image-url" placeholder="Bild-URL für diese Farbe (optional)" data-color="${c}" value="${imageUrl}">
+      </div>
+    `;
+  }).join('');
 
   // images
   const imgEl = document.getElementById('pe-images');
@@ -716,17 +724,21 @@ function addColorChip() {
   const input = document.getElementById('pe-new-color');
   if (!input || !input.value) return;
   const el = document.getElementById('pe-colors');
+  
   const chip = document.createElement('div');
-  chip.className = 'color-chip';
-  chip.style.background = input.value;
-  chip.title = input.value;
-  chip.innerHTML = '<span class="remove-chip" onclick="removeColor(this)">✕</span>';
+  chip.className = 'color-chip-container';
+  chip.innerHTML = `
+    <div class="color-chip" style="background:${input.value}" title="${input.value}">
+      <span class="remove-chip" onclick="removeColor(this.parentElement.parentElement)">✕</span>
+    </div>
+    <input type="text" class="color-image-url" placeholder="Bild-URL für diese Farbe (optional)" data-color="${input.value}">
+  `;
   el.appendChild(chip);
   input.value = '';
 }
 
-function removeColor(chipX) {
-  chipX.parentElement.remove();
+function removeColor(container) {
+  container.remove();
 }
 
 function addImgUrl() {
@@ -754,13 +766,26 @@ async function saveProduct() {
 
   if (!name || price <= 0) { alert('Bitte Name und Preis ausfüllen!'); return; }
 
-  // collect colors
-  const colors = [...document.querySelectorAll('#pe-colors .color-chip')].map(c => c.title || c.style.background);
+  // collect colors and their images
+  const colorContainers = [...document.querySelectorAll('#pe-colors .color-chip-container')];
+  const colors = colorContainers.map(container => {
+    const chip = container.querySelector('.color-chip');
+    return chip.title || chip.style.background;
+  });
+  
+  const colorImages = {};
+  colorContainers.forEach(container => {
+    const chip = container.querySelector('.color-chip');
+    const imageInput = container.querySelector('.color-image-url');
+    const color = chip.title || chip.style.background;
+    colorImages[color] = imageInput ? imageInput.value.trim() : '';
+  });
+  
   // collect images
   const images = [...document.querySelectorAll('#pe-images input')].map(i => i.value.trim()).filter(Boolean);
 
   const product = { 
-    name, desc, price, weight, emoji, category, inStock, colors, images, 
+    name, desc, price, weight, emoji, category, inStock, colors, colorImages, images, 
     id: editingProduct !== null ? allProducts[editingProduct].id : 'p_'+Date.now() 
   };
 

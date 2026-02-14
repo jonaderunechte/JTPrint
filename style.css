@@ -167,9 +167,10 @@ section { margin-bottom:3rem; }
 .det-thumb .emoji { font-size:1.3rem; }
 
 .col-sel { display:flex; gap:.45rem; flex-wrap:wrap; margin-top:.35rem; }
-.col-opt { width:34px; height:34px; border-radius:50%; border:2px solid var(--border); cursor:pointer; transition:border-color .2s, box-shadow .2s; }
+.col-opt { width:34px; height:34px; border-radius:50%; border:2px solid var(--border); cursor:pointer; transition:border-color .2s, box-shadow .2s; overflow:hidden; display:flex; align-items:center; justify-content:center; }
 .col-opt:hover { border-color:var(--txt2); }
 .col-opt.active { border-color:var(--green); box-shadow:0 0 7px var(--glow); }
+.col-opt img { border-radius:50%; object-fit:cover; }
 
 .qty-row { display:flex; align-items:center; gap:.7rem; margin-top:.35rem; }
 .qty-btn { width:34px; height:34px; border-radius:8px; background:var(--card); border:1px solid var(--border); color:var(--txt); font-size:1.1rem; cursor:pointer; transition:border-color .2s; }

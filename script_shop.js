@@ -225,43 +225,71 @@ function openProductDetail(p) {
 function renderDetImage(p, idx) {
   const wrap = document.getElementById('det-img-wrap');
   if (!wrap) return;
-  wrap.innerHTML = `<span class="emoji">${p.emoji || '📦'}</span>`;
-  wrap.style.background = `linear-gradient(135deg, ${detColor}22, ${detColor}44)`;
+  
+  // Prüfe ob es ein Bild für die aktuelle Farbe gibt
+  const currentColorImage = p.colorImages && p.colorImages[detColor] ? p.colorImages[detColor] : '';
+  
+  if (currentColorImage) {
+    // Zeige Bild an
+    wrap.innerHTML = `<img src="${currentColorImage}" alt="${p.name}" style="width:100%;height:100%;object-fit:contain;border-radius:8px;">`;
+    wrap.style.background = `linear-gradient(135deg, ${detColor}22, ${detColor}44)`;
+  } else {
+    // Fallback auf Emoji
+    wrap.innerHTML = `<span class="emoji">${p.emoji || '📦'}</span>`;
+    wrap.style.background = `linear-gradient(135deg, ${detColor}22, ${detColor}44)`;
+  }
 }
 
 function renderDetThumbnails(p) {
   const el = document.getElementById('det-thumbs');
   if (!el) return;
-  el.innerHTML = (p.colors || []).slice(0,5).map((c,i) =>
-    `<div class="det-thumb ${i===0?'active':''}" style="background:${c}33" onclick="switchDetThumb(${i},'${c}')">
-      <span class="emoji" style="font-size:1.1rem">${p.emoji||'📦'}</span></div>`
-  ).join('');
+  el.innerHTML = (p.colors || []).slice(0,5).map((c,i) => {
+    const colorImage = p.colorImages && p.colorImages[c] ? p.colorImages[c] : '';
+    const content = colorImage 
+      ? `<img src="${colorImage}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">`
+      : `<span class="emoji" style="font-size:1.1rem">${p.emoji||'📦'}</span>`;
+    
+    return `<div class="det-thumb ${i===0?'active':''}" style="background:${c}33" onclick="switchDetThumb(${i},'${c}')">
+      ${content}</div>`;
+  }).join('');
 }
 
 function switchDetThumb(i, color) {
   detThumbIdx = i;
   detColor    = color;
   document.querySelectorAll('.det-thumb').forEach((t,idx) => t.classList.toggle('active', idx===i));
-  const wrap = document.getElementById('det-img-wrap');
-  if (wrap) wrap.style.background = `linear-gradient(135deg, ${color}22, ${color}44)`;
   document.querySelectorAll('.col-opt').forEach((c,idx) => c.classList.toggle('active', idx===i));
+  
+  // Aktualisiere das Hauptbild
+  renderDetImage(detProduct, i);
 }
 
 function renderDetColors(p) {
   const el = document.getElementById('det-colors');
   if (!el) return;
-  el.innerHTML = (p.colors || []).map((c,i) =>
-    `<div class="col-opt ${i===0?'active':''}" style="background:${c}" onclick="pickColor(${i},'${c}')"></div>`
-  ).join('');
+  el.innerHTML = (p.colors || []).map((c,i) => {
+    const colorImage = p.colorImages && p.colorImages[c] ? p.colorImages[c] : '';
+    
+    if (colorImage) {
+      // Zeige Bild in der Farb-Option
+      return `<div class="col-opt ${i===0?'active':''}" style="background:${c}33; padding:2px" onclick="pickColor(${i},'${c}')">
+        <img src="${colorImage}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${c}">
+      </div>`;
+    } else {
+      // Fallback: Nur Farbe als Hintergrund (Emoji wird nicht angezeigt)
+      return `<div class="col-opt ${i===0?'active':''}" style="background:${c}" onclick="pickColor(${i},'${c}')"></div>`;
+    }
+  }).join('');
 }
 
 function pickColor(i, color) {
   detColor = color;
+  detThumbIdx = i;
   document.querySelectorAll('.col-opt').forEach((c,idx) => c.classList.toggle('active', idx===i));
   document.querySelectorAll('.det-thumb').forEach((t,idx) => t.classList.toggle('active', idx===i));
-  detThumbIdx = i;
-  const wrap = document.getElementById('det-img-wrap');
-  if (wrap) wrap.style.background = `linear-gradient(135deg, ${color}22, ${color}44)`;
+  
+  // Aktualisiere das Hauptbild
+  renderDetImage(detProduct, i);
 }
 
 function changeQty(delta) {

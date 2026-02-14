@@ -99,10 +99,23 @@
 .pli-del { background:rgba(255,68,85,.15); color:var(--red); }
 
 /* Color input row for editor */
-.color-input-row { display:flex; gap:.4rem; align-items:center; flex-wrap:wrap; }
+.color-input-row { display:flex; gap:.8rem; align-items:flex-start; flex-wrap:wrap; }
+.color-chip-container { display:flex; flex-direction:column; gap:.4rem; }
 .color-chip { width:28px; height:28px; border-radius:50%; border:2px solid var(--border); cursor:pointer; position:relative; }
 .color-chip .remove-chip { position:absolute; top:-5px; right:-5px; width:14px; height:14px; background:var(--red); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.6rem; color:white; cursor:pointer; display:none; }
 .color-chip:hover .remove-chip { display:flex; }
+.color-image-url { 
+  width:200px; 
+  padding:.35rem .5rem; 
+  background:var(--card-solid); 
+  border:1px solid var(--border); 
+  border-radius:6px; 
+  color:var(--txt); 
+  font-size:.75rem;
+  transition:border-color .2s;
+}
+.color-image-url:focus { outline:none; border-color:var(--green); }
+.color-image-url::placeholder { color:var(--txt2); opacity:.6; }
 
 /* Image URL list */
 .img-url-list { display:flex; flex-direction:column; gap:.35rem; }
