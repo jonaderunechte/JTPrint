@@ -225,205 +225,43 @@ function openProductDetail(p) {
 function renderDetImage(p, idx) {
   const wrap = document.getElementById('det-img-wrap');
   if (!wrap) return;
-  
-  // Prüfe ob die aktuelle Farbe ein Bild hat
-  const currentColor = (p.colors && p.colors[idx]) || detColor;
-  const colorImage = (p.colorImages && p.colorImages[currentColor]) || null;
-  
-  if (colorImage) {
-    // Zeige Farb-Bild
-    wrap.innerHTML = `
-      <img src="${colorImage}" 
-           alt="${p.name} - ${currentColor}" 
-           style="width:100%;height:100%;object-fit:cover;border-radius:12px"
-           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <span class="emoji" style="display:none">${p.emoji || '📦'}</span>
-    `;
-    wrap.style.background = '#f5f5f5';
-  } else if (p.images && p.images.length > 0 && p.images[idx]) {
-    // Zeige normales Produktbild
-    wrap.innerHTML = `
-      <img src="${p.images[idx]}" 
-           alt="${p.name}" 
-           style="width:100%;height:100%;object-fit:cover;border-radius:12px"
-           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <span class="emoji" style="display:none">${p.emoji || '📦'}</span>
-    `;
-    wrap.style.background = '#f5f5f5';
-  } else {
-    // Fallback: Emoji mit Farbhintergrund
-    wrap.innerHTML = `<span class="emoji">${p.emoji || '📦'}</span>`;
-    wrap.style.background = `linear-gradient(135deg, ${currentColor || detColor}22, ${currentColor || detColor}44)`;
-  }
+  wrap.innerHTML = `<span class="emoji">${p.emoji || '📦'}</span>`;
+  wrap.style.background = `linear-gradient(135deg, ${detColor}22, ${detColor}44)`;
 }
 
 function renderDetThumbnails(p) {
   const el = document.getElementById('det-thumbs');
   if (!el) return;
-  
-  const hasImages = p.images && p.images.length > 0;
-  const hasColors = p.colors && p.colors.length > 0;
-  
-  if (hasImages) {
-    // Zeige Bild-Thumbnails
-    el.innerHTML = p.images.slice(0, 5).map((img, i) => `
-      <div class="det-thumb ${i === detThumbIdx ? 'active' : ''}" 
-           onclick="switchDetThumb(${i}, '${(p.colors && p.colors[i]) || detColor}')">
-        <img src="${img}" 
-             alt="${p.name}" 
-             style="width:100%;height:100%;object-fit:cover;border-radius:6px"
-             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <span class="emoji" style="display:none;font-size:1.1rem">${p.emoji || '📦'}</span>
-      </div>
-    `).join('');
-  } else if (hasColors) {
-    // Zeige Farb-Thumbnails - MIT Bildern falls vorhanden
-    el.innerHTML = p.colors.slice(0, 5).map((c, i) => {
-      const color = typeof c === 'string' ? c : c.color;
-      const colorImage = (p.colorImages && p.colorImages[color]) || null;
-      
-      if (colorImage) {
-        // Thumbnail mit Farb-Bild
-        return `
-          <div class="det-thumb ${i === 0 ? 'active' : ''}" 
-               onclick="switchDetThumb(${i}, '${color}')">
-            <img src="${colorImage}" 
-                 alt="${p.name} - ${color}" 
-                 style="width:100%;height:100%;object-fit:cover;border-radius:6px"
-                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <span class="emoji" style="display:none;font-size:1.1rem">${p.emoji || '📦'}</span>
-          </div>
-        `;
-      } else {
-        // Thumbnail mit Farbe + Emoji
-        return `
-          <div class="det-thumb ${i === 0 ? 'active' : ''}" 
-               style="background:${color}33" 
-               onclick="switchDetThumb(${i}, '${color}')">
-            <span class="emoji" style="font-size:1.1rem">${p.emoji || '📦'}</span>
-          </div>
-        `;
-      }
-    }).join('');
-  } else {
-    // Fallback: Nur Emoji
-    el.innerHTML = `
-      <div class="det-thumb active">
-        <span class="emoji" style="font-size:1.1rem">${p.emoji || '📦'}</span>
-      </div>
-    `;
-  }
+  el.innerHTML = (p.colors || []).slice(0,5).map((c,i) =>
+    `<div class="det-thumb ${i===0?'active':''}" style="background:${c}33" onclick="switchDetThumb(${i},'${c}')">
+      <span class="emoji" style="font-size:1.1rem">${p.emoji||'📦'}</span></div>`
+  ).join('');
 }
 
 function switchDetThumb(i, color) {
   detThumbIdx = i;
-  detColor = color;
-  
-  // Update active state
-  document.querySelectorAll('.det-thumb').forEach((t, idx) => 
-    t.classList.toggle('active', idx === i)
-  );
-  
-  // Prüfe ob diese Farbe ein Bild hat
-  const colorImage = (detProduct.colorImages && detProduct.colorImages[color]) || null;
-  
+  detColor    = color;
+  document.querySelectorAll('.det-thumb').forEach((t,idx) => t.classList.toggle('active', idx===i));
   const wrap = document.getElementById('det-img-wrap');
-  if (!wrap) return;
-  
-  if (colorImage) {
-    // Zeige Farb-Bild
-    wrap.innerHTML = `
-      <img src="${colorImage}" 
-           alt="${detProduct.name} - ${color}" 
-           style="width:100%;height:100%;object-fit:cover;border-radius:12px"
-           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <span class="emoji" style="display:none">${detProduct.emoji || '📦'}</span>
-    `;
-    wrap.style.background = '#f5f5f5';
-  } else if (detProduct.images && detProduct.images[i]) {
-    // Zeige normales Produktbild
-    renderDetImage(detProduct, i);
-  } else {
-    // Fallback: Emoji mit Farbhintergrund
-    wrap.innerHTML = `<span class="emoji">${detProduct.emoji || '📦'}</span>`;
-    wrap.style.background = `linear-gradient(135deg, ${color}22, ${color}44)`;
-  }
-  
-  // Update color selection
-  document.querySelectorAll('.col-opt').forEach((c, idx) => 
-    c.classList.toggle('active', idx === i)
-  );
+  if (wrap) wrap.style.background = `linear-gradient(135deg, ${color}22, ${color}44)`;
+  document.querySelectorAll('.col-opt').forEach((c,idx) => c.classList.toggle('active', idx===i));
 }
 
 function renderDetColors(p) {
   const el = document.getElementById('det-colors');
   if (!el) return;
-  
-  el.innerHTML = (p.colors || []).map((colorData, i) => {
-    // colorData kann String (Farbe) oder bereits ein Objekt sein
-    let color, image;
-    
-    if (typeof colorData === 'string') {
-      // Alte Struktur: colors = ["#ff0000", "#00ff00"]
-      color = colorData;
-      // Prüfe ob colorImages Objekt existiert
-      image = (p.colorImages && p.colorImages[color]) || null;
-    } else if (typeof colorData === 'object') {
-      // Neue Struktur: colors = [{color: "#ff0000", image: "url"}, ...]
-      color = colorData.color;
-      image = colorData.image || null;
-    } else {
-      return '';
-    }
-    
-    if (image) {
-      // Farbe MIT Bild
-      return `
-        <div class="col-opt ${i===0?'active':''}" 
-             onclick="pickColor(${i}, '${color}', '${image}')"
-             style="background-image:url('${image}');background-size:cover;background-position:center;border:3px solid ${color};position:relative;overflow:hidden;cursor:pointer">
-          <div style="position:absolute;bottom:0;left:0;right:0;height:8px;background:${color}"></div>
-        </div>
-      `;
-    } else {
-      // Farbe OHNE Bild (klassisch)
-      return `
-        <div class="col-opt ${i===0?'active':''}" 
-             style="background:${color};cursor:pointer" 
-             onclick="pickColor(${i}, '${color}')">
-        </div>
-      `;
-    }
-  }).join('');
+  el.innerHTML = (p.colors || []).map((c,i) =>
+    `<div class="col-opt ${i===0?'active':''}" style="background:${c}" onclick="pickColor(${i},'${c}')"></div>`
+  ).join('');
 }
 
-function pickColor(i, color, image = null) {
+function pickColor(i, color) {
   detColor = color;
-  document.querySelectorAll('.col-opt').forEach((c, idx) => c.classList.toggle('active', idx === i));
-  document.querySelectorAll('.det-thumb').forEach((t, idx) => t.classList.toggle('active', idx === i));
+  document.querySelectorAll('.col-opt').forEach((c,idx) => c.classList.toggle('active', idx===i));
+  document.querySelectorAll('.det-thumb').forEach((t,idx) => t.classList.toggle('active', idx===i));
   detThumbIdx = i;
-  
   const wrap = document.getElementById('det-img-wrap');
-  if (!wrap) return;
-  
-  if (image) {
-    // Zeige Farb-Bild
-    wrap.innerHTML = `
-      <img src="${image}" 
-           alt="${detProduct.name} - ${color}" 
-           style="width:100%;height:100%;object-fit:cover;border-radius:12px"
-           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <span class="emoji" style="display:none">${detProduct.emoji || '📦'}</span>
-    `;
-    wrap.style.background = '#f5f5f5';
-  } else if (detProduct.images && detProduct.images[i]) {
-    // Zeige Produktbild für diese Position
-    renderDetImage(detProduct, i);
-  } else {
-    // Nur Farbhintergrund mit Emoji
-    wrap.innerHTML = `<span class="emoji">${detProduct.emoji || '📦'}</span>`;
-    wrap.style.background = `linear-gradient(135deg, ${color}22, ${color}44)`;
-  }
+  if (wrap) wrap.style.background = `linear-gradient(135deg, ${color}22, ${color}44)`;
 }
 
 function changeQty(delta) {

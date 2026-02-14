@@ -230,29 +230,3 @@ footer { text-align:center; padding:1.8rem; color:var(--txt2); font-size:.82rem;
 
 /* ===== CUSTOM DESIGN PRICE ===== */
 .price-res .amt { font-size:1.8rem; color:var(--green); font-weight:700; margin:.3rem 0; }
-
-/* ===== COLOR OPTIONS WITH IMAGES ===== */
-.col-opt {
-  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-}
-
-.col-opt:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 204, 153, 0.3);
-}
-
-.col-opt.active {
-  transform: scale(1.15);
-  box-shadow: 0 0 0 3px var(--green);
-  border-color: var(--green) !important;
-}
-
-/* Color option mit Bild */
-.col-opt[style*="background-image"] {
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-
-.col-opt[style*="background-image"]:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-}

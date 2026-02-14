@@ -19,11 +19,6 @@ const SAMPLE_PRODUCTS = [
     price:12.99, category:'internet', weight:45, inStock:true,
     colors:['#000000','#FFFFFF','#0066cc','#ff4444','#00cc99'],
     images:['https://i.imgur.com/placeholder1.jpg'],
-    colorImages: {
-      '#000000': 'https://via.placeholder.com/400/000000/FFFFFF?text=Schwarz',
-      '#FFFFFF': 'https://via.placeholder.com/400/FFFFFF/000000?text=Weiß',
-      '#0066cc': 'https://via.placeholder.com/400/0066cc/FFFFFF?text=Blau'
-    },
     emoji:'📱'
   },
   {
@@ -32,7 +27,6 @@ const SAMPLE_PRODUCTS = [
     price:8.99, category:'internet', weight:20, inStock:true,
     colors:['#000000','#FFFFFF','#808080'],
     images:[],
-    colorImages: {},  // Leer = Emoji als Fallback
     emoji:'🔌'
   },
   {
@@ -41,7 +35,6 @@ const SAMPLE_PRODUCTS = [
     price:15.99, category:'custom', weight:80, inStock:true,
     colors:['#0066cc','#00cc99','#ff4444','#ffaa00','#9933cc'],
     images:[],
-    colorImages: {},
     emoji:'📦'
   },
   {
@@ -50,7 +43,6 @@ const SAMPLE_PRODUCTS = [
     price:18.99, category:'custom', weight:120, inStock:true,
     colors:['#000000','#FFFFFF','#808080','#0066cc'],
     images:[],
-    colorImages: {},
     emoji:'🎧'
   },
   {
@@ -59,7 +51,6 @@ const SAMPLE_PRODUCTS = [
     price:9.99, category:'internet', weight:35, inStock:true,
     colors:['#FFFFFF','#00cc99','#ffaa00','#ff69b4'],
     images:[],
-    colorImages: {},
     emoji:'🌱'
   },
   {
@@ -68,7 +59,6 @@ const SAMPLE_PRODUCTS = [
     price:6.99, category:'custom', weight:15, inStock:true,
     colors:['#000000','#0066cc','#ff4444','#00cc99','#ffaa00'],
     images:[],
-    colorImages: {},
     emoji:'🔑'
   }
 ];
